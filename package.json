@@ -22,6 +22,7 @@
     "delegates": "^0.1.0",
     "drachtio": "^git+ssh://git@github.com:davehorton/drachtio.git#v0.2.5",
     "drachtio-client": "^git+ssh://git@github.com:davehorton/drachtio-client.git#v0.2.3",
+    "drachtio-sip": "git+ssh://git@github.com:davehorton/drachtio-sip.git#v0.2.3",
     "lodash": "^3.10.1",
     "node-noop": "0.0.1",
     "node-uuid": "^1.4.3",
