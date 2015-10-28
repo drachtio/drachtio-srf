@@ -1,0 +1,4 @@
+/**
+ * @typedef {string} RequestUri - a full sip uri, an address[:port], or a user@address[:port]
+ */
+
