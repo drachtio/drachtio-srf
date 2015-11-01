@@ -16,9 +16,24 @@ app.invite( function( req, res) {
   } ;
 
   srf.createUasDialog( req, res, opts, function(err, dialog) {
-    if( err ) throw err ;
+    if( err ) { throw err ; }
 
-    //dialog.destroy() ;
+    debug('dialog: ', JSON.stringify(dialog)) ;
+    
+
+    setTimeout( function() {
+      dialog.modifySession('hold', function(err) {
+        if( err ) { throw err ;}
+        debug('successfully put dialog on hold') ;
+
+        setTimeout( function() {
+          dialog.modifySession('unhold', function(err) {
+            if( err ) { throw err; }
+            debug('successfully took dialog off hold') ;
+          }) ;
+        }, 2000) ;
+      }) ;
+    }, 2000) ;
     
 
     dialog.on('destroy', destroy.bind( dialog )) ;
