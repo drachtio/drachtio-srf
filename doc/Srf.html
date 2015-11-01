@@ -191,6 +191,273 @@
 
     
 
+    <h4 class="name" id="createBackToBackDialogs"><span class="type-signature"></span>createBackToBackDialogs<span class="signature">(req, res, uri, opts<span class="signature-attributes">opt</span>, cb)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    create back-to-back dialogs; i.e. act as a back-to-back user agent
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>req</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Request</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">drachtio Request</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>res</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Response</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">drachtio Response</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>uri</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#RequestUri">RequestUri</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">sip request uri to send the B leg to</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>opts</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">configuration options</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>cb</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="Srf.html#~b2bDialogCreationCallback">Srf~b2bDialogCreationCallback</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">callback invoked when operation is completed</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line165">line 165</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
     <h4 class="name" id="createUacDialog"><span class="type-signature"></span>createUacDialog<span class="signature">(uri, opts, cb)</span><span class="type-signature"></span></h4>
 
     
@@ -705,6 +972,183 @@
 
     
 
+    <h4 class="name" id="~b2bDialogCreationCallback"><span class="type-signature"></span>b2bDialogCreationCallback<span class="signature">(err, uasDialog, uacDialog)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    This callback provides the response to createBackToBackDialog request.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>err</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Error</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">error returned on non-success</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>uasDialog</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="Dialog.html">Dialog</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">User Agent Server dialog (i.e., "A" leg)</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>uacDialog</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="Dialog.html">Dialog</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">User Agent Client dialog (i.e., "B" leg)</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line187">line 187</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            
+                
+
+    
+
     <h4 class="name" id="~dialogCreationCallback"><span class="type-signature"></span>dialogCreationCallback<span class="signature">(err, dialog)</span><span class="type-signature"></span></h4>
 
     
@@ -828,7 +1272,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line149">line 149</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line150">line 150</a>
     </li></ul></dd>
     
 
@@ -1032,7 +1476,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line174">line 174</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line212">line 212</a>
     </li></ul></dd>
     
 
@@ -1195,7 +1639,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line167">line 167</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line205">line 205</a>
     </li></ul></dd>
     
 
@@ -1225,13 +1669,13 @@
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Dialog.html">Dialog</a></li><li><a href="Srf.html">Srf</a></li></ul><h3><a href="global.html">Global</a></h3>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Dialog.html">Dialog</a></li><li><a href="Srf.html">Srf</a></li></ul><h3>Events</h3><ul><li><a href="Dialog.html#event:destroy">destroy</a></li><li><a href="Dialog.html#event:modifySession">modifySession</a></li></ul><h3><a href="global.html">Global</a></h3>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.3</a> on Sat Oct 31 2015 22:34:09 GMT-0400 (EDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.3</a> on Sun Nov 01 2015 18:39:42 GMT-0500 (EST)
 </footer>
 
 <script> prettyPrint(); </script>

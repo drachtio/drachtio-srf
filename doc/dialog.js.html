@@ -31,6 +31,7 @@ var util = require('util') ;
 var assert = require('assert') ;
 var noop = require('node-noop').noop;
 var only = require('only') ;
+var methods = require('sip-methods') ;
 var debug = require('debug')('drachtio-srf') ;
 
 /**
@@ -38,6 +39,7 @@ var debug = require('debug')('drachtio-srf') ;
  * @typedef {Object} Dialog~Options
  * @property {Object} req drachtio Request (only provided when creating a 'uas' dialogs)
  * @property {Object} res drachtio Response
+ * @property {Object} [sent] - uas only: actual Response sent when confirming the dialog
  */
 
 /**
@@ -66,19 +68,29 @@ function Dialog( srf, type, opts ) {
    * sip properties that uniquely identify this Dialog
    * @type {Dialog~SipInfo}
    */
-  this.sip = {} ;
+  this.sip = {
+    callId: this.req.get('Call-ID'),
+    remoteTag: 'uas' === type ? this.req.getParsedHeader('from').params.tag : this.res.getParsedHeader('to').params.tag,
+    localTag: 'uas' === type ? opts.sent.getParsedHeader('to').params.tag : this.req.getParsedHeader('from').params.tag
+  } ;
 
   /**
    * local side of the Dialog
    * @type {Dialog~SipEndpointInfo}
    */
-  this.local = {} ;
+  this.local = {
+    uri: 'uas' === type ? opts.sent.getParsedHeader('Contact')[0].uri : this.req.uri,
+    sdp: 'uas' === type ? opts.sent.body : this.req.body
+  } ;
 
   /**
    * local side of the Dialog
    * @type {Dialog~SipEndpointInfo}
    */
-  this.remote = {} ;
+  this.remote = {
+    uri: 'uas' === type ? this.req.getParsedHeader('Contact')[0].uri : this.res.getParsedHeader('Contact')[0].uri,
+    sdp: 'uas' === type ? this.req.body : this.res.body
+  } ;
 
   Object.defineProperty(this, 'id',  {
     get: function() {
@@ -111,19 +123,103 @@ Dialog.prototype.destroy = function(cb) {
 /**
  * modify the dialog session by changing attributes of the media connection
  * @param  {string} sdp - 'hold', 'unhold', or a session description protocol
+ * @param  {Dialog~modifySessionCallback} [cb] - callback invoked when operation has completed
  */
-Dialog.prototype.modifySession = function( sdp ) {
+Dialog.prototype.modifySession = function( sdp, cb ) {
+  var reInvite = true ;
+
+  cb = cb || noop ;
 
   switch(sdp) {
     case 'hold':
+      this.local.sdp = this.local.sdp.replace(/a=sendrecv/,'a=inactive') ;
+      debug('hold sdp: ', this.local.sdp) ;
+      this.onHold = true ;
       break ;
     case 'unhold':
+      if( this.onHold ) {
+        this.local.sdp = this.local.sdp.replace(/a=inactive/,'a=sendrecv') ;
+      }
+      else {
+        reInvite = false ;
+        console.error('Dialog#modifySession: attempt to \'unhold\' session which is not on hold');
+      }
       break ;
     default:
+      this.local.sdp = sdp ;
       break ;
   }
-  throw new Error('unimplemented') ;
+  
+  if( reInvite ) {
+    this.agent.request({
+      method: 'INVITE',
+      stackDialogId: this.id,
+      body: this.local.sdp
+    }, function(err, req) {
+      req.on('response', function(res, ack) {
+        if( res.status >= 200 ) {
+          ack() ;
+          if( 200 === res.status ) { return cb(null); }
+          cb(res.status) ;
+        }
+      }) ;
+    }) ;
+  }
 } ;
+/**
+ * This callback provides the response a modifySession request.
+ * @callback Dialog~modifySessionCallback
+ * @param {Error} err  non-success sip response code received from far end
+ */
+
+/**
+ * send a request within a dialog
+ * @param  {Dialog~requestOptions}   opts - configuration options
+ * @param  {Dialog~requestCallback} [cb]  - callback invoked when operation has completed
+ */
+Dialog.prototype.request = function(opts, cb) {
+  assert.ok( typeof opts.method === 'string' &amp;&amp; -1 !== methods.indexOf(opts.method), '\'opts.method\' is required and must be a SIP method') ;
+
+  var self = this ;
+  var method = opts.method.toUpperCase() ;
+  cb = cb || noop ;
+
+  this.agent.request({
+    method: method,
+    stackDialogId: this.id,
+    headers: opts.headers || {},
+    body: opts.body
+  }, function( err, req ) {
+    req.on('response', function( res, ack ) {
+      if( 'BYE' === method ) {
+        self.srf.removeDialog(self) ;
+      }
+      if( res.status >= 200 ) {
+        if( 'INVITE' === method ) { ack() ; }
+        
+        cb( null, res ) ;
+      }
+    }) ;
+  }) ;
+} ;
+/**
+ * @typedef {Object} Dialog~requestOptions
+ * @property {String} method - SIP method to use for the request
+ */
+/**
+ * This callback provides the response to a sip request sent within the dialog.
+ * @callback Dialog~requestCallback
+ * @param {Error} err - error, if any
+ * @param {Response} response -  response received from the far end
+ */
+
+methods.forEach( function( method ) {
+  Dialog.prototype[method] = function( opts, cb ) {
+    opts = opts || {} ;
+    opts.method = method ;
+    return this.request( opts, cb ) ;
+  };
+}) ;
 
 /**
  * This callback provides the SIP request that was generated
@@ -144,14 +240,24 @@ Dialog.prototype.handle = function( req, res ) {
       }) ;
       break ;
 
+    case 'INVITE':
+      var remoteSdp = req.body ;
+      debug('received re-INVITE with remote SDP: %s', remoteSdp) ;
+      res.send(200, {
+        body: this.local.sdp
+      }) ;
+      this.emit('modifySession', remoteSdp) ;
+      break ;
+
     case 'INFO':
     case 'NOTIFY':
-      this.emit('msg', req, res ) ;
+      res.send(200) ;
       break ;
 
     default:
       console.error('Dialog#handle unhandled method: %s', req.method) ;
   }
+  this.emit('msg:' + req.method.toLowerCase(), req.msg) ;
 } ;
 
 //representation
@@ -172,9 +278,19 @@ Dialog.prototype.toString = function() {
 /**
  * SIP Endpoint identifiers
  * @typedef {Object} Dialog~SipEndpointInfo
- * @property {String} signalingAddress - sip address:port 
+ * @property {String} uri - sip 
  * @property {String} sdp - session description protocol
  */
+/**
+ * destroy event triggered when the Dialog is torn down from the far end
+ * @event Dialog#destroy
+ */
+/**
+ * sessionModify event triggered when the far end modifies the session
+ * @event Dialog#modifySession
+ * @param {string} sdp - new session description protocol offered by the far end
+ */
+
 </code></pre>
         </article>
     </section>
@@ -185,13 +301,13 @@ Dialog.prototype.toString = function() {
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Dialog.html">Dialog</a></li><li><a href="Srf.html">Srf</a></li></ul><h3><a href="global.html">Global</a></h3>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Dialog.html">Dialog</a></li><li><a href="Srf.html">Srf</a></li></ul><h3>Events</h3><ul><li><a href="Dialog.html#event:destroy">destroy</a></li><li><a href="Dialog.html#event:modifySession">modifySession</a></li></ul><h3><a href="global.html">Global</a></h3>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.3</a> on Sat Oct 31 2015 22:34:09 GMT-0400 (EDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.3</a> on Sun Nov 01 2015 18:39:42 GMT-0500 (EST)
 </footer>
 
 <script> prettyPrint(); </script>
