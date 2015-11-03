@@ -30,14 +30,15 @@
     "only": "0.0.2"
   },
   "devDependencies": {
+    "grunt": "~0.4.2",
+    "grunt-contrib-jshint": "~0.7.2",
+    "grunt-contrib-nodeunit": "*",
+    "grunt-contrib-watch": "~0.5.3",
+    "grunt-jsdoc": "^1.0.0",
     "jsdoc": ">=3.3.3",
+    "minami": "^1.1.1",
     "minimist": "^1.1.0",
     "mocha": "~2.1.0",
-    "should": "~2.1.1",
-    "grunt": "~0.4.2",
-    "grunt-contrib-watch": "~0.5.3",
-    "grunt-contrib-jshint": "~0.7.2",
-    "grunt-contrib-nodeunit": "*",    
-    "grunt-jsdoc": "^1.0.0"    
+    "should": "~2.1.1"
   }
 }
