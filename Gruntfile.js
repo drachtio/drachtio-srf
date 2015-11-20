@@ -12,6 +12,7 @@ module.exports = function (grunt) {
         // Task configuration
         jshint: {
             options: {
+                ignores: ['test/**/*.js'],
                 node: true,
                 curly: true,
                 eqeqeq: true,
@@ -29,7 +30,7 @@ module.exports = function (grunt) {
                 src: 'gruntfile.js'
             },
             lib_test: {
-                src: ['lib/**/*.js', 'test/**/*.js']
+                src: ['lib/**/*.js']
             }
         },
         jsdoc : {
