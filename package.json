@@ -39,6 +39,7 @@
     "minami": "^1.1.1",
     "minimist": "^1.1.0",
     "mocha": "~2.1.0",
-    "should": "~2.1.1"
+    "should": "~2.1.1",
+    "drachtio-test-fixtures": "~0.1.0"
   }
 }
