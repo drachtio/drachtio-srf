@@ -34,9 +34,12 @@ var app = require('drachtio')();
 var Srf = require('drachtio-srf'); 
 var srf = new Srf(app) ;
 
+// connect to drachtio server
 app.connect({..}) ;
 
 app.invite( function(req, res) {
+
+  // respond to incoming INVITE request by creating a user agent server dialog
   srf.createUasDialog( req, res, {
     localSdp: myLocalSdp,
     headers: {
@@ -46,6 +49,7 @@ app.invite( function(req, res) {
     if( err ) { throw err ; }
     console.log('created user-agent server dialog: ', JSON.stringify(dialog)) ;
 
+    // set up dialog handlers
     dialog.on('destroy', onCallerHangup) ;
 }) ;
 function onCallerHangup(msg) {
