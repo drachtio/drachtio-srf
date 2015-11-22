@@ -44,14 +44,12 @@ app.invite( function(req, res) {
     }
   }, function(err, dialog) {
     if( err ) { throw err ; }
-
     console.log('created user-agent server dialog: ', JSON.stringify(dialog)) ;
 
     dialog.on('destroy', onCallerHangup) ;
-    
 }) ;
 function onCallerHangup(msg) {
-  console.log('caller hung up, incoming BYE message: ', msg) ;
+  console.log('caller hung up, incoming BYE message looked like this: ', msg) ;
 }        
       </pre>
 
