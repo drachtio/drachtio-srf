@@ -29,6 +29,31 @@
       <p>
         drachtio-srf is a high-level abstraction framework that sits on top of the <a href="https://github.com/senchalabs/connect">connect</a>-inspired <a href="https://github.com/davehorton/drachtio">drachtio</a> library, and allows the developer to easily create and manage SIP <a href="/api/Dialog">Dialogs<a>, without the burden of tending to the details of lower-level SIP transactions and messages.
       </p>
+      <code>
+var app = require('drachtio')();
+var Srf = require('drachtio-srf'); 
+var srf = new Srf(app) ;
+
+app.connect({..}) ;
+
+app.invite( function(req, res) {
+  srf.createUasDialog( req, res, {
+    localSdp: myLocalSdp,
+    headers: {
+      'Server': 'drachtio-srf Server'
+    }
+  }, function(err, dialog) {
+    if( err ) { throw err ; }
+
+    console.log('created user-agent server dialog: ', JSON.stringify(dialog)) ;
+
+    dialog.on('destroy', onCallerHangup) ;
+    
+}) ;
+function onCallerHangup(msg) {
+  console.log('caller hung up, incoming BYE message: ', msg) ;
+}        
+      </code>
 
       <h3>Installation</h3>
       <p><strong>Note:</strong> drachtio-srf applications require a network connection to a <a href="">drachtio server</a> process that sits in the VoIP network and handles the low-level SIP messaging.
