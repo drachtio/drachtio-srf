@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>dialog.js - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Dialog.html">Dialog</a><ul class='methods'><li data-type='method'><a href="Dialog.html#destroy">destroy</a></li><li data-type='method'><a href="Dialog.html#modify">modify</a></li><li data-type='method'><a href="Dialog.html#request">request</a></li></ul></li><li><a href="Srf.html">Srf</a><ul class='methods'><li data-type='method'><a href="Srf.html#createBackToBackDialogs">createBackToBackDialogs</a></li><li data-type='method'><a href="Srf.html#createUacDialog">createUacDialog</a></li><li data-type='method'><a href="Srf.html#createUasDialog">createUasDialog</a></li><li data-type='method'><a href="Srf.html#proxyRequest">proxyRequest</a></li></ul></li></ul><h3>Events</h3><ul><li><a href="Dialog.html#event:destroy">destroy</a></li><li><a href="Dialog.html#event:info">info</a></li><li><a href="Dialog.html#event:modify">modify</a></li><li><a href="Dialog.html#event:notify">notify</a></li><li><a href="Dialog.html#event:refer">refer</a></li><li><a href="Dialog.html#event:refresh">refresh</a></li><li><a href="Dialog.html#event:update">update</a></li></ul><h3><a href="global.html">Global</a></h3>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">dialog.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>var Emitter = require('events').EventEmitter ;
+var util = require('util') ;
+var assert = require('assert') ;
+var noop = require('node-noop').noop;
+var only = require('only') ;
+var methods = require('sip-methods') ;
+var debug = require('debug')('drachtio-srf') ;
+
+/**
+ * Arguments provided to Dialog constructor.
+ * @typedef {Object} Dialog~Options
+ * @property {Object} req drachtio Request (only provided when creating a 'uas' dialogs)
+ * @property {Object} res drachtio Response
+ * @property {Object} [sent] - uas only: actual Response sent when confirming the dialog
+ */
+
+/**
+ * SIP Dialog.  
+ * &lt;br>Note: rather than calling the Dialog constructor directly, Dialogs should be created
+ * by calling {@link Srf#createUacDialog}, {@link Srf#createUasDialog}, or {@link Srf#createBackToBackDialogs}.
+ * @constructor
+ * @param {Srf} srf - Srf instance that created this dialog
+ * @param {string} type - type of SIP dialog: 'uac', or 'uas'
+ * @param {Dialog~Options} opts 
+ */
+function Dialog( srf, type, opts ) {
+  var types = ['uas','uac'] ;
+  assert.ok( -1 !== types.indexOf(type), 'argument \'type\' must be one of ' + types.join(',')) ;
+
+  if (!(this instanceof Dialog)) { return new Dialog( srf, type, opts ); }
+
+  Emitter.call(this); 
+
+  this.srf = srf ;
+  this.type = type ;
+  this.req = opts.req ;
+  this.res = opts.res ;
+  this.agent = this.res.agent ;
+  this.onHold = false ;
+
+  /**
+   * sip properties that uniquely identify this Dialog
+   * @type {Dialog~SipInfo}
+   */
+  this.sip = {
+    callId: this.res.get('Call-ID'),
+    remoteTag: 'uas' === type ? this.req.getParsedHeader('from').params.tag : this.res.getParsedHeader('to').params.tag,
+    localTag: 'uas' === type ? opts.sent.getParsedHeader('to').params.tag : this.req.getParsedHeader('from').params.tag
+  } ;
+
+  /**
+   * local side of the Dialog
+   * @type {Dialog~SipEndpointInfo}
+   */
+  this.local = {
+    uri: 'uas' === type ? opts.sent.getParsedHeader('Contact')[0].uri : this.req.uri,
+    sdp: 'uas' === type ? opts.sent.body : this.req.body
+  } ;
+
+  /**
+   * local side of the Dialog
+   * @type {Dialog~SipEndpointInfo}
+   */
+  this.remote = {
+    uri: 'uas' === type ? this.req.getParsedHeader('Contact')[0].uri : this.res.getParsedHeader('Contact')[0].uri,
+    sdp: 'uas' === type ? this.req.body : this.res.body
+  } ;
+
+  Object.defineProperty(this, 'id',  {
+    get: function() {
+      return this.res.stackDialogId ;
+    }
+  }) ;
+
+  this.srf.addDialog(this) ; 
+
+  //TODO: somewhere in here we should take note of the methods the far end supports, 
+  //so we can for instance know whether a mid-session UPDATE can be used
+}
+util.inherits(Dialog, Emitter) ;
+
+module.exports = exports = Dialog ;
+
+/**
+ * destroy the sip dialog by generating a BYE request
+ * @param {Dialog~requestCallback=} cb      callback that returns the generated BYE message
+ */
+Dialog.prototype.destroy = function(cb) {
+  cb = cb || noop ;
+  var self = this ;
+  this.agent.request({
+    method: 'BYE',
+    stackDialogId: self.id
+  }, function(err, bye) {
+    self.srf.removeDialog( self ) ;
+    cb(err, bye) ;
+  }) ;
+} ;
+
+/**
+ * modify the dialog session by changing attributes of the media connection
+ * @param  {string} sdp - 'hold', 'unhold', or a session description protocol
+ * @param  {Dialog~modifySessionCallback} [cb] - callback invoked when operation has completed
+ */
+Dialog.prototype.modify = function( sdp, cb ) {
+  var self = this ;
+  cb = cb || noop ;
+
+  switch(sdp) {
+    case 'hold':
+      this.local.sdp = this.local.sdp.replace(/a=sendrecv/,'a=inactive') ;
+      debug('hold sdp: ', this.local.sdp) ;
+      this.onHold = true ;
+      break ;
+    case 'unhold':
+      if( this.onHold ) {
+        this.local.sdp = this.local.sdp.replace(/a=inactive/,'a=sendrecv') ;
+      }
+      else {
+        console.error('Dialog#modify: attempt to \'unhold\' session which is not on hold');
+        return process.nextTick( function() {
+          cb(new Error('attempt to unhold session that is not on hold') );
+        }) ;
+      }
+      break ;
+    default:
+      this.local.sdp = sdp ;
+      break ;
+  }
+  
+  console.log('Dialog#modify: sending reINVITE for dialog id: %s, sdp: ', this.id, this.local.sdp) ;
+  this.agent.request({
+    method: 'INVITE',
+    stackDialogId: this.id,
+    body: this.local.sdp
+  }, function(err, req) {
+    req.on('response', function(res, ack) {
+      debug('Dialog#modifySession: received response to reINVITE with status %d', res.status) ;
+      if( res.status >= 200 ) {
+        ack() ;
+        if( 200 === res.status ) { 
+          self.remote.sdp = res.body ;
+          return cb(null); 
+        }
+        cb(res.status) ;
+      }
+    }) ;
+  }) ;
+} ;
+/**
+ * This callback provides the response a modifySession request.
+ * @callback Dialog~modifySessionCallback
+ * @param {Error} err  non-success sip response code received from far end
+ */
+
+/**
+ * send a request within a dialog.
+ * Note that you may also call &lt;code>request.info(..)&lt;/code> as a shortcut to send an INFO message, &lt;code>request.notify(..)&lt;/code>
+ * to send a NOTIFY, etc..
+ * @param  {Dialog~requestOptions}   opts - configuration options
+ * @param  {Dialog~requestCallback} [cb]  - callback invoked when operation has completed
+ */
+Dialog.prototype.request = function(opts, cb) {
+  assert.ok( typeof opts.method === 'string' &amp;&amp; -1 !== methods.indexOf(opts.method), '\'opts.method\' is required and must be a SIP method') ;
+
+  var self = this ;
+  var method = opts.method.toUpperCase() ;
+  cb = cb || noop ;
+
+  this.agent.request({
+    method: method,
+    stackDialogId: this.id,
+    headers: opts.headers || {},
+    body: opts.body
+  }, function( err, req ) {
+    req.on('response', function( res, ack ) {
+      if( 'BYE' === method ) {
+        self.srf.removeDialog(self) ;
+      }
+      if( res.status >= 200 ) {
+        if( 'INVITE' === method ) { ack() ; }
+        
+        cb( null, res ) ;
+      }
+    }) ;
+  }) ;
+} ;
+/**
+ * @typedef {Object} Dialog~requestOptions
+ * @property {String} method - SIP method to use for the request
+ * @property {Object} [headers] - SIP headers to apply to the request
+ * @property {String} [body] - body of the SIP request
+ */
+/**
+ * This callback provides the response to a sip request sent within the dialog.
+ * @callback Dialog~requestCallback
+ * @param {Error} err - error, if any
+ * @param {Response} response -  response received from the far end
+ */
+
+methods.forEach( function( method ) {
+  Dialog.prototype.request[method] = function( opts, cb ) {
+    opts = opts || {} ;
+    opts.method = method ;
+    return this.request( opts, cb ) ;
+  };
+}) ;
+
+/**
+ * This callback provides the SIP request that was generated
+ * @callback Dialog~requestCallback
+ * @param {Error} err   error returned on non-success
+ * @param {Request} req Request that was generated
+ */
+
+
+Dialog.prototype.handle = function( req, res ) {
+  debug('Dialog handling message: ', req.method) ;
+  switch( req.method ) {
+    case 'BYE': 
+      this.srf.removeDialog( this ) ;
+      res.send(200) ;
+      this.emit('destroy', req.msg) ;
+      break ;
+
+    case 'INVITE':
+      var refresh = req.body === this.remote.sdp ;
+      if( refresh || 0 === this.listeners('modify').length ) {
+        debug('responding with 200 OK to INVITE') ;
+        res.send(200, {
+          body: this.local.sdp
+        }) ;
+      }
+      else if( !refresh ) {
+        this.emit('modify', req, res) ;        
+      }
+      if( refresh ) {
+        this.emit('refresh', req.msg) ;        
+      }
+      break ;
+
+    case 'INFO':
+    case 'NOTIFY':
+    case 'REFER':
+    case 'UPDATE':
+      var eventName = req.method.toLowerCase() ;
+      if( 0 === this.listeners(eventName).length ) {
+        res.send(200) ;
+      }
+      else {
+        this.emit(eventName, req, res) ;
+      }
+      break ;
+
+    case 'ACK':
+      this.emit('ack', req.msg) ;
+      break ;
+
+    default:
+      console.error('Dialog#handle received invalid method within an INVITE dialog: %s', req.method) ;
+      res.send(501) ;
+      break ;
+  }
+} ;
+
+//representation
+Dialog.prototype.toJSON = function() {
+  return( only( this, 'id type sip local remote onHold')) ;
+} ;
+Dialog.prototype.toString = function() {
+  return this.toJSON().toString() ;
+} ;
+
+/**
+ * SIP Dialog identifiers
+ * @typedef {Object} Dialog~SipInfo
+ * @property {String} callId - SIP Call-ID
+ * @property {String} localTag - tag generated by local side of the Dialog
+ * @property {String} remoteTag  - tag generated by the remote side of the Dialog
+ */
+/**
+ * SIP Endpoint identifiers
+ * @typedef {Object} Dialog~SipEndpointInfo
+ * @property {String} uri - sip 
+ * @property {String} sdp - session description protocol
+ */
+/**
+ * a &lt;code>destroy&lt;/code> event is triggered when the Dialog is torn down from the far end
+ * @event Dialog#destroy
+ * @param {Object} msg - incoming BYE request message
+ */
+/**
+ * a &lt;code>modify&lt;/code> event is triggered when the far end modifies the session by sending a re-INVITE.
+ * When an application adds a handler for this event it must generate
+ * the SIP response by calling &lt;code>res.send&lt;/code> on the provided drachtio response object.
+ * When no handler is found for this event a 200 OK with the current local SDP 
+ * will be automatically generated.
+ * @event Dialog#modify
+ * @param {Object} req - drachtio request object
+ * @param {Object} res - drachtio response object
+ */
+/**
+ * a &lt;code>refresh&lt;/code> event is triggered when the far end sends a session refresh.
+ * There is no need for the application to respond to this event; this is purely 
+ * a notification.
+ * @event Dialog#refresh
+ * @param {Object} msg - incoming re-INVITE request message
+ */
+/**
+ * an &lt;code>info&lt;/code> event is triggered when the far end sends an INFO message.
+ * When an application adds a handler for this event it must generate
+ * the SIP response by calling &lt;code>res.send&lt;/code> on the provided drachtio response object.
+ * When no handler is found for this event a 200 OK will be automatically generated.
+ * @event Dialog#info
+ * @param {Object} req - drachtio request object
+ * @param {Object} res - drachtio response object
+ */
+/**
+ * a &lt;code>notify&lt;/code> event is triggered when the far end sends a NOTIFY message.
+ * When an application adds a handler for this event it must generate
+ * the SIP response by calling &lt;code>res.send&lt;/code> on the provided drachtio response object.
+ * When no handler is found for this event a 200 OK will be automatically generated.
+ * @event Dialog#notify
+ * @param {Object} req - drachtio request object
+ * @param {Object} res - drachtio response object
+ */
+/**
+ * an &lt;code>update&lt;/code> event is triggered when the far end sends an UPDATE message.
+ * When an application adds a handler for this event it must generate
+ * the SIP response by calling &lt;code>res.send&lt;/code> on the provided drachtio response object.
+ * When no handler is found for this event a 200 OK will be automatically generated.
+ * @event Dialog#update
+ * @param {Object} req - drachtio request object
+ * @param {Object} res - drachtio response object
+ */
+/**
+ * a &lt;code>refer&lt;/code> event is triggered when the far end sends a REFER message.
+ * When an application adds a handler for this event it must generate
+ * the SIP response by calling &lt;code>res.send&lt;/code> on the provided drachtio response object.
+ * When no handler is found for this event a 200 OK will be automatically generated.
+ * @event Dialog#refer
+ * @param {Object} req - drachtio request object
+ * @param {Object} res - drachtio response object
+ */
+
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Sun Nov 22 2015 14:40:23 GMT-0500 (EST) using the Minami theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>
