@@ -37,9 +37,19 @@ module.exports = function (grunt) {
             dist : {
                 src: ['lib/*.js', 'lib/*.jsdoc'],
                 options: {
-                    destination: 'doc',
+                    destination: '_site/api',
                     configure : 'conf.json'
                 }
+            }
+        },
+        githubPages: {
+            target: {
+              options: {
+                // The default commit message for the gh-pages branch
+                commitMessage: 'push'
+              },
+              // The folder where your gh-pages repo is
+              src: '_site'
             }
         },
         nodeunit: {
@@ -62,7 +72,8 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-jsdoc');
+    grunt.loadNpmTasks('grunt-github-pages');
 
     // Default task
-    grunt.registerTask('default', ['jshint', 'jsdoc']);
+    grunt.registerTask('default', ['jshint', 'jsdoc','githubPages:target']);
 };

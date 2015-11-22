@@ -7,6 +7,9 @@ pids
 *.pid
 *.seed
 
+# github pages site
+_site
+
 #transient test cases
 examples/nosave.*.js
 
