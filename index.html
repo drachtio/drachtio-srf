@@ -133,7 +133,7 @@ srf.on('connect', function(err, hostport){
       <ul>
         <li><a href="">'destroy'</a> -- fired when the remote end has sent a BYE request (i.e., the remote end has hung up).  No action is required in the associated callback: this is a notification-only event.</li>
         <li><a href="">'refresh'</a> -- fired when the remote end has sent a refreshing re-INVITE.  No action is required in the associated callback: this is a notification-only event.</li>
-        <li><a href="">'modify'</a> -- fired when the remote end has sent a re-INVITE with a modified session description (i.e. SDP). drachtio request and response objects are provided to the event handler, and the application must respond to the re-INVITE by invokding the <pre>res.send()</pre> method.</li>
+        <li><a href="">'modify'</a> -- fired when the remote end has sent a re-INVITE with a modified session description (i.e. SDP). drachtio request and response objects are provided to the event handler, and the application must respond to the re-INVITE by invoking the <code>res.send()</code> method.</li>
         <li><a href="">'info', 'notify', 'refer', 'update'</a> -- fired when the remote end has sent a request within the dialog of the specified request type. drachtio request and response objects are provided to the event handler, and the application must respond to the re-INVITE by invokding the <pre>res.send()</pre> method.</li>
       </ul>
     </p>
