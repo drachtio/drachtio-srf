@@ -36,15 +36,15 @@ function onCallerHangup(msg) {
 }
 ``` 
 
-###Getting Started
+## Getting Started
 *Note:* drachtio-srf applications require a network connection to a [drachtio server](https://github.com/davehorton/drachtio-server) process that sits in the VoIP network and handles the low-level SIP messaging.
 
-####Install drachtio-srf
+### Install drachtio-srf
 ```bash
 npm install drachtio-srf --save
 ```
 
-####Create an instance of the signaling resource framework
+### Create an instance of the signaling resource framework
 First, create a drachtio "app".  This contains the middleware stack and core message routing functions.  Next, create a new instance of the drachtio signaling resource framework, passing the drachtio app that you just created.
 
 ```js
@@ -54,7 +54,7 @@ var Srf = require('drachtio-srf');
 var srf = new Srf(app) ;
 ```
 
-####Use middleware
+#### Use middleware
 Similar to connect, drachtio supports the concept of middleware with the 'use' method. (The 'use' method may equivalently be called on the 'srf' instance, or the underlying 'app').
 
 ```js
@@ -68,14 +68,14 @@ srf.use(function (req, res, next) {
 }) ;
 ```
 
-####Mounting middleware
+### Mounting middleware
 Middleware can optionally be mounted only for specific SIP request types (methods) by specifying the method type (lower-cased) as an optional first parameter. 
 
 ```js
 srf.use('register', parseRegister) ;
 ```
 
-####Error middleware
+### Error middleware
 There are special cases of "error-handling" middleware. There are middleware where the function takes exactly 4 arguments. Errors that occur in the middleware added before the error middleware will invoke this middleware when errors occur.
 
 ```js
@@ -84,7 +84,7 @@ srf.use(function (err, req, res, next) {
 });
 ```
 
-####Connect to a drachtio server
+### Connect to a drachtio server
 The drachtio server process provides the actual sip processing engine that can be controlled by one or more drachtio clients.  Therefore, a drachtio-srf application must initially invoke the "connect" method on the srf instance (or, equivalently, on the underlying drachtio "app" object) to establish a connection to the drachtio server process in order to receive events (e.g. SIP messages) as well as send requests.  
 
 The application may either provide a callback to the "connect" call, or may listen for the "connect" event in order to determine whether/when a connection has been achieved.
@@ -105,7 +105,7 @@ srf.on('connect', function(err, hostport){
 }) ;
 ```
 
-####Creating dialogs
+### Creating dialogs
 At this point, your application is ready to start interacting with a VoIP/SIP network; generating or receiving SIP requests and creating dialogs. The relevant methods on the 'srf' instance are:
 
 * [createUasDialog](http://davehorton.github.io/drachtio-srf/api/Srf.html#createUasDialog)
@@ -113,23 +113,23 @@ At this point, your application is ready to start interacting with a VoIP/SIP ne
 * [createBackToBackDialogs](http://davehorton.github.io/drachtio-srf/api/Srf.html#createBackToBackDialogs)
 * [proxyRequest](http://davehorton.github.io/drachtio-srf/api/Srf.html#proxyRequest)
 
-####Managing dialogs
+### Managing dialogs
 Once you have created a dialog, you will want to be able to respond to events as well as exert control over the dialog by calling methods.
 
-#####Dialog events</h5>
+#### Dialog events</h5>
 * ['destroy'](http://davehorton.github.io/drachtio-srf/api/Dialog.html#event:destroy) - fired when the remote end has sent a BYE request (i.e., the remote end has hung up).  No action is required in the associated callback: this is a notification-only event.
 * ['refresh'](http://davehorton.github.io/drachtio-srf/api/Dialog.html#event:refresh) - fired when the remote end has sent a refreshing re-INVITE.  No action is required in the associated callback: this is a notification-only event.
 * ['modify'](http://davehorton.github.io/drachtio-srf/api/Dialog.html#event:modify) - fired when the remote end has sent a re-INVITE with a modified session description (i.e. SDP). drachtio request and response objects are provided to the event handler, and the application must respond to the re-INVITE by invoking the 'res.send' method.</li>
 * ['info', 'notify', 'refer', 'update'](http://davehorton.github.io/drachtio-srf/api/Dialog.html#event:info) -- fired when the remote end has sent a request within the dialog of the specified request type. drachtio request and response objects are provided to the event handler, and the application must respond to the re-INVITE by invoking the 'res.send' method. (Note: if the application does not register a listener for this class of event, a 200 OK with an empty body will automatically be generated in response to the incoming request).
 
-#####Dialog methods
+#### Dialog methods
 * [destroy](http://davehorton.github.io/drachtio-srf/api/Srf.html#destroy) - terminates the dialog (i.e. sends a BYE to the far end)
 * [modify](http://davehorton.github.io/drachtio-srf/api/Srf.html#modify) - modifies the dialog media session; either placing or removing the call from hold, or re-INVITING the far end to a new media session description
 * [request](http://davehorton.github.io/drachtio-srf/api/Srf.html#request) - send a request within a dialog (e.g. INFO, NOTIFY, etc)
 
-####Sample applications</h4>
+### Sample applications</h4>
 * [Load-balancing SIP proxy](https://github.com/davehorton/simple-sip-proxy)
 * [Two-stage dialing application](https://github.com/davehorton/drachtio-sample-twostage-dialing)
 
-###License
+## License
 [MIT](https://github.com/davehorton/drachtio-srf/blob/master/LICENSE)
