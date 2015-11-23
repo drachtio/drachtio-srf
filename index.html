@@ -75,6 +75,15 @@ var Srf = require('drachtio-srf');
 var srf = new Srf(app) ;</pre>
         </p>
 
+      <h4>Use middleware</h4>
+      <p>Similar to connect, drachtio supports the concept of middleware with the 'use' method.
+        <pre>
+var rangeCheck = require('range_check');
+...
+app.use(function (req, res, next) {
+  if( !rangeCheck.inRange( req.source_address, config.authorizedSources) ) { return res.send(403) ; }
+  next() ;
+}) ;</pre>
 
       <footer class="site-footer">
         <span class="site-footer-owner"><a href="https://github.com/davehorton/drachtio-srf">drachtio-srf</a> is maintained by <a href="https://github.com/davehorton">davehorton</a>.</span>
