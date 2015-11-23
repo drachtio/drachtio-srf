@@ -75,7 +75,7 @@ var srf = new Srf(app) ;</pre>
         </p>
 
       <h4>Use middleware</h4>
-      <p>Similar to connect, drachtio supports the concept of middleware with the 'use' method.
+      <p>Similar to connect, drachtio supports the concept of middleware with the 'use' method. (The 'use' method may equivalently be called on the 'srf' instance, or the underlying 'app').
         <pre>
 var rangeCheck = require('range_check');
 ...
@@ -86,7 +86,7 @@ srf.use(function (req, res, next) {
   next() ;
 }) ;</pre>
     <h4>Mounting middleware</h4>
-    <p>Middleware can optionally be mounted only for specific SIP request types (methods) by specifying the method type (lower-cased) as an optional first parameter
+    <p>Middleware can optionally be mounted only for specific SIP request types (methods) by specifying the method type (lower-cased) as an optional first parameter. 
       <pre>
 srf.use('register', parseRegister) ;</pre>
     </p>
