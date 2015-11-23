@@ -90,6 +90,22 @@ app.use(function (req, res, next) {
       <pre>
 app.use('register', parseRegister) ;</pre>
     </p>
+    <h4>Error middleware</h4>
+    <p>There are special cases of "error-handling" middleware. There are middleware where the function takes exactly 4 arguments. Errors that occur in the middleware added before the error middleware will invoke this middleware when errors occur.
+      <pre>
+app.use(function (err, req, res, next) {
+  // an error occurred!
+});</pre>
+    </p>
+    <h4>Connect to a drachtio server</h4>
+    <p>The drachtio server process provides the actual sip processing engine that can be controlled by one or more drachtio clients.  Therefore, a drachtio-srf application must initially connect to the drachtio server process in order to receive events (e.g. SIP messages) as well as send requests.
+      <pre>
+srf.connect({
+  host: <ip address to connect to>,
+  port: <port to connect to>
+  secret: <shared secret client must provide to authenticate to drachtio server>
+}) ;</pre>
+
 
       <footer class="site-footer">
         <span class="site-footer-owner"><a href="https://github.com/davehorton/drachtio-srf">drachtio-srf</a> is maintained by <a href="https://github.com/davehorton">davehorton</a>.</span>
