@@ -54,7 +54,7 @@ var Srf = require('drachtio-srf');
 var srf = new Srf(app) ;
 ```
 
-#### Use middleware
+### Use middleware
 Similar to connect, drachtio supports the concept of middleware with the 'use' method. (The 'use' method may equivalently be called on the 'srf' instance, or the underlying 'app').
 
 ```js
@@ -127,7 +127,7 @@ Once you have created a dialog, you will want to be able to respond to events as
 * [modify](http://davehorton.github.io/drachtio-srf/api/Srf.html#modify) - modifies the dialog media session; either placing or removing the call from hold, or re-INVITING the far end to a new media session description
 * [request](http://davehorton.github.io/drachtio-srf/api/Srf.html#request) - send a request within a dialog (e.g. INFO, NOTIFY, etc)
 
-### Sample applications</h4>
+## Sample applications</h4>
 * [Load-balancing SIP proxy](https://github.com/davehorton/simple-sip-proxy)
 * [Two-stage dialing application](https://github.com/davehorton/drachtio-sample-twostage-dialing)
 
