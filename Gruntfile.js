@@ -75,5 +75,6 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-github-pages');
 
     // Default task
-    grunt.registerTask('default', ['jshint', 'jsdoc','githubPages:target']);
+    grunt.registerTask('default', ['jshint']);
+    grunt.registerTask('builddocs', ['jsdoc','githubPages:target']);
 };
