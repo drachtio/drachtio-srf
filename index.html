@@ -35,9 +35,9 @@ var Srf = require('drachtio-srf');
 var srf = new Srf(app) ;
 
 // connect to drachtio server
-app.connect({..}) ;
+srf.connect({..}) ;
 
-app.invite( function(req, res) {
+srf.invite( function(req, res) {
 
   // respond to incoming INVITE request by creating a user agent server dialog
   srf.createUasDialog( req, res, {
@@ -79,7 +79,7 @@ var srf = new Srf(app) ;</pre>
         <pre>
 var rangeCheck = require('range_check');
 ...
-app.use(function (req, res, next) {
+srf.use(function (req, res, next) {
   if( !rangeCheck.inRange( req.source_address, config.authorizedSources) ) { 
     return res.send(403) ; 
   }
@@ -88,12 +88,12 @@ app.use(function (req, res, next) {
     <h4>Mounting middleware</h4>
     <p>Middleware can optionally be mounted only for specific SIP request types (methods) by specifying the method type (lower-cased) as an optional first parameter
       <pre>
-app.use('register', parseRegister) ;</pre>
+srf.use('register', parseRegister) ;</pre>
     </p>
     <h4>Error middleware</h4>
     <p>There are special cases of "error-handling" middleware. There are middleware where the function takes exactly 4 arguments. Errors that occur in the middleware added before the error middleware will invoke this middleware when errors occur.
       <pre>
-app.use(function (err, req, res, next) {
+srf.use(function (err, req, res, next) {
   // an error occurred!
 });</pre>
     </p>
@@ -101,9 +101,9 @@ app.use(function (err, req, res, next) {
     <p>The drachtio server process provides the actual sip processing engine that can be controlled by one or more drachtio clients.  Therefore, a drachtio-srf application must initially invoke the "connect" method on the srf instance (or, equivalently, on the underlying drachtio "app" object) to establish a connection to the drachtio server process in order to receive events (e.g. SIP messages) as well as send requests.  The application may either provide a callback to the "connect" call, or may listen for the "connect" event in order to determine whether/when a connection has been achieved.
       <pre>
 srf.connect({
-  host: <ip address to connect to>,
-  port: <port to connect to>
-  secret: <shared secret client must provide to authenticate to drachtio server>
+  host: {ip address to connect to},
+  port: {port to connect to},
+  secret: {shared secret client must provide to authenticate to drachtio server}
 }, function(hostport) {
   console.log('successfully connected to drachtio server which is listening for SIP messages on %s': hostport) ;
 }) ;
