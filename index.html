@@ -126,6 +126,18 @@ srf.on('connect', function(err, hostport){
       </ul>
     </p>
 
+    <h4>Managing dialogs</h4>
+    <p>
+      Once you have created a dialog, you will want to be able to respond to events as well as exert control over the dialog by calling methods.
+      <h5>Dialog events</h5>
+      <ul>
+        <li><a href="">'destroy'</a> -- fired when the remote end has sent a BYE request (i.e., the remote end has hung up).  No action is required in the associated callback: this is a notification-only event.</li>
+        <li><a href="">'refresh'</a> -- fired when the remote end has sent a refreshing re-INVITE.  No action is required in the associated callback: this is a notification-only event.</li>
+        <li><a href="">'modify'</a> -- fired when the remote end has sent a re-INVITE with a modified session description (i.e. SDP). drachtio request and response objects are provided to the event handler, and the application must respond to the re-INVITE by invokding the <pre>res.send()</pre> method.</li>
+        <li><a href="">'info', 'notify', 'refer', 'update'</a> -- fired when the remote end has sent a request within the dialog of the specified request type. drachtio request and response objects are provided to the event handler, and the application must respond to the re-INVITE by invokding the <pre>res.send()</pre> method.</li>
+      </ul>
+    </p>
+
     <h4>Sample applications</h4>
     <p>
       <ul>
