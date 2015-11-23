@@ -107,6 +107,7 @@ srf.connect({
 }, function(hostport) {
   console.log('successfully connected to drachtio server which is listening for SIP messages on %s': hostport) ;
 }) ;
+
 // or, instead of callback
 srf.on('connect', function(err, hostport){
   console.log('successfully connected to drachtio server which is listening for SIP messages on %s': hostport) ;  
