@@ -19,7 +19,7 @@
     </section>
 
     <section class="main-content">
-      <div class="drachtio-img"><img src="img/definition-only-cropped.png">
+      <div class="drachtio-img"><img src="http://davehorton.github.io/drachtio-srf/img/definition-only-cropped.png">
       </div>
       <p>
         Welcome to the drachtio signaling resource framework, empowering nodejs/javascript developers to build highly-scalable SIP application servers -- without requiring a Ph.D in <a href="https://www.ietf.org/rfc/rfc3261.txt">SIP</a> or VoIP :)
@@ -27,8 +27,9 @@
       <p>drachtio is an open-source, nodejs-based ecosystem for creating any kind of VoIP server-based application: registrar, proxy, back-to-back user agent, and others. Furthermore, when coupled with the drachtio <a href="https://github.com/davehorton/drachtio-fsmrf">media resource function</a>, rich media-processing applications can be easily built as well.
       </p>
       <p>
-        Within the drachtio ecosystem, drachtio-srf is a high-level abstraction framework that sits on top of the <a href="https://github.com/senchalabs/connect">connect</a>-inspired <a href="https://github.com/davehorton/drachtio">drachtio</a> library, and allows the developer to easily create and manage SIP <a href="/drachtio-srf/api/Dialog">Dialogs</a>, without the burden of tending to the details of lower-level SIP transactions and messages.
+        Within the drachtio ecosystem, drachtio-srf is a high-level abstraction framework that sits on top of the <a href="https://github.com/senchalabs/connect">connect</a>-inspired <a href="https://github.com/davehorton/drachtio">drachtio</a> library, and allows the developer to easily create and manage SIP <a href="http://davehorton.github.io/drachtio-srf/api/Dialog">Dialogs</a>, without the burden of tending to the details of lower-level SIP transactions and messages.
       </p>
+      <p><strong>Note:</strong> API documentation for drachtio-srf is available <a href="http://davehorton.github.io/drachtio-srf/api/index.html">here</a>.
       <pre>
 var app = require('drachtio')();
 var Srf = require('drachtio-srf'); 
@@ -110,6 +111,7 @@ srf.connect({
 
 // or, instead of callback
 srf.on('connect', function(err, hostport){
+  if( err ) throw err ;
   console.log('successfully connected to drachtio server which is listening for SIP messages on %s': hostport) ;  
 }) ;
 </pre>
