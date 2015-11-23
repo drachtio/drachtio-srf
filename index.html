@@ -98,13 +98,20 @@ app.use(function (err, req, res, next) {
 });</pre>
     </p>
     <h4>Connect to a drachtio server</h4>
-    <p>The drachtio server process provides the actual sip processing engine that can be controlled by one or more drachtio clients.  Therefore, a drachtio-srf application must initially connect to the drachtio server process in order to receive events (e.g. SIP messages) as well as send requests.
+    <p>The drachtio server process provides the actual sip processing engine that can be controlled by one or more drachtio clients.  Therefore, a drachtio-srf application must initially invoke the "connect" method on the srf instance (or, equivalently, on the underlying drachtio "app" object) to establish a connection to the drachtio server process in order to receive events (e.g. SIP messages) as well as send requests.  The application may either provide a callback to the "connect" call, or may listen for the "connect" event in order to determine whether/when a connection has been achieved.
       <pre>
 srf.connect({
   host: <ip address to connect to>,
   port: <port to connect to>
   secret: <shared secret client must provide to authenticate to drachtio server>
-}) ;</pre>
+}, function(hostport) {
+  console.log('successfully connected to drachtio server which is listening for SIP messages on %s': hostport) ;
+}) ;
+// or, instead of callback
+srf.on('connect', function(err, hostport){
+  console.log('successfully connected to drachtio server which is listening for SIP messages on %s': hostport) ;  
+}) ;
+</pre>
 
 
       <footer class="site-footer">
