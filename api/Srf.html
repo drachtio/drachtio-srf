@@ -23,7 +23,7 @@
 <label for="nav-trigger" class="overlay"></label>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Dialog.html">Dialog</a><ul class='methods'><li data-type='method'><a href="Dialog.html#destroy">destroy</a></li><li data-type='method'><a href="Dialog.html#modify">modify</a></li><li data-type='method'><a href="Dialog.html#request">request</a></li></ul></li><li><a href="Srf.html">Srf</a><ul class='methods'><li data-type='method'><a href="Srf.html#connect">connect</a></li><li data-type='method'><a href="Srf.html#createBackToBackDialogs">createBackToBackDialogs</a></li><li data-type='method'><a href="Srf.html#createUacDialog">createUacDialog</a></li><li data-type='method'><a href="Srf.html#createUasDialog">createUasDialog</a></li><li data-type='method'><a href="Srf.html#proxyRequest">proxyRequest</a></li><li data-type='method'><a href="Srf.html#request">request</a></li></ul></li></ul><h3>Events</h3><ul><li><a href="Dialog.html#event:destroy">destroy</a></li><li><a href="Dialog.html#event:info">info</a></li><li><a href="Dialog.html#event:modify">modify</a></li><li><a href="Dialog.html#event:notify">notify</a></li><li><a href="Dialog.html#event:refer">refer</a></li><li><a href="Dialog.html#event:refresh">refresh</a></li><li><a href="Dialog.html#event:update">update</a></li><li><a href="Srf.html#event:connect">connect</a></li></ul><h3><a href="global.html">Global</a></h3>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Dialog.html">Dialog</a><ul class='methods'><li data-type='method'><a href="Dialog.html#destroy">destroy</a></li><li data-type='method'><a href="Dialog.html#modify">modify</a></li><li data-type='method'><a href="Dialog.html#request">request</a></li></ul></li><li><a href="Srf.html">Srf</a><ul class='methods'><li data-type='method'><a href="Srf.html#connect">connect</a></li><li data-type='method'><a href="Srf.html#createBackToBackDialogs">createBackToBackDialogs</a></li><li data-type='method'><a href="Srf.html#createUacDialog">createUacDialog</a></li><li data-type='method'><a href="Srf.html#createUasDialog">createUasDialog</a></li><li data-type='method'><a href="Srf.html#proxyRequest">proxyRequest</a></li><li data-type='method'><a href="Srf.html#request">request</a></li></ul></li></ul><h3>Events</h3><ul><li><a href="Dialog.html#event:destroy">destroy</a></li><li><a href="Dialog.html#event:info">info</a></li><li><a href="Dialog.html#event:modify">modify</a></li><li><a href="Dialog.html#event:notify">notify</a></li><li><a href="Dialog.html#event:refer">refer</a></li><li><a href="Dialog.html#event:refresh">refresh</a></li><li><a href="Dialog.html#event:update">update</a></li><li><a href="Srf.html#event:cdr:attempt">cdr:attempt</a></li><li><a href="Srf.html#event:cdr:start">cdr:start</a></li><li><a href="Srf.html#event:cdr:stop">cdr:stop</a></li><li><a href="Srf.html#event:connect">connect</a></li></ul><h3><a href="global.html">Global</a></h3>
 </nav>
 
 <div id="main">
@@ -3663,6 +3663,583 @@
 
     
 
+    <h4 class="name" id="event:cdr:attempt">cdr:attempt</h4>
+
+    
+
+
+
+<div class="description">
+    a <code>cdr:attempt</code> event is emitted by an Srf instance when a call attempt has been received (inbound) or initiated (outbound)
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>source</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">'network'|'application', depending on whether the INVITE is inbound (received), or outbound (sent), respectively</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>time</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">the time (UTC) recorded by the SIP stack corresponding to the attempt</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>msg</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">the actual message that was sent or received</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line316">line 316</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="event:cdr:start">cdr:start</h4>
+
+    
+
+
+
+<div class="description">
+    a <code>cdr:start</code> event is emitted by an Srf instance when a call attempt has been connected successfully
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>source</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">'network'|'application', depending on whether the INVITE is inbound (received), or outbound (sent), respectively</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>time</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">the time (UTC) recorded by the SIP stack corresponding to the attempt</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>role</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">'uac'|'uas'|'uac-proxy'|'uas-proxy' indicating whether the application is acting as a user agent client, user agent server, proxy (sending message), or proxy (receiving message) for this cdr</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>msg</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">the actual message that was sent or received</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line323">line 323</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="event:cdr:stop">cdr:stop</h4>
+
+    
+
+
+
+<div class="description">
+    a <code>cdr:stop</code> event is emitted by an Srf instance when a connected call has ended
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>source</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">'network'|'application', depending on whether the INVITE is inbound (received), or outbound (sent), respectively</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>time</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">the time (UTC) recorded by the SIP stack corresponding to the attempt</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>reason</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">the reason the call was ended</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>msg</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">the actual message that was sent or received</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line331">line 331</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
     <h4 class="name" id="event:connect">connect</h4>
 
     
@@ -3670,7 +4247,7 @@
 
 
 <div class="description">
-    a <code>connect</code> event is triggered when a connect method completes with either success or failure
+    a <code>connect</code> event is emitted by an Srf instance when a connect method completes with either success or failure
 </div>
 
 
@@ -3826,7 +4403,7 @@
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Sun Nov 22 2015 23:08:31 GMT-0500 (EST) using the Minami theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Sun Nov 22 2015 23:19:49 GMT-0500 (EST) using the Minami theme.
 </footer>
 
 <script>prettyPrint();</script>
