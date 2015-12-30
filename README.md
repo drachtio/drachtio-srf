@@ -6,6 +6,8 @@ drachtio is an open-source, nodejs-based ecosystem for creating any kind of VoIP
 
 Within the drachtio ecosystem, drachtio-srf is a high-level abstraction framework that sits on top of the [connect](https://github.com/senchalabs/connect)-inspired [drachtio](https://github.com/davehorton/drachtio) library, and allows the developer to easily create and manage SIP [Dialogs](http://davehorton.github.io/drachtio-srf/api/Dialog), without the burden of tending to the details of lower-level SIP transactions and messages.
 
+[![Join the chat at https://gitter.im/davehorton/drachtio-srf](https://badges.gitter.im/davehorton/drachtio-srf.svg)](https://gitter.im/davehorton/drachtio-srf?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 *Note:* API documentation for drachtio-srf [can be found here](http://davehorton.github.io/drachtio-srf/api/index.html).
 
 ```js
@@ -38,7 +40,6 @@ function onCallerHangup(msg) {
 
 ## Getting Started
 
-[![Join the chat at https://gitter.im/davehorton/drachtio-srf](https://badges.gitter.im/davehorton/drachtio-srf.svg)](https://gitter.im/davehorton/drachtio-srf?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 *Note:* drachtio-srf applications require a network connection to a [drachtio server](https://github.com/davehorton/drachtio-server) process that sits in the VoIP network and handles the low-level SIP messaging.
 
 ### Install drachtio-srf
