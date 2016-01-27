@@ -1,6 +1,6 @@
 {
   "name": "drachtio-srf",
-  "version": "0.99.8",
+  "version": "0.99.9",
   "description": "drachtio signaling resource framework",
   "main": "lib/srf.js",
   "scripts": {
@@ -20,9 +20,9 @@
     "async": "^1.4.2",
     "debug": "^2.2.0",
     "delegates": "^0.1.0",
-    "drachtio-client": "davehorton/drachtio-client.git#0.3.2",
-    "drachtio": "davehorton/drachtio.git#0.3.4",
-    "drachtio-sip": "davehorton/drachtio-sip.git#0.2.3",
+    "drachtio-client": "^davehorton/drachtio-client.git#0.3.3",
+    "drachtio": "^davehorton/drachtio.git#0.3.5",
+    "drachtio-sip": "^davehorton/drachtio-sip.git#0.2.3",
     "lodash": "^3.10.1",
     "node-noop": "0.0.1",
     "node-uuid": "^1.4.3",
