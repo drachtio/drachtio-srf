@@ -20,13 +20,14 @@
     "async": "^1.4.2",
     "debug": "^2.2.0",
     "delegates": "^0.1.0",
-    "drachtio-client": "davehorton/drachtio-client.git#0.3.11",
-    "drachtio": "davehorton/drachtio.git#0.3.13",
+    "drachtio": "davehorton/drachtio.git#0.3.14",
+    "drachtio-client": "davehorton/drachtio-client.git#0.3.12",
     "drachtio-sip": "davehorton/drachtio-sip.git#0.2.3",
     "lodash": "^3.10.1",
     "node-noop": "0.0.1",
     "node-uuid": "^1.4.3",
     "only": "0.0.2",
+    "q": "^1.4.1",
     "sip-methods": "^0.1.0"
   },
   "devDependencies": {
