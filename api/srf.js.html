@@ -47,6 +47,9 @@ var _ = require('lodash') ;
 var assert = require('assert') ;
 var parser = require('drachtio-sip').parser ;
 var methods = require('sip-methods') ;
+var SipError = require('./sip_error') ;
+var Q = require('q');
+var async = require('async') ;
 var debug = require('debug')('drachtio-srf') ;
 
 
@@ -126,6 +129,11 @@ Srf.prototype.createUasDialog = function( req, res, opts, cb ) {
     }) ;
     self.addDialog( dialog );
   }); 
+
+  req.on('cancel', function() {
+    debug('Srf#createUasDialog: received CANCEL from uac') ;
+    cb( new SipError( 487, 'Request Terminated')) ;
+  }) ;
 } ;
 
 /**
@@ -134,12 +142,18 @@ Srf.prototype.createUasDialog = function( req, res, opts, cb ) {
  * @param  {RequestUri}   uri -  request uri to send to 
  * @param  {Srf~uacOptions}   opts   configuration options
  * @param {Srf~dialogCreationCallback} cb      callback that provides the created Dialog
+ * @param {Srf~provisionalResponseCallback} [cbProvisional]  callback that passes on provisional responses
+ * @param {Srf~cancelCallback} [cbCancel]  callback that passes on provisional responses
+ * @returns {Promise} promise fulfilled with the request that is actually sent
  */
-Srf.prototype.createUacDialog = function( uri, opts, cb ) {
+Srf.prototype.createUacDialog = function( uri, opts, cb, cbProvisional ) {
   var self = this ;
+
+  var deferred = Q.defer();
 
   if( typeof uri === 'string' ) { opts.uri = uri ;}
   else if( typeof uri === 'object' ) { 
+    cbProvisional = cb ;
     cb = opts ;
     opts = uri ;
   }
@@ -172,7 +186,11 @@ Srf.prototype.createUacDialog = function( uri, opts, cb ) {
       body: opts.localSdp
     },
     function( err, req ){
-      if( err ) { return cb(err) ; }
+      if( err ) { 
+        deferred.reject(err) ;
+        return cb(err) ; 
+      }
+      deferred.resolve(req) ;
       req.on('response', function(res, ack) {
         if( res.status >= 200 ) {
           ack() ;
@@ -183,11 +201,16 @@ Srf.prototype.createUacDialog = function( uri, opts, cb ) {
             return cb(null, dialog) ;
           }
 
-          cb( '' + res.status + ' ' + res.reason) ;
+          cb( new SipError(res.status, res.reason) ) ;
+        }
+        else if( cbProvisional ) {
+          cbProvisional( res ) ;
         }
       }) ;
     }
   ) ;
+  
+  return deferred.promise;
 } ;
 /**
  * This callback provides the response to an api request.
@@ -200,38 +223,106 @@ Srf.prototype.createUacDialog = function( uri, opts, cb ) {
  * create back-to-back dialogs; i.e. act as a back-to-back user agent
  * @param  {Request}   req  - incoming drachtio Request object, received in app.invite(...) method
  * @param  {Response}   res  - drachtio Response passed with incoming request
- * @param  {RequestUri}   uri  - sip request uri to send the B leg to
- * @param  {Object}   [opts] - configuration options
+ * @param  {String|Array}  uri] - an IP address[:port], or list of same, to send the B leg to
+ * @param  {Srf~b2bOptions}  [opts] -   configuration options
  * @param  {Srf~b2bDialogCreationCallback} cb - callback invoked when operation is completed
  */
 Srf.prototype.createBackToBackDialogs = function( req, res, uri, opts, cb ) {
+  assert.ok(  _.isString(uri) || _.isArray(uri), 'argument \'uri\' must be either a string or an array') ;
+
+  var self = this ;
   if( typeof opts === 'function') {
     cb = opts ;
     opts = {} ;
   }
 
-  opts.localSdp = req.body ;
-  this.createUacDialog( uri, opts, function(err, uacDialog ) {
-    if( err ) { 
-      res.send(err.status, err.reason) ;
-      return cb( err ) ; 
+  // default From, To, and user part of uri if not provided
+  opts.headers = opts.headers || {} ;
+  _.each( opts.headers, function( value, hdr ) { opts.headers[hdr.toLowerCase] = value ; }) ;
+  if( !opts.headers.from) { opts.callingNumber = req.callingNumber; }
+  if( !opts.headers.to ) { opts.calledNumber = req.calledNumber; }
+
+  opts.localSdp = opts.localSdp || req.body ;
+
+  uri = 'string' === typeof uri ? [uri] : uri ;
+
+  var finalUacFail ;
+  var finalUacSuccess ;
+  var receivedProvisional = false ;
+  var canceled = false ;
+
+  async.detectSeries( 
+    uri, 
+    function truthTest( uri, callback) {
+      
+      if( receivedProvisional || canceled ) { 
+        // stop cranking back once we receive a provisional > 100 from somebody or the caller canceled
+        return callback(null, false); 
+      }
+
+      // launch the next INVITE
+      self.createUacDialog( uri, opts, function(err, uacDialog ) {
+        if( err ) { 
+          //non-success: crank back to the next uri if we have one
+          finalUacFail = err ;
+          return callback(null, false) ; 
+        }
+
+        // success - we're done
+        finalUacSuccess = uacDialog ;
+        return callback(null, true) ;
+      }, 
+      function( provisionalRes ) {
+        if( provisionalRes.status > 100 ) {
+          debug('Srf#createBackToBackDialogs: received a provisional response %d', provisionalRes.status) ;
+          var opts = {} ;
+          if( provisionalRes.body ) { opts.body = provisionalRes.body ; }
+          res.send(provisionalRes.status, provisionalRes.reason, opts) ;
+
+          // we're committed to this uac now
+          receivedProvisional = true ;
+        }
+      }).then( function( uacInvite ) {
+        req.on('cancel', function() {
+          debug('Srf#createBackToBackDialogs: received CANCEL as uas; sending CANCEL as uac') ;
+          canceled = true ;
+          finalUacFail = new SipError( 487, 'Request Terminated') ;
+          uacInvite.cancel() ;
+          callback( null, false ) ;
+        }) ;
+      }) ;
+    }, 
+    function( err, uacDialog) {
+      if( typeof uacDialog === 'undefined') {
+        // all failed, send the final failure response back (TODO: should we be tracking the "best" failure to return?)
+        res.send(finalUacFail.status, finalUacFail.reason) ;
+        return cb( finalUacFail ) ;
+      }
+
+      // success 
+      opts = {} ;
+      opts.localSdp = uacDialog.remote.sdp ;
+      self.createUasDialog( req, res, opts, function( err, uasDialog ) {
+        if( err ) { return cb(err); }
+
+        cb( null, uasDialog, uacDialog ) ;
+      }) ;
     }
-
-    opts.localSdp = uacDialog.remote.sdp ;
-    this.createUasDialog( req, res, opts, function( err, uasDialog ) {
-      if( err ) { return cb(err); }
-
-      cb( null, uasDialog, uacDialog ) ;
-    }) ;
-  
-  }) ;
+  ) ;
 } ;
+
 /**
  * This callback provides the response to createBackToBackDialog request.
  * @callback Srf~b2bDialogCreationCallback
  * @param {Error} err   error returned on non-success
  * @param {Dialog} uasDialog - User Agent Server dialog (i.e., "A" leg)
  * @param {Dialog} uacDialog - User Agent Client dialog (i.e., "B" leg) 
+ */
+
+/**
+ * This callback provides the provisional responses received on the UAS leg when issuing a createBackToBackDialog request.
+ * @callback Srf~provisionalResponseCallback
+ * @param  {Response}   res  - drachtio Response object
  */
 
 /**
@@ -279,9 +370,17 @@ Srf.prototype.removeDialog = function( dialog ) {
 /**
  * Arguments provided when creating a UAC dialog
  * @typedef {Object} Srf~uacOptions
- * @property {Object=} headers SIP headers to include on the SIP INVITE request
+ * @property {Object=} [headers] SIP headers to include on the SIP INVITE request
  * @property {string} localSdp the local session description protocol to include in the SIP INVITE request
- * @property {RequestUri=} uri request uri to send to 
+ * @property {RequestUri=} [uri] request uri to send to 
+ */
+
+/**
+ * Arguments provided when creating a B2BUA
+ * @typedef {Object} Srf~b2bOptions
+ * @property {Object} [headers] SIP headers to include on the SIP INVITE request
+ * @property {string} [localSdp] the local session description protocol to include in the SIP INVITE request
+ * @property {string} provisionalTimeout - timeout after which to attempt next uri in the destination array
  */
 
 /**
@@ -400,7 +499,7 @@ methods.forEach( function(method) {
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Wed Dec 30 2015 15:45:56 GMT-0500 (EST) using the Minami theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Wed May 04 2016 11:46:03 GMT-0400 (EDT) using the Minami theme.
 </footer>
 
 <script>prettyPrint();</script>
