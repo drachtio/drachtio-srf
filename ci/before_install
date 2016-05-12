@@ -8,4 +8,4 @@ mkdir build && cd $_
 ../configure
 make
 sudo make install
-cd ../../drachtio
+cd ../../drachtio-srf
