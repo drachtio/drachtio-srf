@@ -1,7 +1,8 @@
 var assert = require('assert');
 var should = require('should');
-var debug = require('debug')('drachtio-client') ;
-var Agent = require('drachtio-client').Agent ;
+var debug = require('debug')('drachtio-srf') ;
+var drachtio = require('drachtio') ;
+var Agent = drachtio.Agent ;
 var fixture = require('drachtio-test-fixtures') ;
 var uac, uas ;
 var cfg = fixture(__dirname,[8050,8051],[6050,6051]) ;
@@ -60,6 +61,7 @@ describe('uac / uas scenarios', function() {
         cfg.connectAll([uac, uas], function(err){
             if( err ) { throw err ; }
  
+            // send initial INVITE
             uac.request({
                 uri: cfg.sipServer[1],
                 method: 'INVITE',
@@ -73,29 +75,32 @@ describe('uac / uas scenarios', function() {
                     res.should.have.property('status',200);
                     ack() ; 
 
+                    // wait, then send re-INVITE
                     setTimeout( function() {
                         uac.request({
                             method: 'INVITE',
                             stackDialogId: res.stackDialogId,
                             body: cfg.client[0].sdp + 'a:inactive'
                         }, function(err, req) {
-                            res.should.have.property('status',200);
-                            ack() ;
+                            req.on('response', function(res, ack) {
+                                res.should.have.property('status',200);
+                                ack() ;
 
-                            setTimeout( function(){
-                                uac.request({
-                                    method: 'BYE',
-                                    stackDialogId: res.stackDialogId
-                                }, function(err, bye){
-                                    should.not.exist(err) ;
-                                    bye.on('response', function(response){
-                                        response.should.have.property('status',200);
-                                        uac.idle.should.be.true ;
-                                        done() ;
+                                // wait, then send BYE
+                                setTimeout( function(){
+                                    uac.request({
+                                        method: 'BYE',
+                                        stackDialogId: res.stackDialogId
+                                    }, function(err, bye){
+                                        should.not.exist(err) ;
+                                        bye.on('response', function(response){
+                                            response.should.have.property('status',200);
+                                            uac.idle.should.be.true ;
+                                            done() ;
+                                        }) ;
                                     }) ;
-                                }) ;
-                            }, 1) ;
-
+                                }, 1) ;
+                            }) ;
                         }) ;
 
                     }, 10);                     
@@ -110,6 +115,7 @@ describe('uac / uas scenarios', function() {
         cfg.connectAll([uac, uas], function(err){
             if( err ) { throw err ; }
  
+            // send initial INVITE
             uac.request({
                 uri: cfg.sipServer[1],
                 method: 'INVITE',
@@ -123,29 +129,32 @@ describe('uac / uas scenarios', function() {
                     res.should.have.property('status',200);
                     ack() ; 
 
+                    // wait, then send a re-INVITE
                     setTimeout( function() {
                         uac.request({
                             method: 'INVITE',
                             stackDialogId: res.stackDialogId,
                             body: cfg.client[0].sdp 
                         }, function(err, req) {
-                            res.should.have.property('status',200);
-                            ack() ;
+                            req.on('response', function(res, ack) {
+                                res.should.have.property('status',200);
+                                ack() ;
 
-                            setTimeout( function(){
-                                uac.request({
-                                    method: 'BYE',
-                                    stackDialogId: res.stackDialogId
-                                }, function(err, bye){
-                                    should.not.exist(err) ;
-                                    bye.on('response', function(response){
-                                        response.should.have.property('status',200);
-                                        uac.idle.should.be.true ;
-                                        done() ;
+                                // wait, then send BYE
+                                setTimeout( function(){
+                                    uac.request({
+                                        method: 'BYE',
+                                        stackDialogId: res.stackDialogId
+                                    }, function(err, bye){
+                                        should.not.exist(err) ;
+                                        bye.on('response', function(response){
+                                            response.should.have.property('status',200);
+                                            uac.idle.should.be.true ;
+                                            done() ;
+                                        }) ;
                                     }) ;
-                                }) ;
-                            }, 1) ;
-
+                                }, 1) ;
+                            }) ;
                         }) ;
 
                     }, 10);                     
