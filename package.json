@@ -24,10 +24,10 @@
     "drachtio-sip": "^0.2.3",
     "lodash": "^3.10.1",
     "node-noop": "0.0.1",
-    "node-uuid": "^1.4.3",
     "only": "0.0.2",
     "q": "^1.4.1",
-    "sip-methods": "^0.1.0"
+    "sip-methods": "^0.1.0",
+    "uuid": "^3.0.0"
   },
   "devDependencies": {
     "drachtio-test-fixtures": "^0.1.7",
