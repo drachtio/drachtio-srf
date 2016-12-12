@@ -434,7 +434,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line396">line 396</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line450">line 450</a>
     </li></ul></dd>
     
 
@@ -704,7 +704,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line190">line 190</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line191">line 191</a>
     </li></ul></dd>
     
 
@@ -1436,7 +1436,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line295">line 295</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line345">line 345</a>
     </li></ul></dd>
     
 
@@ -1643,7 +1643,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line376">line 376</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line430">line 430</a>
     </li></ul></dd>
     
 
@@ -1826,7 +1826,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line274">line 274</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line324">line 324</a>
     </li></ul></dd>
     
 
@@ -1938,7 +1938,7 @@
 
         <tr>
             
-                <td class="name"><code>localSdp</code></td>
+                <td class="name"><code>localSdpA</code></td>
             
 
             <td class="type">
@@ -1962,7 +1962,131 @@
 
             
 
-            <td class="description last">the local session description protocol to include in the SIP INVITE request</td>
+            <td class="description last">the local session description protocol to offer in the response to the SIP INVITE request on the A leg</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>localSdpB</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">the local session description protocol to offer in the SIP INVITE request on the B leg</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>proxyRequestHeaders</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">an array of header names which, if they appear in the INVITE request on the A leg, should be included unchanged on the generated B leg INVITE</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>proxyResponseHeaders</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">an array of header names which, if they appear in the response to the outgoing INVITE, should be included unchanged on the generated response to the A leg</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>onProvisional</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Srf~provisionalCallback</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">a callback that is invoked when a provisional response is received from the B leg</td>
         </tr>
 
     
@@ -1991,7 +2115,7 @@
 
             
 
-            <td class="description last">timeout after which to attempt next uri in the destination array</td>
+            <td class="description last">timeout after which to attempt next uri in the destination array (e.g '1s')</td>
         </tr>
 
     
@@ -2030,7 +2154,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line338">line 338</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line388">line 388</a>
     </li></ul></dd>
     
 
@@ -2151,7 +2275,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line404">line 404</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line458">line 458</a>
     </li></ul></dd>
     
 
@@ -2305,7 +2429,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line175">line 175</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line176">line 176</a>
     </li></ul></dd>
     
 
@@ -2436,7 +2560,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line282">line 282</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line332">line 332</a>
     </li></ul></dd>
     
 
@@ -2590,7 +2714,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line315">line 315</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line365">line 365</a>
     </li></ul></dd>
     
 
@@ -2886,7 +3010,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line346">line 346</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line400">line 400</a>
     </li></ul></dd>
     
 
@@ -3056,7 +3180,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line362">line 362</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line416">line 416</a>
     </li></ul></dd>
     
 
@@ -3226,7 +3350,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line369">line 369</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line423">line 423</a>
     </li></ul></dd>
     
 
@@ -3373,7 +3497,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line356">line 356</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line410">line 410</a>
     </li></ul></dd>
     
 
@@ -3517,7 +3641,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line390">line 390</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line444">line 444</a>
     </li></ul></dd>
     
 
@@ -3721,7 +3845,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line383">line 383</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line437">line 437</a>
     </li></ul></dd>
     
 
@@ -3915,7 +4039,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line330">line 330</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line380">line 380</a>
     </li></ul></dd>
     
 
@@ -4078,7 +4202,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line323">line 323</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line373">line 373</a>
     </li></ul></dd>
     
 
@@ -4251,7 +4375,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line415">line 415</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line469">line 469</a>
     </li></ul></dd>
     
 
@@ -4451,7 +4575,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line422">line 422</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line476">line 476</a>
     </li></ul></dd>
     
 
@@ -4651,7 +4775,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line430">line 430</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line484">line 484</a>
     </li></ul></dd>
     
 
@@ -4805,7 +4929,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line409">line 409</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line463">line 463</a>
     </li></ul></dd>
     
 
@@ -4845,7 +4969,7 @@
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Wed May 04 2016 11:46:03 GMT-0400 (EDT) using the Minami theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Mon Dec 12 2016 15:25:55 GMT-0500 (EST) using the Minami theme.
 </footer>
 
 <script>prettyPrint();</script>

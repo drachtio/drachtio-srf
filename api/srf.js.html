@@ -200,8 +200,9 @@ Srf.prototype.createUacDialog = function( uri, opts, cb, cbProvisional ) {
             self.addDialog( dialog ) ;
             return cb(null, dialog) ;
           }
-
-          cb( new SipError(res.status, res.reason) ) ;
+          var error = new SipError(res.status, res.reason) ;
+          error.res = res ;
+          cb(error) ;
         }
         else if( cbProvisional ) {
           cbProvisional( res ) ;
@@ -236,13 +237,25 @@ Srf.prototype.createBackToBackDialogs = function( req, res, uri, opts, cb ) {
     opts = {} ;
   }
 
+  assert.ok(  !opts.onProvisional || typeof opts.onProvisional === 'function', 'argument \'opts.onProvisional\' must be a function') ;
+
+  var onProvisional = opts.onProvisional ;
+
+  var proxyRequestHeaders = opts.proxyRequestHeaders || [] ;
+  var proxyResponseHeaders = opts.proxyResponseHeaders || [] ;
+
   // default From, To, and user part of uri if not provided
   opts.headers = opts.headers || {} ;
-  _.each( opts.headers, function( value, hdr ) { opts.headers[hdr.toLowerCase] = value ; }) ;
-  if( !opts.headers.from) { opts.callingNumber = req.callingNumber; }
-  if( !opts.headers.to ) { opts.calledNumber = req.calledNumber; }
 
-  opts.localSdp = opts.localSdp || req.body ;
+  // pass specified headers on to the B leg
+  proxyRequestHeaders.forEach( function(hdr) { if( req.has(hdr) ) { opts.headers[hdr] = req.get(hdr) ; } }) ;
+
+  _.each( opts.headers, function( value, hdr ) { opts.headers[hdr.toLowerCase] = value ; }) ;
+  if( !opts.headers.from &amp;&amp; !opts.callingNumber ) { opts.callingNumber = req.callingNumber; }
+  if( !opts.headers.to &amp;&amp; !opts.calledNumber ) { opts.calledNumber = req.calledNumber; }
+
+  opts.localSdp = opts.localSdpB || req.body ;
+  var localSdpA = opts.localSdpA ;
 
   uri = 'string' === typeof uri ? [uri] : uri ;
 
@@ -250,35 +263,56 @@ Srf.prototype.createBackToBackDialogs = function( req, res, uri, opts, cb ) {
   var finalUacSuccess ;
   var receivedProvisional = false ;
   var canceled = false ;
+  var uacBye ;
 
+  // DH: NOTE (possible TODO): callback signature changes in async 2.x for detectXXX
   async.detectSeries( 
     uri, 
     function truthTest( uri, callback) {
       
       if( receivedProvisional || canceled ) { 
         // stop cranking back once we receive a provisional > 100 from somebody or the caller canceled
-        return callback(null, false); 
+        return callback(false); 
       }
 
       // launch the next INVITE
+      debug('sending INVITE to %s', uri) ;
       self.createUacDialog( uri, opts, function(err, uacDialog ) {
         if( err ) { 
           //non-success: crank back to the next uri if we have one
           finalUacFail = err ;
-          return callback(null, false) ; 
+          debug('got failure %d', err.status) ;
+
+          return callback(false) ; 
         }
 
         // success - we're done
+        debug('got success!') ;
         finalUacSuccess = uacDialog ;
-        return callback(null, true) ;
+
+        // need to handle a very quick hangup coming before we establish the uas dialog
+        uacDialog.on('destroy', function( msg ) {
+          debug('Srf#createBackToBackDialogs: got a BYE on B leg before A leg has ACK\'ed') ;
+          uacBye = msg ;
+        }) ;
+        callback(true) ;
       }, 
       function( provisionalRes ) {
         if( provisionalRes.status > 100 ) {
           debug('Srf#createBackToBackDialogs: received a provisional response %d', provisionalRes.status) ;
-          var opts = {} ;
-          if( provisionalRes.body ) { opts.body = provisionalRes.body ; }
+          var opts = { headers: {} } ;
+          if( provisionalRes.body ) { 
+            opts.body = localSdpA || provisionalRes.body ; 
+          }
+
+          // pass specified headers back to the A leg
+          proxyResponseHeaders.forEach( function(hdr) { if( provisionalRes.has(hdr) ) { opts.headers[hdr] = provisionalRes.get(hdr) ; } }) ;
+
           res.send(provisionalRes.status, provisionalRes.reason, opts) ;
 
+          if( onProvisional ) { 
+            onProvisional( provisionalRes ) ;
+          }
           // we're committed to this uac now
           receivedProvisional = true ;
         }
@@ -288,24 +322,40 @@ Srf.prototype.createBackToBackDialogs = function( req, res, uri, opts, cb ) {
           canceled = true ;
           finalUacFail = new SipError( 487, 'Request Terminated') ;
           uacInvite.cancel() ;
-          callback( null, false ) ;
         }) ;
       }) ;
     }, 
-    function( err, uacDialog) {
-      if( typeof uacDialog === 'undefined') {
+    function( successUri) {
+      opts = opts = { headers: {} } ;
+
+      // pass specified headers back to the A leg
+      proxyResponseHeaders.forEach( function(hdr) { if( finalUacFail.res.has(hdr) ) { opts.headers[hdr] = finalUacFail.res.get(hdr) ; } }) ;
+
+      if( typeof successUri === 'undefined') {
         // all failed, send the final failure response back (TODO: should we be tracking the "best" failure to return?)
-        res.send(finalUacFail.status, finalUacFail.reason) ;
+        res.send(finalUacFail.status, finalUacFail.reason, opts) ;
         return cb( finalUacFail ) ;
       }
 
       // success 
-      opts = {} ;
-      opts.localSdp = uacDialog.remote.sdp ;
-      self.createUasDialog( req, res, opts, function( err, uasDialog ) {
-        if( err ) { return cb(err); }
+      opts.localSdp = localSdpA || finalUacSuccess.remote.sdp ;
 
-        cb( null, uasDialog, uacDialog ) ;
+
+      self.createUasDialog( req, res, opts, function( err, uasDialog ) {
+        if( err ) { 
+          return cb(err); 
+        }
+
+        finalUacSuccess.removeAllListeners('destroy') ;
+
+        // if B leg has already hung up, emit destroy event after caller has a chance to set up handlers
+        if( uacBye ) {
+          setImmediate( function() {
+            finalUacSuccess.emit( 'destroy', uacBye ) ;
+          }) ;
+        }
+
+        cb( null, uasDialog, finalUacSuccess ) ;
       }) ;
     }
   ) ;
@@ -379,8 +429,12 @@ Srf.prototype.removeDialog = function( dialog ) {
  * Arguments provided when creating a B2BUA
  * @typedef {Object} Srf~b2bOptions
  * @property {Object} [headers] SIP headers to include on the SIP INVITE request
- * @property {string} [localSdp] the local session description protocol to include in the SIP INVITE request
- * @property {string} provisionalTimeout - timeout after which to attempt next uri in the destination array
+ * @property {string} [localSdpA] the local session description protocol to offer in the response to the SIP INVITE request on the A leg
+ * @property {string} [localSdpB] the local session description protocol to offer in the SIP INVITE request on the B leg
+ * @property {Array} [proxyRequestHeaders] an array of header names which, if they appear in the INVITE request on the A leg, should be included unchanged on the generated B leg INVITE
+ * @property {Array} [proxyResponseHeaders] an array of header names which, if they appear in the response to the outgoing INVITE, should be included unchanged on the generated response to the A leg
+ * @property {Srf~provisionalCallback} [onProvisional] a callback that is invoked when a provisional response is received from the B leg
+ * @property {string} provisionalTimeout - timeout after which to attempt next uri in the destination array (e.g '1s')
  */
 
 /**
@@ -479,6 +533,7 @@ Srf.prototype.removeDialog = function( dialog ) {
 
 delegate(Srf.prototype, '_app')
   .method('connect')
+  .method('disconnect')
   .method('on')
   .method('use')
   .method('request') ;
@@ -499,7 +554,7 @@ methods.forEach( function(method) {
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Wed May 04 2016 11:46:03 GMT-0400 (EDT) using the Minami theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Mon Dec 12 2016 15:25:55 GMT-0500 (EST) using the Minami theme.
 </footer>
 
 <script>prettyPrint();</script>
