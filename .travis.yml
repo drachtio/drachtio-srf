@@ -1,5 +1,7 @@
 language: node_js
-
+node_js:
+  - "6.9.3"
+  
 before_install: "sudo bash ci/before_install"
 
 after_script: "sudo bash ci/after_install"
