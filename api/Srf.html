@@ -44,6 +44,8 @@
         Srf
         </h2>
         
+            <div class="class-description">A signaling resource framework</div>
+        
     
 </header>
 
@@ -52,6 +54,8 @@
     
         
 
+    
+    <h2>Constructor</h2>
     
 
     <h4 class="name" id="Srf"><span class="type-signature"></span>new Srf<span class="signature">(app)</span><span class="type-signature"></span></h4>
@@ -154,7 +158,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line21">line 21</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line16">line 16</a>
     </li></ul></dd>
     
 
@@ -434,7 +438,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line450">line 450</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line603">line 603</a>
     </li></ul></dd>
     
 
@@ -704,7 +708,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line191">line 191</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line206">line 206</a>
     </li></ul></dd>
     
 
@@ -735,7 +739,7 @@
 
     
 
-    <h4 class="name" id="createUacDialog"><span class="type-signature"></span>createUacDialog<span class="signature">(uri, opts, cb, cbProvisional<span class="signature-attributes">opt</span>, cbCancel<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+    <h4 class="name" id="createUacDialog"><span class="type-signature"></span>createUacDialog<span class="signature">(uri, opts, cb, cbProvisional<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
 
     
 
@@ -903,39 +907,6 @@
         </tr>
 
     
-
-        <tr>
-            
-                <td class="name"><code>cbCancel</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Srf~cancelCallback</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last">callback that passes on provisional responses</td>
-        </tr>
-
-    
     </tbody>
 </table>
 
@@ -973,7 +944,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line109">line 109</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line103">line 103</a>
     </li></ul></dd>
     
 
@@ -1000,7 +971,7 @@
 
         
 <div class="param-desc">
-    promise fulfilled with the request that is actually sent
+    promise fulfilled with the request that is actually sent over the wire
 </div>
 
 
@@ -1195,7 +1166,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line69">line 69</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line60">line 60</a>
     </li></ul></dd>
     
 
@@ -1436,7 +1407,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line345">line 345</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line427">line 427</a>
     </li></ul></dd>
     
 
@@ -1643,7 +1614,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line430">line 430</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line583">line 583</a>
     </li></ul></dd>
     
 
@@ -1826,7 +1797,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line324">line 324</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line497">line 497</a>
     </li></ul></dd>
     
 
@@ -1945,6 +1916,9 @@
             
                 
 <span class="param-type">string</span>
+|
+
+<span class="param-type">function</span>
 
 
             
@@ -1962,7 +1936,7 @@
 
             
 
-            <td class="description last">the local session description protocol to offer in the response to the SIP INVITE request on the A leg</td>
+            <td class="description last">the local session description protocol to offer in the response to the SIP INVITE request on the A leg; if a function is provided, the function is invoked to produce the SDP</td>
         </tr>
 
     
@@ -2154,7 +2128,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line388">line 388</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line541">line 541</a>
     </li></ul></dd>
     
 
@@ -2275,7 +2249,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line458">line 458</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line611">line 611</a>
     </li></ul></dd>
     
 
@@ -2429,7 +2403,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line176">line 176</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line511">line 511</a>
     </li></ul></dd>
     
 
@@ -2560,7 +2534,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line332">line 332</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line505">line 505</a>
     </li></ul></dd>
     
 
@@ -2714,7 +2688,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line365">line 365</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line518">line 518</a>
     </li></ul></dd>
     
 
@@ -3010,7 +2984,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line400">line 400</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line553">line 553</a>
     </li></ul></dd>
     
 
@@ -3180,7 +3154,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line416">line 416</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line569">line 569</a>
     </li></ul></dd>
     
 
@@ -3350,7 +3324,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line423">line 423</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line576">line 576</a>
     </li></ul></dd>
     
 
@@ -3497,7 +3471,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line410">line 410</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line563">line 563</a>
     </li></ul></dd>
     
 
@@ -3641,7 +3615,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line444">line 444</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line597">line 597</a>
     </li></ul></dd>
     
 
@@ -3845,7 +3819,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line437">line 437</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line590">line 590</a>
     </li></ul></dd>
     
 
@@ -4039,7 +4013,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line380">line 380</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line533">line 533</a>
     </li></ul></dd>
     
 
@@ -4202,7 +4176,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line373">line 373</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line526">line 526</a>
     </li></ul></dd>
     
 
@@ -4375,7 +4349,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line469">line 469</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line622">line 622</a>
     </li></ul></dd>
     
 
@@ -4575,7 +4549,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line476">line 476</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line629">line 629</a>
     </li></ul></dd>
     
 
@@ -4775,7 +4749,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line484">line 484</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line637">line 637</a>
     </li></ul></dd>
     
 
@@ -4929,7 +4903,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line463">line 463</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line616">line 616</a>
     </li></ul></dd>
     
 
@@ -4969,7 +4943,7 @@
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Mon Dec 12 2016 15:25:55 GMT-0500 (EST) using the Minami theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Wed Feb 08 2017 23:01:51 GMT-0500 (EST) using the Minami theme.
 </footer>
 
 <script>prettyPrint();</script>
