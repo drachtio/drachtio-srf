@@ -6,6 +6,7 @@ var Agent = drachtio.Agent ;
 var fixture = require('drachtio-test-fixtures') ;
 var uac, uas ;
 var cfg = fixture(__dirname,[8050,8051],[6050,6051]) ;
+var Srf = require('../..') ;
 
 describe('uac / uas scenarios', function() {
     this.timeout(6000) ;
@@ -17,6 +18,41 @@ describe('uac / uas scenarios', function() {
         cfg.stopServers(done) ;
     }) ;
  
+     it('Srf#createUacDialog should handle auth challenge', function(done) {
+        var self = this ;
+        var app = drachtio() ;
+        app.connect(cfg.client[0].connect_opts) ;
+
+        var srf = new Srf(app) ;
+        uas = require('../scripts/uac-auth/app')(cfg.client[1]) ;
+        cfg.connectAll([app, uas], function(err){
+            if( err ) throw err ;
+            srf.createUacDialog(cfg.sipServer[1], {
+                method: 'INVITE',
+                headers: {
+                    To: 'sip:dhorton@sip.drachtio.org',
+                    From: 'sip:dhorton@sip.drachtio.org',
+                    Contact: '<sip:dhorton@sip.drachtio.org>;expires=30',
+                    Subject: self.test.fullTitle()
+                },
+                auth: {
+                    username: 'dhorton',
+                    password: '1234'
+                }                
+            }, function(err, dlg) {
+                should.not.exist(err) ;
+                dlg.destroy( function(err, bye) {
+                    bye.on('response', function() {
+                        should.not.exist(err) ;
+                        app.idle.should.be.true ;
+                        done() ;
+                    }) ;
+                }) ;
+
+            }) ;
+        }) ;
+    }) ;    
+
     it('should create a UAS dialog and allow remote side to tear down', function(done) {
         var self = this ;
         uac = cfg.configureUac( cfg.client[0], Agent ) ;
@@ -108,6 +144,7 @@ describe('uac / uas scenarios', function() {
             }) ;
         }) ;
     }) ;    
+
     it('should trigger a refresh event when a refreshing re-INVITE is received', function(done) {
         var self = this ;
         uac = cfg.configureUac( cfg.client[0], Agent ) ;

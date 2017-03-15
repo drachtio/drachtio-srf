@@ -1,6 +1,6 @@
 {
   "name": "drachtio-srf",
-  "version": "3.0.2",
+  "version": "3.0.3",
   "description": "drachtio signaling resource framework",
   "main": "lib/srf.js",
   "scripts": {
@@ -40,6 +40,8 @@
     "grunt-contrib-watch": "~0.5.3",
     "grunt-github-pages": "0.0.4",
     "grunt-jsdoc": "^1.0.0",
+    "passport": "^0.3.2",
+    "passport-http": "^0.3.0",
     "jsdoc": ">=3.3.3",
     "minami": "^1.1.1",
     "minimist": "^1.1.0",
