@@ -199,4 +199,24 @@ describe('uac / uas scenarios', function() {
             }) ;
         }) ;
     }) ;    
+     it('new Srf() should work with connect opts instead of app', function(done) {
+        var self = this ;
+        var srf = new Srf(cfg.client[0].connect_opts) ;
+        uas = require('../scripts/uas/app2')(cfg.client[1]) ;
+        cfg.connectAll([srf, uas], function(err){
+            if( err ) { throw err ; }
+
+            srf.createUacDialog({
+                uri: cfg.sipServer[1],
+                body: cfg.client[0].sdp,
+                headers: {
+                    Subject: self.test.fullTitle()
+                }
+            }, function( err, dialog ) {
+                should.not.exist(err) ;
+                dialog.destroy() ;
+                done() ;
+            }) ;
+        }) ;
+    }) ;    
 }) ;
