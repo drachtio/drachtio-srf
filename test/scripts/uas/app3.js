@@ -16,7 +16,7 @@ module.exports = function( config ) {
   srf.connect(config.connect_opts) ;
 
   app.invite( function(req, res ) {
-    assert(srf.locals.title = 'locals');
+    assert(req.app.locals.title = 'locals');
     srf.createUasDialog( req, res, {
       localSdp: config.sdp
     }, function(err, dialog) {
