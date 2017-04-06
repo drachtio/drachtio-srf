@@ -53,6 +53,43 @@ describe('uac / uas scenarios', function() {
         }) ;
     }) ;    
 
+    it('should support app locals', function(done) {
+        var self = this ;
+        uac = cfg.configureUac( cfg.client[0], Agent ) ;
+        uas = require('../scripts/uas/app3')(cfg.client[1]) ;
+        cfg.connectAll([uac, uas], function(err){
+            if( err ) { throw err ; }
+
+            uac.request({
+                uri: cfg.sipServer[1],
+                method: 'INVITE',
+                body: cfg.client[0].sdp,
+                headers: {
+                    Subject: self.test.fullTitle()
+                }
+            }, function( err, req ) {
+                should.not.exist(err) ;
+                req.on('response', function(res, ack){
+                    res.should.have.property('status',200);
+                    ack() ; 
+                    
+                    setTimeout( function(){
+                        uac.request({
+                            method: 'BYE',
+                            stackDialogId: res.stackDialogId
+                        }, function(err, bye){
+                            should.not.exist(err) ;
+                            bye.on('response', function(response){
+                                response.should.have.property('status',200);
+                                uac.idle.should.be.true ;
+                                done() ;
+                            }) ;
+                        }) ;
+                    }, 1) ;
+                }) ;
+            }) ;
+        }) ;
+    }) ;    
     it('should create a UAS dialog and allow remote side to tear down', function(done) {
         var self = this ;
         uac = cfg.configureUac( cfg.client[0], Agent ) ;
