@@ -1,21 +1,17 @@
-var drachtio = require('drachtio') ;
-var app = drachtio() ;
-var Srf = require('../../..') ;
-var srf = new Srf(app) ;
-var fs = require('fs') ;
-var assert = require('assert'); 
-var debug = require('debug')('srf-test') ;
+const Srf = require('../../..') ;
+const assert = require('assert'); 
+const debug = require('debug')('srf-test') ;
 
 module.exports = function( config ) {
 
-  app.set('api logger',fs.createWriteStream(config.apiLog) ) ;
   config.connect_opts.label = config.label; 
-  app.connect(config.connect_opts) ;
+  let srf = new Srf(config.connect_opts) ;
+  srf.set('api logger',config.apiLog ) ;
 
-  app.invite( function(req, res ) {
+  srf.invite( ( req, res ) => {
     srf.createUasDialog( req, res, {
       localSdp: config.sdp
-    }, function(err, dialog) {
+    }, (err, dialog) => {
       assert(!err) ;
 
       dialog.on('destroy', function() {
@@ -24,8 +20,7 @@ module.exports = function( config ) {
     }) ;
   }) ;
 
-
-  return app ;
+  return srf ;
 } ;
 
 

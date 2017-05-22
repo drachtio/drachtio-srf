@@ -2,7 +2,6 @@ var drachtio = require('drachtio') ;
 var app = drachtio() ;
 var Srf = require('../../..') ;
 var srf = new Srf(app) ;
-var fs = require('fs') ;
 var assert = require('assert'); 
 var debug = require('debug')('srf-test') ;
 var assert = require('assert');
@@ -11,7 +10,7 @@ srf.locals.title = 'locals';
 
 module.exports = function( config ) {
 
-  app.set('api logger',fs.createWriteStream(config.apiLog) ) ;
+  app.set('api logger',config.apiLog) ;
   config.connect_opts.label = config.label; 
   srf.connect(config.connect_opts) ;
 
@@ -29,7 +28,7 @@ module.exports = function( config ) {
   }) ;
 
 
-  return app ;
+  return srf ;
 } ;
 
 

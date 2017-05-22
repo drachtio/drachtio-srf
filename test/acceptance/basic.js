@@ -5,7 +5,7 @@ var drachtio = require('drachtio') ;
 var Agent = drachtio.Agent ;
 var fixture = require('drachtio-test-fixtures') ;
 var uac, uas ;
-var cfg = fixture(__dirname,[8050,8051],[6050,6051]) ;
+var cfg = fixture(__dirname,[8060,8061],[6060,6061]) ;
 var Srf = require('../..') ;
 
 describe('uac / uas scenarios', function() {
@@ -19,21 +19,19 @@ describe('uac / uas scenarios', function() {
     }) ;
  
      it('Srf#createUacDialog should handle auth challenge', function(done) {
-        var self = this ;
-        var app = drachtio() ;
-        app.connect(cfg.client[0].connect_opts) ;
+        uac = new Srf(cfg.client[0].connect_opts) ;
+        uac.set('api logger',cfg.client[0].apiLog ) ;
 
-        var srf = new Srf(app) ;
-        uas = require('../scripts/uac-auth/app')(cfg.client[1]) ;
-        cfg.connectAll([app, uas], function(err){
-            if( err ) throw err ;
-            srf.createUacDialog(cfg.sipServer[1], {
+        uas = require('../scripts/uas/app2')(cfg.client[1]) ;
+        cfg.connectAll([uac, uas], (err) => {
+            if( err ) { throw err;  }
+            uac.createUacDialog(cfg.sipServer[1], {
                 method: 'INVITE',
                 headers: {
                     To: 'sip:dhorton@sip.drachtio.org',
                     From: 'sip:dhorton@sip.drachtio.org',
                     Contact: '<sip:dhorton@sip.drachtio.org>;expires=30',
-                    Subject: self.test.fullTitle()
+                    Subject: this.test.fullTitle()
                 },
                 auth: {
                     username: 'dhorton',
@@ -44,7 +42,7 @@ describe('uac / uas scenarios', function() {
                 dlg.destroy( function(err, bye) {
                     bye.on('response', function() {
                         should.not.exist(err) ;
-                        app.idle.should.be.true ;
+                        uac.idle.should.be.true ;
                         done() ;
                     }) ;
                 }) ;
@@ -237,17 +235,16 @@ describe('uac / uas scenarios', function() {
         }) ;
     }) ;    
      it('new Srf() should work with connect opts instead of app', function(done) {
-        var self = this ;
         var srf = new Srf(cfg.client[0].connect_opts) ;
         uas = require('../scripts/uas/app2')(cfg.client[1]) ;
-        cfg.connectAll([srf, uas], function(err){
+        cfg.connectAll([srf, uas], (err) => {
             if( err ) { throw err ; }
 
             srf.createUacDialog({
                 uri: cfg.sipServer[1],
                 body: cfg.client[0].sdp,
                 headers: {
-                    Subject: self.test.fullTitle()
+                    Subject: this.test.fullTitle()
                 }
             }, function( err, dialog ) {
                 should.not.exist(err) ;
