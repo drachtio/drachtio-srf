@@ -4,8 +4,8 @@ var debug = require('debug')('drachtio-srf') ;
 var drachtio = require('drachtio') ;
 var Agent = drachtio.Agent ;
 var fixture = require('drachtio-test-fixtures') ;
-var uac, uas ;
-var cfg = fixture(__dirname,[8060,8061],[6060,6061]) ;
+var uac, uas, b2b ;
+var cfg = fixture(__dirname,[8060,8061,8062],[6060,6061,6062]) ;
 var Srf = require('../..') ;
 
 describe('uac / uas scenarios', function() {
@@ -250,6 +250,40 @@ describe('uac / uas scenarios', function() {
                 should.not.exist(err) ;
                 dialog.destroy() ;
                 done() ;
+            }) ;
+        }) ;
+    }) ;    
+    it('Srf#createBackToBackDialogs should handle CANCEL during outdial', function(done) {
+        var srf = new Srf(cfg.client[0].connect_opts) ;
+        b2b = require('../scripts/uas/b2b')(Object.assign({b2bTarget: cfg.sipServer[2]}, cfg.client[1])) ;
+        uas = require('../scripts/uas/app4')(cfg.client[2]) ;
+        cfg.connectAll([srf, uas], (err) => {
+            if( err ) { throw err ; }
+            srf.request({
+                uri: cfg.sipServer[1],
+                method: 'INVITE',
+                body: cfg.client[0].sdp,
+                headers: {
+                    Subject: this.test.fullTitle()
+                }
+            }, function( err, req ) {
+                should.not.exist(err) ;
+
+                req.on('response', (response) => {
+                    if( response.status < 200 ) { return; }
+                    response.status.should.eql(487);
+
+                    // need to leave a little time for the B2BUA to finish its work
+                    setTimeout( () => {
+                        srf.idle.should.be.true ;
+                        uas.idle.should.be.true ;
+                        b2b.idle.should.be.true ;
+
+                        done() ;
+                    }, 750) ;
+                }) ;
+
+                setTimeout(() => { req.cancel(); }, 450) ;
             }) ;
         }) ;
     }) ;    
