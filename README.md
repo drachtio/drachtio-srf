@@ -1,6 +1,5 @@
 # drachtio-srf [![Build Status](https://secure.travis-ci.org/davehorton/drachtio-srf.png)](http://travis-ci.org/davehorton/drachtio-srf) [![NPM version](https://badge.fury.io/js/drachtio-srf.svg)](http://badge.fury.io/js/drachtio-srf)
 
-
 [![drachtio logo](http://davehorton.github.io/drachtio-srf/img/definition-only-cropped.png)](http://davehorton.github.io/drachtio-srf)
 
 Welcome to the drachtio signaling resource framework, empowering nodejs/javascript developers to build highly-scalable SIP application servers -- without requiring a Ph.D in [SIP](https://www.ietf.org/rfc/rfc3261.txt) or VoIP :)
