@@ -1,6 +1,7 @@
 language: node_js
 node_js:
   - "6"
+dist: trusty
 
 before_install: "sudo bash ci/before_install"
 
