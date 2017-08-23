@@ -49,6 +49,41 @@ describe('uac / uas scenarios', function() {
     }) ;
   }) ;
 
+  it('Srf#createUAC should handle auth challenge', function(done) {
+    uac = new Srf(cfg.client[0].connect_opts) ;
+    uac.set('api logger', cfg.client[0].apiLog) ;
+
+    uas = require('../scripts/uas/app2')(cfg.client[1]) ;
+    cfg.connectAll([uac, uas], (err) => {
+      if (err) { throw err;  }
+      uac.createUAC(cfg.sipServer[1], {
+        method: 'INVITE',
+        headers: {
+          To: 'sip:dhorton@sip.drachtio.org',
+          From: 'sip:dhorton@sip.drachtio.org',
+          Contact: '<sip:dhorton@sip.drachtio.org>;expires=30',
+          Subject: this.test.fullTitle()
+        },
+        auth: {
+          username: 'dhorton',
+          password: '1234'
+        }
+      })
+        .then((dlg) => {
+          dlg.destroy((err, bye) => {
+            bye.on('response', function() {
+              should.not.exist(err) ;
+              uac.idle.should.be.true ;
+              done() ;
+            }) ;
+          }) ;
+        })
+        .catch((err) => {
+          console.log(err);
+        })
+    }) ;
+  }) ;
+
   it('should support app locals', function(done) {
     uac = cfg.configureUac(cfg.client[0], Agent) ;
     uas = require('../scripts/uas/app3')(cfg.client[1]) ;
@@ -89,6 +124,42 @@ describe('uac / uas scenarios', function() {
   it('should create a UAS dialog and allow remote side to tear down', function(done) {
     uac = cfg.configureUac(cfg.client[0], Agent) ;
     uas = require('../scripts/uas/app')(cfg.client[1]) ;
+    cfg.connectAll([uac, uas], (err) => {
+      if (err) { throw err ; }
+
+      uac.request({
+        uri: cfg.sipServer[1],
+        method: 'INVITE',
+        body: cfg.client[0].sdp,
+        headers: {
+          Subject: this.test.fullTitle()
+        }
+      }, (err, req) => {
+        should.not.exist(err) ;
+        req.on('response', (res, ack) => {
+          res.should.have.property('status', 200);
+          ack() ;
+
+          setTimeout(() => {
+            uac.request({
+              method: 'BYE',
+              stackDialogId: res.stackDialogId
+            }, (err, bye) => {
+              should.not.exist(err) ;
+              bye.on('response', (response) => {
+                response.should.have.property('status', 200);
+                uac.idle.should.be.true ;
+                done() ;
+              }) ;
+            }) ;
+          }, 1) ;
+        }) ;
+      }) ;
+    }) ;
+  }) ;
+  it('should support promises-based UAS', function(done) {
+    uac = cfg.configureUac(cfg.client[0], Agent) ;
+    uas = require('../scripts/uas/app5')(cfg.client[1]) ;
     cfg.connectAll([uac, uas], (err) => {
       if (err) { throw err ; }
 
@@ -246,6 +317,7 @@ describe('uac / uas scenarios', function() {
       }) ;
     }) ;
   }) ;
+
   it('Srf#createBackToBackDialogs should handle CANCEL during outdial', function(done) {
     var srf = new Srf(cfg.client[0].connect_opts) ;
     b2b = require('../scripts/uas/b2b')(Object.assign({b2bTarget: cfg.sipServer[2]}, cfg.client[1])) ;
