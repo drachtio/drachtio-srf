@@ -3,7 +3,7 @@ sudo apt-get install -y libcurl4-openssl-dev
 curl-config --version
 curl-config --libs 
 cd ..
-git clone --depth=50 --branch=develop https://github.com/davehorton/drachtio-server
+git clone --depth=50 --branch=cluster-experimental https://github.com/davehorton/drachtio-server
 cd drachtio-server
 sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
 git submodule update --init --recursive
