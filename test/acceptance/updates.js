@@ -31,7 +31,7 @@ describe('uac / uas scenarios with newer method signatures', function() {
     cfg.stopServers(done) ;
   }) ;
 
-  it('Srf#createB2B should work for successful call', function(done) {
+  it.only('Srf#createB2B should work for successful call', function(done) {
     const srf = new Srf() ;
     uac = cfg.configureUac(cfg.client[0], Agent) ;
     srf.connect(cfg.client[1].connect_opts);
