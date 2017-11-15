@@ -1,8 +1,8 @@
-var drachtio = require('drachtio') ;
 var Srf = require('../../..') ;
 var srf = new Srf() ;
 var fs = require('fs') ;
 var debug = require('debug')('srf-test') ;
+var assert = require('assert');
 
 module.exports = (config) => {
 
@@ -14,12 +14,12 @@ module.exports = (config) => {
 
     srf.createUAS(req, res, {
       localSdp: config.sdp
-    })
-      .then((dialog) => {
-        dialog.on('destroy', () => {
-          debug('done') ;
-        }) ;
+    }, (err, dialog) => {
+      assert(!err);
+      dialog.on('destroy', () => {
+        debug('done') ;
       }) ;
+    });
   }) ;
 
   return srf ;

@@ -8,6 +8,11 @@ var Srf = require('../..') ;
 const debug = require('debug')('drachtio-srf');
 const async = require('async') ;
 const assert = require('assert');
+const Dialog = require('../../lib/dialog');
+
+process.on('unhandledRejection', (reason, p) => {
+  console.log('Unhandled Rejection at: Promise', p, 'reason:', reason);
+});
 
 function destroyAll(uas) {
   return new Promise((resolve, reject) => {
@@ -20,7 +25,7 @@ function destroyAll(uas) {
     });
   });
 }
-describe('uac / uas scenarios with newer method signatures', function() {
+describe('createB2BUA', function() {
   this.timeout(6000) ;
 
   debug('test...');
@@ -31,7 +36,7 @@ describe('uac / uas scenarios with newer method signatures', function() {
     cfg.stopServers(done) ;
   }) ;
 
-  it.only('Srf#createB2B should work for successful call', function(done) {
+  it('should work for successful call', function(done) {
     const srf = new Srf() ;
     uac = cfg.configureUac(cfg.client[0], Agent) ;
     srf.connect(cfg.client[1].connect_opts);
@@ -73,7 +78,7 @@ describe('uac / uas scenarios with newer method signatures', function() {
     });
   });
 
-  it('Srf#createB2B should work for failed UAC call', function(done) {
+  it('should work for failed call', function(done) {
     const srf = new Srf() ;
     uac = cfg.configureUac(cfg.client[0], Agent) ;
     srf.connect(cfg.client[1].connect_opts);
@@ -112,7 +117,7 @@ describe('uac / uas scenarios with newer method signatures', function() {
     });
   });
 
-  it('Srf#createB2B should handle CANCEL', function(done) {
+  it('should handle CANCEL during call setup', function(done) {
     const srf = new Srf() ;
     uac = cfg.configureUac(cfg.client[0], Agent) ;
     srf.connect(cfg.client[1].connect_opts);
@@ -123,7 +128,7 @@ describe('uac / uas scenarios with newer method signatures', function() {
       srf.invite((req, res) => {
         srf.createB2BUA(req, res, cfg.sipServer[2])
           .then(({uas, uac}) => {
-            assert('unexpected success - should have failed with 503');
+            assert('unexpected success - should have failed with 487');
           })
           .catch((err) => {
             err.status.should.eql(487);
@@ -150,7 +155,7 @@ describe('uac / uas scenarios with newer method signatures', function() {
     });
   });
 
-  it('Srf#createB2B should include headers from uas leg onto uac leg', function(done) {
+  it('should propagate headers from UAS onto UAC', function(done) {
     const srf = new Srf() ;
     uac = cfg.configureUac(cfg.client[0], Agent) ;
     srf.connect(cfg.client[1].connect_opts);
@@ -194,7 +199,7 @@ describe('uac / uas scenarios with newer method signatures', function() {
       });
     });
   });
-  it('Srf#createB2B should support SDP provided as string', function(done) {
+  it('should allow SDP to be provided as string', function(done) {
     const srf = new Srf() ;
     uac = cfg.configureUac(cfg.client[0], Agent) ;
     srf.connect(cfg.client[1].connect_opts);
@@ -238,7 +243,7 @@ describe('uac / uas scenarios with newer method signatures', function() {
     });
   });
 
-  it('Srf#createB2B should support SDP provided as promise', function(done) {
+  it('should allow SDP to be provided as a function returning a promise', function(done) {
     const srf = new Srf() ;
     uac = cfg.configureUac(cfg.client[0], Agent) ;
     srf.connect(cfg.client[1].connect_opts);
@@ -289,4 +294,181 @@ describe('uac / uas scenarios with newer method signatures', function() {
       });
     });
   });
+
+  it('should support callback Srf#createB2BUA(req, res, uri, opts, undefined, undefined, callback)', function(done) {
+    const srf = new Srf() ;
+    uac = cfg.configureUac(cfg.client[0], Agent) ;
+    srf.connect(cfg.client[1].connect_opts);
+    uas = require('../scripts/uas/app22')(cfg.client[2]) ;
+    cfg.connectAll([uac, srf, uas], (err) => {
+      assert(!err);
+
+      srf.invite((req, res) => {
+        srf.createB2BUA(req, res, cfg.sipServer[2], {}, null, null, (err, {uas, uac}) => {
+          should.not.exist(err) ;
+          destroyAll([uac, uas])
+            .then(() => {
+              uac.should.be.idle;
+              uas.should.be.idle;
+              done() ;
+            });
+        });
+      });
+
+      uac.request({
+        uri: cfg.sipServer[1],
+        method: 'INVITE',
+        body: cfg.client[0].sdp,
+        headers: {
+          Subject: this.test.fullTitle()
+        }
+      }, (err, req) => {
+        should.not.exist(err) ;
+        req.on('response', (res, ack) => {
+          res.should.have.property('status', 200);
+          ack() ;
+        });
+      });
+    });
+  });
+
+  it('should support cbFinalizedUac callback to provide early access to uac: Srf#createB2BUA(req, res, opts, {cbFinalizedUac})', function(done) {
+    const srf = new Srf() ;
+    let gotUac = false ;
+    uac = cfg.configureUac(cfg.client[0], Agent) ;
+    srf.connect(cfg.client[1].connect_opts);
+    uas = require('../scripts/uas/app23')(cfg.client[2]) ;
+    cfg.connectAll([uac, srf, uas], (err) => {
+      assert(!err);
+
+      srf.invite((req, res) => {
+        srf.createB2BUA(req, res, {uri: cfg.sipServer[2]}, {cbFinalizedUac: (uac) => {
+          uac.should.be.an.instanceOf(Dialog);
+          gotUac = true ;
+        }})
+          .then(({uas, uac}) => {
+            should.not.exist(err) ;
+            gotUac.should.be.true;
+            uac.should.be.an.instanceOf(Dialog);
+            uas.should.be.an.instanceOf(Dialog);
+            destroyAll([uac, uas])
+              .then(() => {
+                uac.should.be.idle;
+                uas.should.be.idle;
+                done() ;
+              });
+          });
+      });
+
+      uac.request({
+        uri: cfg.sipServer[1],
+        method: 'INVITE',
+        body: cfg.client[0].sdp,
+        headers: {
+          Subject: this.test.fullTitle()
+        }
+      }, (err, req) => {
+        should.not.exist(err) ;
+        req.on('response', (res, ack) => {
+          res.should.have.property('status', 200);
+          ack() ;
+        });
+      });
+    });
+  });
+
+  it('should support cbRequest and cbProvisional callbacks: Srf#createB2BUA(req, res, uri, opts, {cbRequest, cbProvisional})', function(done) {
+    const srf = new Srf() ;
+    uac = cfg.configureUac(cfg.client[0], Agent) ;
+    srf.connect(cfg.client[1].connect_opts);
+    uas = require('../scripts/uas/app25')(cfg.client[2]) ;
+    cfg.connectAll([uac, srf, uas], (err) => {
+      assert(!err);
+
+      let gotRequest = false ;
+      let gotProvisional = false ;
+
+      srf.invite((req, res) => {
+        srf.createB2BUA(req, res, cfg.sipServer[2], {},
+          {
+            cbRequest: (sent) => {
+              gotRequest = true ;
+            },
+            cbProvisional: (prov) => {
+              gotProvisional = true ;
+            }
+          })
+          .then(({uas, uac}) => {
+            should.not.exist(err) ;
+            gotRequest.should.be.true ;
+            gotProvisional.should.be.true ;
+            uac.should.be.an.instanceOf(Dialog);
+            uas.should.be.an.instanceOf(Dialog);
+            destroyAll([uac, uas])
+              .then(() => {
+                uac.should.be.idle;
+                uas.should.be.idle;
+                done() ;
+              });
+          });
+      });
+
+      uac.request({
+        uri: cfg.sipServer[1],
+        method: 'INVITE',
+        body: cfg.client[0].sdp,
+        headers: {
+          Subject: this.test.fullTitle()
+        }
+      }, (err, req) => {
+        should.not.exist(err) ;
+        req.on('response', (res, ack) => {
+          if (res.status === 200) ack() ;
+        });
+      });
+    });
+  });
+
+  it('should work for signature Srf#createB2BUA(req, res, {uri})', function(done) {
+    const srf = new Srf() ;
+    uac = cfg.configureUac(cfg.client[0], Agent) ;
+    srf.connect(cfg.client[1].connect_opts);
+    uas = require('../scripts/uas/app24')(cfg.client[2]) ;
+    cfg.connectAll([uac, srf, uas], (err) => {
+      assert(!err);
+
+      srf.invite((req, res) => {
+        srf.createB2BUA(req, res, {uri: cfg.sipServer[2]})
+          .then(({uas, uac}) => {
+
+            destroyAll([uac, uas])
+              .then(() => {
+                uac.should.be.idle;
+                uas.should.be.idle;
+                done() ;
+              });
+
+          })
+          .catch((err) => {
+            throw err;
+          });
+      });
+
+      uac.request({
+        uri: cfg.sipServer[1],
+        method: 'INVITE',
+        body: cfg.client[0].sdp,
+        headers: {
+          Subject: this.test.fullTitle()
+        }
+      }, (err, req) => {
+        should.not.exist(err) ;
+        req.on('response', (res, ack) => {
+          res.should.have.property('status', 200);
+          ack() ;
+        });
+      });
+    });
+  });
+
 });

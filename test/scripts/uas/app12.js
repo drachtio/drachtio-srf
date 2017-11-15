@@ -1,4 +1,3 @@
-var drachtio = require('drachtio') ;
 var Srf = require('../../..') ;
 var srf = new Srf() ;
 var fs = require('fs') ;
@@ -14,12 +13,12 @@ module.exports = (config) => {
 
     srf.createUAS(req, res, {
       localSdp: config.sdp
-    })
-      .then((dialog) => {
-        dialog.on('destroy', () => {
-          debug('done') ;
-        }) ;
+    }, (err, dialog) => {
+      if (err) throw err ;
+      dialog.on('destroy', () => {
+        debug('done') ;
       }) ;
+    });
   }) ;
 
   return srf ;
