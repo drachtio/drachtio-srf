@@ -19,153 +19,563 @@
     </section>
 
     <section class="main-content">
-      <div class="drachtio-img"><img src="http://davehorton.github.io/drachtio-srf/img/definition-only-cropped.png">
-      </div>
+      <div class="drachtio-img"><img src="http://davehorton.github.io/drachtio-srf/img/definition-only-cropped.png"></div>
       <p>
-        Welcome to the drachtio signaling resource framework, empowering nodejs/javascript developers to build highly-scalable SIP application servers -- without requiring a Ph.D in <a href="https://www.ietf.org/rfc/rfc3261.txt">SIP</a> or VoIP :)
-      </p>
-      <p>drachtio is an open-source, nodejs-based ecosystem for creating any kind of VoIP server-based application: registrar, proxy, back-to-back user agent, and many others. Furthermore, when coupled with the drachtio <a href="https://github.com/davehorton/drachtio-fsmrf">media resource function</a>, rich media-processing applications can be easily built as well.
+        Welcome to the Drachtio Signaling Resource framework (drachtio-srf), a module for building high-performance <a href="https://www.ietf.org/rfc/rfc3261.txt">SIP</a> server applications in pure javascript.
       </p>
       <p>
-        Within the drachtio ecosystem, drachtio-srf is a high-level abstraction framework that sits on top of the <a href="https://github.com/senchalabs/connect">connect</a>-inspired <a href="https://github.com/davehorton/drachtio">drachtio</a> library, and allows the developer to easily create and manage SIP <a href="http://davehorton.github.io/drachtio-srf/api/Dialog">Dialogs</a>, without the burden of tending to the details of lower-level SIP transactions and messages.
+        drachtio-srf bundles the lower-level sip middleware library <a href="https://github.com/davehorton/drachtio">drachtio</a>, and requires a network connection to a <a href="https://github.com/davehorton/drachtio-server">drachtio server</a> process.  The drachtio server provides the sip transaction processing engine and is controlled by nodejs applications using the drachtio-srf module.
       </p>
       <p>
-        <strong>Note:</strong> API documentation for drachtio-srf <a href="http://davehorton.github.io/drachtio-srf/api/index.html">can be found here</a>.
+        drachtio-srf concerns itself solely with SIP signaling; however, a companion framework, <a href="https://github.com/davehorton/drachtio-fsmrf">drachtio-fsmrf</a>, may be of interest to developers, as this framework allows the integration of media control (RTP) into SIP applications using <a href="https://freeswitch.org">Freeswitch</a> as a media server.
+      </p>
+      <p>
+        All components of the drachtio ecosystem are released under the MIT open source license.
+      </p>
+      <p>
+        <a href="http://davehorton.github.io/drachtio-srf/api/index.html">API documentation for drachtio-srf can be found here</a>.
+      </p>
+
+      <h1>
+        <a id="user-content-table-of-contents" class="deep-link" href="#table-of-contents" aria-hidden="true">
+        </a>Table of Contents
+      </h1>
+      <ul>
+      <li><a href="#getting-started">Getting Started</a></li>
+      <li><a href="#receiving-sip-requests">Receiving SIP requests</a></li>
+      <li><a href="#sending-sip-requests">Sending SIP requests</a>
+      <ul>
+      <li><a href="#dealing-with-local-server-ip-addresses">Dealing with local server IP addresses</a></li>
+      <li><a href="#handling-responses">Handling responses</a></li>
+      </ul>
+      </li>
+      <li><a href="#creating-sip-dialogs">Creating SIP Dialogs</a>
+      <ul>
+      <li><a href="#srfcreateuas">Srf#createUAS</a></li>
+      <li><a href="#srfcreateuac">Srf#createUAC</a></li>
+      <li><a href="#srfcreateb2bua">Srf#createB2BUA</a></li>
+      </ul>
+      </li>
+      <li><a href="#more-on-sip-dialogs">More on SIP Dialogs</a>
+      <ul>
+      <li><a href="#dialog-events">Dialog events</a></li>
+      </ul>
+      </li>
+      <li><a href="#dialog-properties">Dialog properties</a></li>
+      <li><a href="#dialog-methods">Dialog methods</a></li>
+      <li><a href="#creating-a-sip-proxy-server">Creating a SIP Proxy Server</a></li>
+      <li><a href="#call-detail-records-cdrs">Call Detail Records (CDRs)</a></li>
+      <li><a href="#advanced-middleware-topics">Advanced middleware topics</a>
+      </ul>
+
+      <h2><a id="getting-started" class="deep-link" href="#getting-started" aria-hidden="true"></a>Getting Started</h2>
+      <p><strong>Note:</strong>&nbsp;The sample code below assumes that a drachtio server process is running on the localhost and is listening for connections from applications on port 9022 (tcp).</p>
+      <p>Applications connect to a drachtio server as follows:</p>
+      <pre>
+const Srf = require('drachtio-srf');
+const srf = new Srf() ;
+srf.connect({
+  host: '127.0.0.1',
+  port: 9022,
+  secret: 'cymru'
+}) ;
+srf
+  .on('connect', (err, hostport) => {
+    if (err) return console.log(`error connecting: ${err}`);
+    console.log(`successfully connected to drachtio server accepting SIP traffic on: ${hostport}`);
+  })
+  .on('error', (err) => {
+    console.log(`srf error: ${error}`);
+  });        
+      </pre>
+      <blockquote>Note: It is recommended to always listen for 'error' events, as above, because drachtio-srf will automatically reconnect to the drachtio server if the connection is lost for some reason as long as your application listens for 'error' events.</blockquote>
+      
+      <h2><a id="receiving-sip-requests" class="deep-link" href="#receiving-sip-requests" aria-hidden="true"></a>Receiving SIP requests</h2>
+      <p>
+        For those familiar with node.js middleware frameworks (such as connect, express, koa, and others) drachtio-srf takes a similar approach for receiving SIP requests and sending responses.
       </p>
       <pre>
-var app = require('drachtio')();
-var Srf = require('drachtio-srf'); 
-var srf = new Srf(app) ;
-
-// connect to drachtio server
-srf.connect({..}) ;
-
-srf.invite( function(req, res) {
-
-  // respond to incoming INVITE request by creating a user agent server dialog
-  srf.createUasDialog( req, res, {
-    localSdp: myLocalSdp,
-    headers: {
-      'Server': 'drachtio-srf Server'
-    }
-  }, function(err, dialog) {
-    if( err ) { throw err ; }
-    console.log('created user-agent server dialog: ', JSON.stringify(dialog)) ;
-
-    // set up dialog handlers
-    dialog.on('destroy', onCallerHangup) ;
-}) ;
-function onCallerHangup(msg) {
-  console.log('caller hung up, incoming BYE message looked like this: ', msg) ;
-}        
+srf.invite((req, res) => {
+  console.log(`received SIP INVITE from {req.source_address} with Call-id {req.get('Call-Id')}`);
+  res.send(486); // Busy Here
+}) ;        
       </pre>
 
-      <h3>Getting Started</h3>
-      <p><strong>Note:</strong> drachtio-srf applications require a network connection to a <a href="https://github.com/davehorton/drachtio-server">drachtio server</a> process that sits in the VoIP network and handles the low-level SIP messaging.
-      </p>
-      <h4>Install drachtio-srf</h4>
+      <h2><a id="sending-sip-requests" class="deep-link" href="#sending-sip-requests" aria-hidden="true"></a>Sending SIP requests</h2>
       <p>
-        <pre>
-npm install drachtio-srf --save</pre>
+        Now that we've seen how to handle incoming requests and generate a response, let's cover how to send a SIP request.  As we will see shortly, drachtio-srf provides some higher-level methods for creating and working with SIP dialogs that we will often use, but at a simple API exists to send out a SIP request:        
       </p>
-      <h4>Create an instance of the signaling resource framework</h4>
-        <p>First, create a drachtio "app".  This contains the middleware stack and core message routing functions.  Next, create a new instance of the drachtio signaling resource framework, passing the drachtio app that you just created.
-          <pre>
-var drachtio = require('drachtio') ;
-var app = drachtio();
-var Srf = require('drachtio-srf'); 
-var srf = new Srf(app) ;</pre>
-        </p>
+      <pre>
+srf.request('sip:daveh@drachtio.org', {
+  method: 'INVITE'
+  headers: {
+    'User-Agent': 'my great app/1.0'
+  },
+  body: someSdp
+}, (err, req) => {
+  // err - error sending, or null if successful
+  // req - if successful, the request that was actually sent out over the wire
+})
+      </pre>
+      <p>
+        In the example above, we sent out an INVITE.  
+      </p>
+      <p>
+        But what about all of the required headers that we did not supply?  <code>Call-Id</code>, <code>CSeq</code>, <code>From</code>, and <code>To</code> are all required headers for an INVITE, but in the example above the application did not supply them.  What would have happened?  
+      </p>
+      <p>
+        Well, the drachtio server will set appropriate default values for these (and a few other) headers if the application does not provide them (because, of course we could have supplied value above in the <code>headers</code> object).          
+      </p>
+      <p>
+        The defaults will be set as follows:
+      </p>
+      <ul>
+        <li><code>Call-Id:</code>will be set to a randomly-generated unique uuid (there is rarely a reason for an app to explicitly set Call-Id or CSeq)</li>
+        <li><code>CSeq:</code>will be set to '1 INVITE'</li>
+        <li><code>From:</code>will be set to 'sip:{hostport}', where hostport is the sip address that drachtio server is listening on</li>
+        <li><code>To:</code>will be 'sip:{user}@{hostport}', where user is taken from the sip uri provided</li>
+        <li><code>Content-Type:</code>will be set to 'application/sdp' if a <code>body</code> property containing a session description protocol is provided; in all other cases the application must explicitly set the Content-Type header</li>
+        <li><code>Via:</code>In all cases, the drachtio server will construct the proper Via header.  Applications should never specify a Via header</li>
+      </ul>
 
-      <h4>Use middleware</h4>
-      <p>Similar to connect, drachtio supports the concept of middleware with the 'use' method. (The 'use' method may equivalently be called on the 'srf' instance, or the underlying 'app').
-        <pre>
-var rangeCheck = require('range_check');
+      <h2><a id="dealing-with-local-server-ip-addresses" class="deep-link" href="#dealing-with-local-server-ip-addresses" aria-hidden="true"></a>Dealing with local server IP addresses</h2>
+      <p>
+        Often, an application <strong>will</strong> want to specify a <code>From</code>, a <code>To</code>, or a <code>Contact</code> header.  It can be a challenge to put the proper IP address (and possibly, sip port) in the hostport part of the sip uris -- that is, the sip address that the connected drachtio server is actually listening on.  Because the drachtio server may be running on a remote server, and furthermore, may be listening on multiple sip hostports, it is a non-trival exercise for an application to populate correctly into these headers.
+      </p>
+      <p>
+        The solution is to let the drachtio server fill in this part of the header by simply using the string `placeholder` in the provided header, e.g.:
+      </p>
+      <pre>
+srf.request('sip:daveh@drachtio.org', {
+  method: 'INVITE'
+  headers: {
+    'From': '&lt;sip:5083084809@placeholder&gt;',
+    'To': '&lt;sip:+16173333456@placeholder&gt;'
+  },
+  body: someSdp
+}, (err, req) => {...})        
+      </pre>
+      <blockquote>
+        Note: do not provide a `tag=` attribute when specifying a `From` or `To` header.  The drachtio server will generate tags as needed for all requests and responses.
+      </blockquote>
+
+      <h2><a id="handling-responses" class="deep-link" href="#handling-responses" aria-hidden="true"></a>Handling responses</h2>
+      <p>
+        Now that we know how to send a request, what about receiving the associated response?
+      </p>
+      <p>
+        This can be done by listening to the <code>response</code> event associated with the <code>req</code> object provided in the callback (i.e., the req object is an event emitter):
+      </p>
+      <pre>
+srf.request('sip:daveh@drachtio.org', {
+  method: 'OPTIONS'
+}, (err, req) => {
+  if (err) return console.log(`error sending OPTIONS: ${err}`);
+  req.on('response', (res) => {
+    console.log(`got a ${res.status} to my OPTIONS request`);
+  })
+});        
+      </pre>
+      <p>
+        An INVITE is a special case when it comes to sending requests, because besides receiving the response(s) a final ACK must be sent.
+      </p>
+      <p>
+        For non-200 OK final responses to an INVITE, the drachtio server will automatically generate the ACK, but for a successful 200 OK response the application must generate the ACK (this is because there are some scenarios where the ACK could carry an SDP as well).
+      </p>
+      <p>
+        To do so, in the case of an INVITE request, the `response` event will have a second parameter which is a function that the application should call to generate the ACK; e.g.:        
+      </p>
+      <pre>
+srf.request('sip:daveh@drachtio.org', {
+  method: 'INVITE'
+  headers: {
+    'From': '&lt;sip:5083084809@placeholder&gt;',
+    'To': '&lt;sip:+16173333456@placeholder&gt;'
+  },
+  body: someSdp
+}, (err, req) => {
+  if (err) return console.log(`error sending INVITE: ${err}`);
+
+  req.on('response', (res, ack) => {
+    if (200 === res.status) {
+      ack(); // success !
+    }
+  });
+});        
+      </pre>
+
+      <h2><a id="creating-sip-dialogs" class="deep-link" href="#creating-sip-dialogs" aria-hidden="true"></a>Creating SIP Dialogs</h2>
+      <p>
+        The examples above show how to send and receive individual SIP messages, but drachtio-srf also provides APIs to work with the <a href="https://tools.ietf.org/html/rfc3261#section-12">higher-level concept of SIP dialogs</a>.  A SIP dialog is established through INVITE (or SUBSCRIBE) messages and represents a long-lived signaling and media connection between two endpoints.  SIP dialogs can be created, modified, and destroyed using drachtio-srf.  
+      </p>
+      <p>
+        The API allows developers to create user agent servers (i.e., a SIP dialog initiated by responding to an incoming SIP INVITE), user agent clients (dialogs created by initiating a new SIP INVITE request), and back-to-back user agents.  
+      </p>
+      <p>
+        All of the API methods below supporting returning a created dialog object either via a callback or returning a Promise.
+      </p>
+
+      <h3><a id="srfcreateuas" class="deep-link" href="#srfcreateuas" aria-hidden="true"></a>Srf#createUAS</h3>
+      <p>
+        Use this method to respond to an incoming INVITE and establish a sip dialog as a user agent server.
+      </p>
+      <p>
+        returning a Promise:
+      </p>
+      <pre>
+srf.invite((req, res) => {
+  srf.createUAS(req, res, {
+    localSdp: someSdp  // a string, or
+                      //  a function returning a Promise that resolves to a string
+  })
+    .then((dialog) => {
+      console.log('successfully created UAS dialog');
+      dialog.on('destroy', () => {
+        console.log('remote party hung up');
+      });
+    });
+    .catch((err) => {
+      console.log(`Error creating UAS dialog: ${err}`);
+    }) ;
+});        
+      </pre>
+      
+      <p>
+        using a callback:
+      </p>
+      <pre>
+srf.invite((req, res) => {
+  srf.createUAS(req, res, {
+    localSdp: someSdp  
+  }, (err, dialog) => {
+    if (err) {
+      return console.log(`Error creating UAS dialog: ${err}`);
+    }
+    console.log('successfully created UAS dialog');
+    dialog.on('destroy', () => {
+      console.log('remote party hung up');
+    });
+  });
+});        
+      </pre>
+
+      <p>
+        headers can also be supplied in the usual way:
+      </p>
+      <pre>
+srf.createUAS(req, res, {
+  localSdp: someSdp,
+  headers: {
+    'X-My-Header': 'custom headers too!'
+  }        
+}).then((dialog) => {...});
+      </pre>
+
+      <h3><a id="srfcreateuac" class="deep-link" href="#srfcreateuac" aria-hidden="true"></a>Srf#createUAC</h3>
+      <p>
+        Use this to generate an INVITE and establish a sip dialog as a user agent client.
+      </p>
+      <p>
+        returning a Promise:        
+      </p>
+      <pre>
+srf.createUAC(uri, {
+  localSdp: someSdp
+})
+  .then((dialog) => {....})
+  .catch((err) => {
+    console.log(`INVITE failed with final status ${err.status}`);
+  });        
+      </pre>
+
+      <p>
+        using a callback:
+      </p>
+      <pre>
+srf.createUAC(uri, {
+  localSdp: someSdp
+}, {}, (err, dialog) => {....});        
+      </pre>
+      <p>
+        The third parameter in method call above (the empty object `{}`) is an object that can optionally contain additional callbacks to provide information during the call establishment phase.  When using a callback, it must be there - even as an empty object - in order to satisfy the correct method signature.
+      </p>
+      <pre>
+srf.createUAC(uri, {
+  localSdp: someSdp
+}, {
+  cbRequest: ((req) => {...}),       //  INVITE request that was sent over the wire
+  cbProvisional: ((res) ==> {....})  // a 180 or 183 provisional response that was received
+}, (err, dialog) => {....});        
+      </pre>
+      <p>
+        As usual, headers can also be specified in the normal manner.  
+      </p>
+      <p>
+        Furthermore, <code>opts.callingNumber</code> and <code>opts.calledNumber</code> can be specified as a convenient way to provide the calling and called phone numbers that should appear in the <code>From</code>, <code>To</code>, and <code>Contact</code> headers (once again, the remainder of the header values, including the sip address, will be automatically filled out by the drachtio server):
+      </p>
+      <pre>
+srf.createUAC(uri, {
+  localSdp: someSdp,
+  callingNumber: '+15083084809',  // => From: sip:+15083084809@...
+  calledNumber: '+6173333456',    // => To: sip:+16173333456@..
+  headers: {
+    Subject: 'outbound call'
+  }
+}).then((dialog) => {....});        
+      </pre>
+      <p>
+        A SUBSCRIBE dialog can be created as well:
+      </p>
+      <pre>
+srf.createUAC(uri, {
+  localSdp: someSdp,
+  method: 'SUBSCRIBE'
+})
+  .then((dialog) => {....})
+  .catch((err) => {
+    console.log(`SUBSCRIBE failed with final status ${err.status}`);
+  });        
+      </pre>
+
+      <h3><a id="srfcreateb2bua" class="deep-link" href="#srfcreateb2bua" aria-hidden="true"></a>Srf#createB2BUA</h3>
+      <P>
+        Use this to create a back-to-back user agent.        
+      </P>
+      <P>
+        returning a Promise:        
+      </P>
+      <pre>
+srf.invite((req, res) => {
+  srf.createB2BUA(req, res, uri, {
+    localSdp: req.body
+  })
+    .then(({uas, uac}) => {
+      console('successfully connected call');
+
+      // propogate BYE from one leg to the other
+      uas.on('destroy', () => {uac.destroy();})
+      uac.on('destroy', () => {uas.destroy();})
+    })
+    .catch((err) => {
+      console.log(`INVITE failed with final status ${err.status}`);
+    });  
+});
+      </pre>
+      <p>
+        using a callback:
+      </p>
+      <pre>
+srf.createB2BUA(req, res, uri, {
+  localSdp: someSdp
+}, {
+  cbRequest: ((req) => {...}),      // INVITE request that was sent over the wire to B party 
+  cbProvisional: ((res) ==> {...}), // a 180 or 183 provisional response that was received from B party
+  cbFinalizedUac: (uac) => {...}    // if you need the created UAC dialog as soon it is created 
+                                    // i.e, as soon as 200 OK received by B, 
+                                    // before 200 OK/ACK exchanged with A 
+}, (err, {uas, uac}) => {....});        
+      </pre>
+      <p>
+        It is also possible to provide a list of headers that should be propogated from the incoming INVITE to the outgoing one (or vice versa on responses traveling back upstream):
+      </p>
+      <pre>
+srf.createB2BUA(req, res, uri, {
+  localSdp: req.body,
+  proxyRequestHeaders:['Subject', 'User-Agent'],
+  proxyResponseHeaders: ['Server']
+})
+  .then(({uas, uac}) => {
+    console('successfully connected call');
+
+    // propogate BYE from one leg to the other
+    uas.on('destroy', () => {uac.destroy();})
+    uac.on('destroy', () => {uas.destroy();})
+  })
+  .catch((err) => {
+    console.log(`INVITE failed with final status ${err.status}`);
+  });          
+      </pre>
+
+      <h2><a id="more-on-sip-dialogs" class="deep-link" href="#more-on-sip-dialogs" aria-hidden="true"></a>More on SIP Dialogs</h2>
+
+      <p>
+        All of the APIs above create a SIP dialog object, which is an event emitter.  For full details, <a href="http://davehorton.github.io/drachtio-srf/api/Dialog.html">please see the API documentation</a>.  
+      </p>
+      <p>
+        Developers interact with dialogs to listen for events, call methods, and read properties.  An overview of the most common interfaces is described below:
+      </p>
+
+      <h3><a id="dialog-events" class="deep-link" href="#dialog-events" aria-hidden="true"></a>Dialog Events</h3>
+      <p>
+        The most important event is the `destroy` event, which is triggered when a BYE is received for a SIP dialog (or a NOTIFY with Subscription-State: terminated for a SUBSCRIBE dialog).  Applications should always listen for the <code>destroy</code> event and take appropriate action (e.g., write a cdr, destroy related dialogs, etc).        
+      </p>
+      <p>
+        Other events include <code>modify</code> when a reINVITE is received with a changed SDP.  The application is responsible for sending a response to the re-INVITE in this case, and the event callback provides the <code>req</code>, <code>res</code> objects for this purpose.        
+      </p>
+      <p>
+        In the case of an INVITE on hold (or off hold), the dialog will emit the <code>hold</code> or <code>unhold</code> event. No action by the application is necessary, as the framework will generate the appropriate response.        
+      </p>
+      <p>
+        Similarly, if a session timer refreshing re-INVITE is received, a <code>refresh</code> event is emitted and no action is required by the application.        
+      </p>
+      <h3><a id="dialog-properties" class="deep-link" href="#dialog-properties" aria-hidden="true"></a>Dialog Properties</h3>
+      <p>
+        Some of the more commonly-accessed properties are as follows:
+        <ul>
+          <li>the <code>sip</code> object, which includes the <code>callId</code>, <code>remoteTag</code>, and <code>localTag</code> string properties; these <a href="https://tools.ietf.org/html/rfc3261#section-12">uniquely define a SIP dialog</a>
+          </li>
+          <li>the <code>remote</code> object, which contains the <code>uri</code> and <code>sdp</code> properties for the remote side of the dialog
+          </li>
+          <li><code>connected</code>, which is true if the dialog is active, false otherwise</li>
+          <li><code>onHold</code>, which is true if the dialog is currently in an on-hold state, false otherwise.</li>
+        </ul>        
+      </p>
+      <h3><a id="dialog-methods" class="deep-link" href="#dialog-methods" aria-hidden="true"></a>Dialog Methods</h3>
+      <p>
+        The most common method is <code>destroy</code>, which tears down a SIP dialog by sending a BYE (and a SUBSCRIBE dialog by sending a NOTIFY with Subscription-State: terminated).  The <code>destroy</code> method optionally takes one parameter, a callback which provides the SIP message sent over the wire (BYE or NOTIFY).        
+      </p>
+      <pre>
+// if I need to wait till I get a response to the BYE..
+dlg.destroy((bye) => {
+  bye.on('response', (msg) => {
+    console.log(`response to bye on ${bye.get('Call-Id)} was ${msg.status}'));
+  });
+});   
+      </pre>
+      <p>
+        The dialog also exposes a <code>modify</code> method, which can be used to modify the session description protocol.  It can be used in any of the following ways:        
+      </p>
+      <pre>
+// provide a modified sdp for the local side of the dialog..
+dlg.modify(newSdp, (err) => {
+  // on success, dlg.remote.sdp will have the new remote sdp
+}); 
+                                    
+// put the dialog on hold (sdp is automatically generated)
+dlg.modify('hold', (err) => {...}); 
+
+// take the dialog off hold (sdp is automatically generated)
+dlg.modify('unhold', (err) => {....})         
+      </pre>
+
+      <h2><a id="creating-a-sip-proxy-server" class="deep-link" href="#creating-a-sip-proxy-server" aria-hidden="true"></a>Creating a SIP Proxy Server</h2>
+
+      <p>
+Creating a SIP proxy server is simple:        
+      </p>
+      <pre>
+srf.invite((req, res) => {
+
+  // simple outbound proxy - 
+  // INVITE is proxied to the sip uri in the inbound request header
+  srf.proxyRequest(req, res);
+
+  // proxy to a specified destination
+  srf.proxyRequest( req, res, 'sip:next.hop.com');
+
+  // lots of options available, 
+  // plus a callback to indicate success if needed
+  srf.proxyRequest( req, res, ['sip:try.this.com', 'sip:try.that.com'], {
+    recordRoute: true,
+    forking: 'sequential',
+    followRedirects: true,
+    provisionalTimeout: '2s',
+    finalTimeout: '20s'
+    headers: {
+      Subject: 'my subject header'
+    }
+  }, (err, result) => {
+    console.log(JSON.stringify(result)); // {finalStatus: 200, finalResponse:{..}, responses: [..]}
+  });
+});        
+      </pre>
+      <p>
+        For full details, <a href="http://davehorton.github.io/drachtio-srf/api/Srf.html#proxyRequest">see here</a>.      
+      </p>
+
+      <h2><a id="call-detail-records-cdrs" class="deep-link" href="#call-detail-records-cdrs" aria-hidden="true"></a>Call Detail Records (CDRs)</h2>
+      <p>
+      Applications can connect to the drachtio server and receive call detail record information about all calls passing through the server.  It is possible to create an application that both performs call control and receives call detail record information; as well, it is possible to separate these into separate applications.        
+      </p>
+      <p>
+        Call detail records are emitted as events on the drachtio server framework instance that is created by <code>new Srf();</code>.        
+      </p>
+      <p>
+        Three type of cdr events are emitted:
+        <ul>
+          <li>a <code>cdr:attempt</code> event, when an INVITE is received by or generated from the server</li>
+          <li>a <code>cdr:start</code> event, when a final success response to an INVITE is received by or sent from the server</li>
+          <li>a <code>cdr:end</code> event, when either a final non-success response to an INVITE is received or sent, or a BYE is processed for an existing call leg</li>
+        </ul>     
+      </p>
+      <p>
+        Given the above, for each call attempt there will always be a `cdr:attempt` and a `cdr:end` event, but only `cdr:start` event for connected calls.        
+      </p>
+      <pre>
+const Srf = require('drachtio-srf');
+const srf = new Srf() ;
+
+srf.connect({..});
+
+srf.on('cdr:attempt', (source, time, msg) => {
+  console.log(`${msg.get('Call-Id')}: got attempt record from ${source} at ${time}`) ;
+  // source: 'network' or 'application'
+  // time: UTC time message was sent or received by server
+  // msg: object representing INVITE message that was sent or recieved
+}) ;
+
+srf.on('cdr:start', (source, time, role, msg) => {
+  console.log(`${msg.get('Call-Id')}: got start record from ${source} at ${time} with role ${role}`) ;
+  // role: 'uac', 'uas', 'uac-proxy', or 'uas-proxy'
+  // msg: object representing 200 OK that was sent or received
+}) ;
+
+srf.on('cdr:stop', (source, time, reason, msg) => {
+  console.log(`${msg.get('Call-Id')}: got end record from ${source} at ${time} with reason ${reason}`) ;
+  // reason: reason the call was ended: 
+  //      'call-rejected', 'call-canceled', 'normal-release', 'session-expired', 
+  //      'system-initiated-termination', or 'system-error-initiated-termination'
+  // msg: object representing BYE message that was sent or received
+});        
+      </pre>
+
+      <h2><a id="advanced-middleware-topics" class="deep-link" href="#advanced-middleware-topics" aria-hidden="true"></a>Advanced middleware topics</h2>
+
+      <p>
+        Similar to many http-based nodejs servers, drachtio-srf supports the concept of middleware with the <code>use</code> method.         
+      </p>
+      <pre>
+const config = require('config');
+const rangeCheck = require('range_check');
 ...
-srf.use(function (req, res, next) {
-  if( !rangeCheck.inRange( req.source_address, config.authorizedSources) ) { 
+srf.use((req, res, next) => {
+  if( !rangeCheck.inRange( req.source_address, config.get('authorizedSources') ) { 
     return res.send(403) ; 
   }
   next() ;
-}) ;</pre>
-    <h4>Mounting middleware</h4>
-    <p>Middleware can optionally be mounted only for specific SIP request types (methods) by specifying the method type (lower-cased) as an optional first parameter. 
+}) ;
+srf.invite((req, res) => {
+  // only authorized sources get here..
+})        
+      </pre>
+
+      <p>
+      Middleware can optionally be mounted only for specific SIP request types (methods) by specifying the method type (lower-cased) as an optional first parameter.         
+      </p>
       <pre>
-srf.use('register', parseRegister) ;</pre>
-    </p>
-    <h4>Error middleware</h4>
-    <p>There are special cases of "error-handling" middleware. There are middleware where the function takes exactly 4 arguments. Errors that occur in the middleware added before the error middleware will invoke this middleware when errors occur.
+srf.use('register', (req, res, next) => {..});        
+      </pre>
+      <p>
+There are special cases of "error-handling" middleware. These are middleware where the function takes exactly 4 arguments. Errors that occur in the middleware added before the error middleware will invoke this middleware when errors occur.        
+      </p>
       <pre>
+srf.use(middleware1);
+srf.use(middleware2)
 srf.use(function (err, req, res, next) {
   // an error occurred!
-});</pre>
-    </p>
-    <h4>Connect to a drachtio server</h4>
-    <p>The drachtio server process provides the actual sip processing engine that can be controlled by one or more drachtio clients.  Therefore, a drachtio-srf application must initially invoke the "connect" method on the srf instance (or, equivalently, on the underlying drachtio "app" object) to establish a connection to the drachtio server process in order to receive events (e.g. SIP messages) as well as send requests.  
-    </p>
-    <p>The application may either provide a callback to the "connect" call, or may listen for the "connect" event in order to determine whether/when a connection has been achieved.
-      <pre>
-srf.connect({
-  host: {ip address to connect to},
-  port: {port to connect to},
-  secret: {shared secret client must provide to authenticate to drachtio server}
-}, function(hostport) {
-  console.log('connected to server listening for SIP messages on %s': hostport) ;
-}) ;
-
-// or, instead of callback
-srf.on('connect', function(err, hostport){
-  if( err ) throw err ;
-  console.log('connected to server listening for SIP messages on %': hostport) ;  
-}) ;
-</pre>
-
-    <h4>Creating dialogs</h4>
-    <p>At this point, your application is ready to start interacting with a VoIP/SIP network; generating or receiving SIP requests and creating dialogs. The relevant methods on the 'srf' instance are:
-      <ul>
-        <li><a href="http://davehorton.github.io/drachtio-srf/api/Srf.html#createUasDialog">createUasDialog</a></li>
-        <li><a href="http://davehorton.github.io/drachtio-srf/api/Srf.html#createUacDialog">createUacDialog</a></li>
-        <li><a href="http://davehorton.github.io/drachtio-srf/api/Srf.html#createBackToBackDialogs">createBackToBackDialogs</a></li>
-        <li><a href="http://davehorton.github.io/drachtio-srf/api/Srf.html#proxyRequest">proxyRequest</a></li>
-      </ul>
-    </p>
-
-    <h4>Managing dialogs</h4>
-    <p>
-      Once you have created a dialog, you will want to be able to respond to events as well as exert control over the dialog by calling methods.
-      <h5>Dialog events</h5>
-      <ul>
-        <li><a href="http://davehorton.github.io/drachtio-srf/api/Dialog.html#event:destroy">'destroy'</a> -- fired when the remote end has sent a BYE request (i.e., the remote end has hung up).  No action is required in the associated callback: this is a notification-only event.</li>
-        <li><a href="http://davehorton.github.io/drachtio-srf/api/Dialog.html#event:refresh">'refresh'</a> -- fired when the remote end has sent a refreshing re-INVITE.  No action is required in the associated callback: this is a notification-only event.</li>
-        <li><a href="http://davehorton.github.io/drachtio-srf/api/Dialog.html#event:modify">'modify'</a> -- fired when the remote end has sent a re-INVITE with a modified session description (i.e. SDP). drachtio request and response objects are provided to the event handler, and the application must respond to the re-INVITE by invoking the 'res.send' method.</li>
-        <li><a href="http://davehorton.github.io/drachtio-srf/api/Dialog.html#event:info">'info', 'notify', 'refer', 'update'</a> -- fired when the remote end has sent a request within the dialog of the specified request type. drachtio request and response objects are provided to the event handler, and the application must respond to the re-INVITE by invoking the 'res.send' method. (Note: if the application does not register a listener for this class of event, a 200 OK with an empty body will automatically be generated in response to the incoming request).</li>
-      </ul>
-      <h5>Dialog methods</h5>
-      <ul>
-        <li><a href="http://davehorton.github.io/drachtio-srf/api/Srf.html#destroy">destroy</a> - terminates the dialog (i.e. sends a BYE to the far end)</li>
-        <li><a href="http://davehorton.github.io/drachtio-srf/api/Srf.html#modify">modify</a> - modifies the dialog media session; either placing or removing the call from hold, or re-INVITING the far end to a new media session description</li>
-        <li><a href="http://davehorton.github.io/drachtio-srf/api/Srf.html#request">request</a> - send a request within a dialog (e.g. INFO, NOTIFY, etc)</li>
-      </ul>
-    </p>
-
-    <h4>Sample applications</h4>
-    <p>
-      <ul>
-        <li><a href="https://github.com/davehorton/simple-sip-proxy">Load-balancing SIP proxy</a></li>
-        <li><a href="https://github.com/davehorton/drachtio-sample-twostage-dialing">Two-stage dialing application</a></li>
-      </ul>
-    </p>
-    <h3>Call Detail Records (cdrs)</h3>
-    <p>It is a common requirement for any SIP network element to be able to generate cdrs.  The drachtio server generates 'attempt', 'start', and 'stop' cdrs, and drachtio-srf applications can listen for associated cdr events:
-      <ul>
-        <li><a href="http://davehorton.github.io/drachtio-srf/api/Srf.html#event:cdr:attempt">cdr:attempt</a> events are generated whenever an INVITE is received from the network or generated by an application.  In other words, there will be an attempt cdr for every call attempt handled by the drachtio server.</li>
-        <li><a href="http://davehorton.github.io/drachtio-srf/api/Srf.html#event:cdr:attempt">cdr:start</a> events are generated when a call is successfully connected (i.e. a 200 OK response to an INVITE is received or generated).</li>
-        <li><a href="http://davehorton.github.io/drachtio-srf/api/Srf.html#event:cdr:attempt">cdr:stop</a> events are generated when a call attempt concludes.  Note that when a call is rejected (i.e. a non-success final response) a cdr:stop event is generated; alternatively, when a connected call is terminated a cdr:stop event will also be generated.</li>
-      </ul>
-    </p>
-
-    <h3>License</h3>
-      <a href="https://github.com/davehorton/drachtio-srf/blob/master/LICENSE">MIT</a>
+});
+srf.invite((req, res) => {...});
+      </pre>
 
       <footer class="site-footer">
         <span class="site-footer-owner"><a href="https://github.com/davehorton/drachtio-srf">drachtio-srf</a> is maintained by <a href="https://github.com/davehorton">davehorton</a>.</span>
