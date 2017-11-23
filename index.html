@@ -407,7 +407,7 @@ srf.createB2BUA(req, res, uri, {
 
       <h3><a id="dialog-events" class="deep-link" href="#dialog-events" aria-hidden="true"></a>Dialog Events</h3>
       <p>
-        The most important event is the `destroy` event, which is triggered when a BYE is received for a SIP dialog (or a NOTIFY with Subscription-State: terminated for a SUBSCRIBE dialog).  Applications should always listen for the <code>destroy</code> event and take appropriate action (e.g., write a cdr, destroy related dialogs, etc).        
+        The most important event is the <code>destroy</code> event, which is triggered when a BYE is received for a SIP dialog (or a NOTIFY with Subscription-State: terminated for a SUBSCRIBE dialog).  Applications should always listen for the <code>destroy</code> event and take appropriate action (e.g., write a cdr, destroy related dialogs, etc).        
       </p>
       <p>
         Other events include <code>modify</code> when a reINVITE is received with a changed SDP.  The application is responsible for sending a response to the re-INVITE in this case, and the event callback provides the <code>req</code>, <code>res</code> objects for this purpose.        

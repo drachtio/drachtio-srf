@@ -60,7 +60,7 @@
     <h2>Constructor</h2>
     
 
-    <h4 class="name" id="Srf"><span class="type-signature"></span>new Srf<span class="signature">(app)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="Srf"><span class="type-signature"></span>new Srf<span class="signature">(app<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
 
     
 
@@ -68,6 +68,9 @@
 
 <div class="description">
     Creates a signaling resource framework instance.
+It is preferred to not pass any arguments to the constructor, e.g.
+   const srf = new Srf();
+although
 </div>
 
 
@@ -135,6 +138,8 @@
         <th>Type</th>
 
         
+        <th>Attributes</th>
+        
 
         
 
@@ -160,11 +165,21 @@
             </td>
 
             
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
 
             
 
             <td class="description last">
-                drachtio app, or connects args (optional)
+                drachtio app, or connects args.
                 
             </td>
         </tr>
@@ -256,7 +271,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1124">line 1124</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1132">line 1132</a>
     </li></ul></dd>
     
 
@@ -531,7 +546,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line305">line 305</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line306">line 306</a>
     </li></ul></dd>
     
 
@@ -879,7 +894,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line661">line 661</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line662">line 662</a>
     </li></ul></dd>
     
 
@@ -1147,7 +1162,7 @@
 
     
 
-    <h4 class="name" id="createUAC"><span class="type-signature"></span>createUAC<span class="signature">(uri, opts, cbRequest<span class="signature-attributes">opt</span>, cbProvisional<span class="signature-attributes">opt</span>, callback<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+    <h4 class="name" id="createUAC"><span class="type-signature"></span>createUAC<span class="signature">(uri, opts, optsCallbacks<span class="signature-attributes">opt</span>, callback<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
 
     
 
@@ -1190,7 +1205,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line164">line 164</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line165">line 165</a>
     </li></ul></dd>
     
 
@@ -1304,13 +1319,13 @@
 
         <tr>
             
-                <td class="name"><code>cbRequest</code></td>
+                <td class="name"><code>optsCallbacks</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type"><code>Srf~requestCreationCallback</code></span>
+<span class="param-type"><code><a href="Srf.html#~uacProgressCallbacks">Srf~uacProgressCallbacks</a></code></span>
 
 
             
@@ -1331,43 +1346,7 @@
             
 
             <td class="description last">
-                callback that provides the request that was sent over the wire
-                
-            </td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>cbProvisional</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><code><a href="Srf.html#~provisionalResponseCallback">Srf~provisionalResponseCallback</a></code></span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last">
-                callback that passes on provisional responses
+                contains callbacks with call progress info
                 
             </td>
         </tr>
@@ -1504,7 +1483,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line548">line 548</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line549">line 549</a>
     </li></ul></dd>
     
 
@@ -1778,7 +1757,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line107">line 107</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line109">line 109</a>
     </li></ul></dd>
     
 
@@ -2056,7 +2035,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line501">line 501</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line502">line 502</a>
     </li></ul></dd>
     
 
@@ -2269,7 +2248,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line916">line 916</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line917">line 917</a>
     </li></ul></dd>
     
 
@@ -2523,7 +2502,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1103">line 1103</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1111">line 1111</a>
     </li></ul></dd>
     
 
@@ -2746,7 +2725,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1002">line 1002</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1003">line 1003</a>
     </li></ul></dd>
     
 
@@ -3197,7 +3176,7 @@ provisional response is received from the B leg</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1047">line 1047</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1055">line 1055</a>
     </li></ul></dd>
     
 
@@ -3275,7 +3254,7 @@ provisional response is received from the B leg</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1132">line 1132</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1140">line 1140</a>
     </li></ul></dd>
     
 
@@ -3410,7 +3389,7 @@ provisional response is received from the B leg</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1017">line 1017</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1018">line 1018</a>
     </li></ul></dd>
     
 
@@ -3572,7 +3551,7 @@ issuing a createBackToBackDialog request.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1010">line 1010</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1011">line 1011</a>
     </li></ul></dd>
     
 
@@ -3707,7 +3686,7 @@ issuing a createBackToBackDialog request.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1024">line 1024</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1025">line 1025</a>
     </li></ul></dd>
     
 
@@ -4096,7 +4075,7 @@ back upstream without generating a new response</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1064">line 1064</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1072">line 1072</a>
     </li></ul></dd>
     
 
@@ -4275,7 +4254,7 @@ destination in response to the proxy request</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1088">line 1088</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1096">line 1096</a>
     </li></ul></dd>
     
 
@@ -4453,7 +4432,7 @@ destination in response to the proxy request</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1096">line 1096</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1104">line 1104</a>
     </li></ul></dd>
     
 
@@ -4606,7 +4585,7 @@ destination in response to the proxy request</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1082">line 1082</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1090">line 1090</a>
     </li></ul></dd>
     
 
@@ -4684,7 +4663,7 @@ destination in response to the proxy request</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1117">line 1117</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1125">line 1125</a>
     </li></ul></dd>
     
 
@@ -4970,7 +4949,7 @@ want to call "req.on('response', function(res){..}"" in order to handle response
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1110">line 1110</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1118">line 1118</a>
     </li></ul></dd>
     
 
@@ -5172,7 +5151,160 @@ want to call "req.on('response', function(res){..}"" in order to handle response
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1039">line 1039</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1040">line 1040</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type"><code>Object</code></span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</div>
+
+            
+                
+<div class="section-members">
+<h4 class="name" id="~uacProgressCallbacks">uacProgressCallbacks</h4>
+
+
+
+
+<div class="description">
+    Callbacks providing call progress information for a UAC INVITE
+</div>
+
+
+
+
+
+    <h5 class="subsection-title">Properties:</h5>
+
+    
+
+<table class="props">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>cbRequest</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><code>function</code></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">callback that provides request sent over the wire</td>
+        </tr>
+
+        
+
+    
+
+        <tr>
+            
+                <td class="name"><code>cbProvisional</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><code>function</code></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">callback that provides a provisional response received</td>
+        </tr>
+
+        
+
+    
+    </tbody>
+</table>
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1048">line 1048</a>
     </li></ul></dd>
     
 
@@ -5250,7 +5382,7 @@ want to call "req.on('response', function(res){..}"" in order to handle response
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line995">line 995</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line996">line 996</a>
     </li></ul></dd>
     
 
@@ -5502,7 +5634,7 @@ want to call "req.on('response', function(res){..}"" in order to handle response
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1032">line 1032</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1033">line 1033</a>
     </li></ul></dd>
     
 
@@ -5587,7 +5719,7 @@ received (inbound) or initiated (outbound)
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1144">line 1144</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1152">line 1152</a>
     </li></ul></dd>
     
 
@@ -5775,7 +5907,7 @@ received (inbound) or initiated (outbound)
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1153">line 1153</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1161">line 1161</a>
     </li></ul></dd>
     
 
@@ -5991,7 +6123,7 @@ is acting as a user agent client, user agent server, proxy (sending message), or
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1164">line 1164</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1172">line 1172</a>
     </li></ul></dd>
     
 
@@ -6206,7 +6338,7 @@ with either success or failure
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1137">line 1137</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1145">line 1145</a>
     </li></ul></dd>
     
 
@@ -6332,7 +6464,7 @@ with either success or failure
 <br class="clear">
 
 <footer>
-    Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.4</a> on Tue Nov 21 2017 21:20:36 GMT-0500 (EST) using the Minami theme.
+    Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.4</a> on Thu Nov 23 2017 14:53:45 GMT-0600 (CST) using the Minami theme.
 </footer>
 
 <script>prettyPrint();</script>
