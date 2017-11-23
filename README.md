@@ -164,19 +164,22 @@ srf.request('sip:daveh@drachtio.org', {
 
 ## Creating SIP Dialogs
 
-The examples above show how to send and receive individual SIP messages, but drachtio-srf also provides APIs to work with the higher-level [concept of SIP dialogs](https://tools.ietf.org/html/rfc3261#section-12).  A SIP dialog is established through INVITE (or SUBSCRIBE) messages and represents a long-lived signaling and media connection between two endpoints.  SIP dialogs can be created, modified, and destroyed using drachtio-srf.  The API allows developers to create user agent servers (i.e., a SIP dialog initiated by responding to an incoming SIP INVITE), user agent clients (dialogs created by initiating a new SIP INVITE request), and back-to-back user agents.  
+The examples above show how to send and receive individual SIP messages, but drachtio-srf also provides APIs to work with the [higher-level concept of SIP dialogs](https://tools.ietf.org/html/rfc3261#section-12).  A SIP dialog is established through INVITE (or SUBSCRIBE) messages and represents a long-lived signaling and media connection between two endpoints.  SIP dialogs can be created, modified, and destroyed using drachtio-srf.  
+
+The API allows developers to create user agent servers (i.e., a SIP dialog initiated by responding to an incoming SIP INVITE), user agent clients (dialogs created by initiating a new SIP INVITE request), and back-to-back user agents.  
 
 All of the API methods below supporting returning a created dialog object either via a callback or returning a Promise.
 
 ### Srf#createUAS
 
-Use this to respond to an incoming INVITE and establish a sip dialog as a user agent server.
+Use this method to respond to an incoming INVITE and establish a sip dialog as a user agent server.
 
 returning a Promise:
 ```js
 srf.invite((req, res) => {
   srf.createUAS(req, res, {
-    localSdp: someSdp  // a string, or a Promise-returning function that resolves to a string
+    localSdp: someSdp  // a string, or
+                      //  a function returning a Promise that resolves to a string
   })
     .then((dialog) => {
       console.log('successfully created UAS dialog');
@@ -300,7 +303,7 @@ srf.createB2BUA(req, res, uri, {
   cbFinalizedUac: (uac) => {...}    // if you need the created UAC dialog as soon it is created 
                                     // i.e, as soon as 200 OK received by B, 
                                     // before 200 OK/ACK exchanged with A 
-}, (err, dialog) => {....});
+}, (err, {uas, uac}) => {....});
 ```
 It is also possible to provide a list of headers that should be propogated from the incoming INVITE to the outgoing one (or vice versa on responses traveling back upstream):
 ```js
@@ -321,7 +324,7 @@ srf.createB2BUA(req, res, uri, {
   });  
 ```
 ## More on SIP Dialogs
-All of the APIs above create a SIP dialog object, which is an event emitter.  For full details, [please see the API documentation here](http://davehorton.github.io/drachtio-srf/api/Dialog.html).  Developers will interact with dialogs to listen for events, call methods, and read properties.  An overview of the most common interfaces is described below:
+All of the APIs above create a SIP dialog object, which is an event emitter.  For full details, [please see the API documentation](http://davehorton.github.io/drachtio-srf/api/Dialog.html).  Developers will interact with dialogs to listen for events, call methods, and read properties.  An overview of the most common interfaces is described below:
 
 ### Dialog events
 The most important event is the `destroy` event, which is triggered when a BYE is received for a SIP dialog (or a NOTIFY with Subscription-State: terminated for a SUBSCRIBE dialog).  Applications should always listen for the 'destroy' event and take appropriate action (e.g., write a cdr, destroy related dialogs, etc).
@@ -333,9 +336,9 @@ In the case of an INVITE on hold (or off hold), the dialog will emit the `hold` 
 Similarly, if a session timer refreshing re-INVITE is received, a `refresh` event is emitted and no action is required by the application.
 
 ## Dialog properties
-Some of the commonly-accessed properties are as follows:
-* the `sip` object, which includes the `callId`, `remoteTag`, and `localTag` string properties; these uniquely define a SIP dialog per [RFC 3261](https://tools.ietf.org/html/rfc3261#section-12)
-* the `local` object, which provides information related to the local side of the dialog: `uri`, `sdp`, and `contact`
+Some of the more commonly-accessed properties are as follows:
+* the `sip` object, which includes the `callId`, `remoteTag`, and `localTag` string properties; these [uniquely define a SIP dialog](https://tools.ietf.org/html/rfc3261#section-12)
+* the `local` object, which provides information related to the local side of the dialog: the `uri`, `sdp`, and `contact` properties
 * the `remote` object, which contains the `uri` and `sdp` properties for the remote side of the dialog
 * `connected`, which is true if the dialog is active, false otherwise
 * `onHold`, which is true if the dialog is currently in an on-hold state, false otherwise.
@@ -343,14 +346,26 @@ Some of the commonly-accessed properties are as follows:
 ## Dialog methods
 The most common method is `destroy`, which tears down a SIP dialog by sending a BYE (and a SUBSCRIBE dialog by sending a NOTIFY with Subscription-State: terminated).  The `destroy` method optionally takes one parameter, a callback which provides the SIP message sent over the wire (BYE or NOTIFY).
 
+```js
+// if I need to wait till I get a response to the BYE..
+dlg.destroy((bye) => {
+  bye.on('response', (msg) => {
+    console.log(`response to bye on ${bye.get('Call-Id)} was ${msg.status}'));
+  });
+})
+```
 The dialog also exposes a `modify` method, which can be used to modify the session description protocol.  It can be used in any of the following ways:
 ```js
-dlg.modify(newSdp, (err) => {...}); // provide a modified sdp for the local side of the dialog..
-                                    // on success, dlg.remote.sdp will have the new remote sdp
+// provide a modified sdp for the local side of the dialog..
+dlg.modify(newSdp, (err) => {
+  // on success, dlg.remote.sdp will have the new remote sdp
+}); 
+                                    
+// put the dialog on hold (sdp is automatically generated)
+dlg.modify('hold', (err) => {...}); 
 
-dlg.modify('hold', (err) => {...}); // put the dialog on hold (sdp is automatically generated)
-
-dlg.modify('unhold', (err) => {....}) // take the dialog off hold (sdp is automatically generated)
+// take the dialog off hold (sdp is automatically generated)
+dlg.modify('unhold', (err) => {....}) 
 ```
 
 ## Creating a SIP Proxy Server
@@ -358,13 +373,15 @@ Creating a SIP proxy server is quite simple:
 ```js
 srf.invite((req, res) => {
 
-  // simple outbound proxy - INVITE is proxied to the sip uri in the inbound request header
+  // simple outbound proxy - 
+  // INVITE is proxied to the sip uri in the inbound request header
   srf.proxyRequest(req, res);
 
   // proxy to a specified destination
   srf.proxyRequest( req, res, 'sip:next.hop.com');
 
-  // lots of options available, plus a callback to indicate success if needed
+  // lots of options available, 
+  // plus a callback to indicate success if needed
   srf.proxyRequest( req, res, ['sip:try.this.com', 'sip:try.that.com'], {
     recordRoute: true,
     forking: 'sequential',
@@ -382,7 +399,7 @@ srf.invite((req, res) => {
 For full details, [see here](http://davehorton.github.io/drachtio-srf/api/Srf.html#proxyRequest#)
 
 ## Call Detail Records (CDRs)
-Applications can connect to the drachtio server and receive call detail record information about all calls handled by the server.  It is possible to create an application that both performs call control and receives call detail record information; as well, it is possible to separate these into separate applications.
+Applications can connect to the drachtio server and receive call detail record information about all calls passing through the server.  It is possible to create an application that both performs call control and receives call detail record information; as well, it is possible to separate these into separate applications.
 
 Call detail records are emitted as events on the drachtio server framework instance that is created by `new Srf();`.
 
@@ -454,5 +471,3 @@ srf.use(function (err, req, res, next) {
 });
 srf.invite((req, res) => {...});
 ```
-## License
-[MIT](https://github.com/davehorton/drachtio-srf/blob/master/LICENSE)
