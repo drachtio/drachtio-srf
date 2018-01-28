@@ -174,4 +174,42 @@ describe('createUAS', function() {
     }) ;
   }) ;
 
+  it('it should handle sending 183 and then 200', function(done) {
+    uac = cfg.configureUac(cfg.client[0], Agent) ;
+    uas = require('../scripts/uas/app27')(cfg.client[1]) ;
+    cfg.connectAll([uac, uas], (err) => {
+      if (err) { throw err ; }
+
+      uac.request({
+        uri: cfg.sipServer[1],
+        method: 'INVITE',
+        body: cfg.client[0].sdp,
+        headers: {
+          Subject: this.test.fullTitle()
+        }
+      }, (err, req) => {
+        should.not.exist(err) ;
+        req.on('response', (res, ack) => {
+          res.should.have.property('status', 200);
+          ack() ;
+
+          setTimeout(() => {
+            uac.request({
+              method: 'BYE',
+              stackDialogId: res.stackDialogId
+            }, (err, bye) => {
+              should.not.exist(err) ;
+              bye.on('response', (response) => {
+                response.should.have.property('status', 200);
+                uac.idle.should.be.true ;
+                done() ;
+              }) ;
+            }) ;
+          }, 1) ;
+        }) ;
+      }) ;
+    }) ;
+  }) ;
+
+
 });
