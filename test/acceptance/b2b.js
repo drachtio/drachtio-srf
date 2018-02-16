@@ -117,6 +117,44 @@ describe('createB2BUA', function() {
     });
   });
 
+  it('should not propagate failure if so configured', function(done) {
+    const srf = new Srf() ;
+    uac = cfg.configureUac(cfg.client[0], Agent) ;
+    srf.connect(cfg.client[1].connect_opts);
+    uas = require('../scripts/uas/app28')(cfg.client[2]) ;
+    cfg.connectAll([uac, srf, uas], (err) => {
+      assert(!err);
+
+      srf.invite((req, res) => {
+        srf.createB2BUA(req, res, cfg.sipServer[2], {
+          passFailure: false
+        })
+          .then(({uas, uac}) => {
+            assert('unexpected success - should have failed with 503');
+          })
+          .catch((err) => {
+            err.status.should.eql(503);
+            res.send(480);
+          });
+      });
+
+      uac.request({
+        uri: cfg.sipServer[1],
+        method: 'INVITE',
+        body: cfg.client[0].sdp,
+        headers: {
+          Subject: this.test.fullTitle()
+        }
+      }, (err, req) => {
+        should.not.exist(err) ;
+        req.on('response', (res) => {
+          res.should.have.property('status', 480);
+          done() ;
+        });
+      });
+    });
+  });
+
   it('should handle CANCEL during call setup', function(done) {
     const srf = new Srf() ;
     uac = cfg.configureUac(cfg.client[0], Agent) ;
