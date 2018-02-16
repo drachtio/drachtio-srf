@@ -271,7 +271,7 @@ Note: It is preferred to not pass any arguments to the constructor, e.g. <br/>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1182">line 1182</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1187">line 1187</a>
     </li></ul></dd>
     
 
@@ -895,7 +895,7 @@ Note: It is preferred to not pass any arguments to the constructor, e.g. <br/>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line689">line 689</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line693">line 693</a>
     </li></ul></dd>
     
 
@@ -1485,7 +1485,7 @@ otherwise the function returns a reference to the Srf instance
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line576">line 576</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line580">line 580</a>
     </li></ul></dd>
     
 
@@ -2038,7 +2038,7 @@ otherwise the function returns a reference to the Srf instance
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line529">line 529</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line533">line 533</a>
     </li></ul></dd>
     
 
@@ -2251,7 +2251,7 @@ otherwise the function returns a reference to the Srf instance
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line945">line 945</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line949">line 949</a>
     </li></ul></dd>
     
 
@@ -2535,7 +2535,7 @@ otherwise the function returns a reference to the Srf instance
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1161">line 1161</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1166">line 1166</a>
     </li></ul></dd>
     
 
@@ -2758,7 +2758,7 @@ otherwise the function returns a reference to the Srf instance
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1039">line 1039</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1043">line 1043</a>
     </li></ul></dd>
     
 
@@ -2930,6 +2930,8 @@ otherwise the function returns a reference to the Srf instance
         
 
         
+        <th>Default</th>
+        
 
         <th class="last">Description</th>
     </tr>
@@ -2962,6 +2964,10 @@ otherwise the function returns a reference to the Srf instance
                 </td>
             
 
+            
+                <td class="default">
+                
+                </td>
             
 
             <td class="description last">SIP headers to include on the SIP INVITE request</td>
@@ -2999,6 +3005,10 @@ otherwise the function returns a reference to the Srf instance
             
 
             
+                <td class="default">
+                
+                </td>
+            
 
             <td class="description last">the local session description protocol
 to offer in the response to the SIP INVITE request on the A leg; if a function is
@@ -3034,6 +3044,10 @@ to offer in the response to the SIP INVITE request on the A leg; if a function i
             
 
             
+                <td class="default">
+                
+                </td>
+            
 
             <td class="description last">the local session description protocol to offer in the SIP INVITE request on the B leg</td>
         </tr>
@@ -3066,6 +3080,10 @@ to offer in the response to the SIP INVITE request on the A leg; if a function i
                 </td>
             
 
+            
+                <td class="default">
+                
+                </td>
             
 
             <td class="description last">an array of header names which, if they appear in the INVITE request
@@ -3101,6 +3119,10 @@ on the A leg, should be included unchanged on the generated B leg INVITE</td>
             
 
             
+                <td class="default">
+                
+                </td>
+            
 
             <td class="description last">an array of header names which, if they appear
 in the response to the outgoing INVITE, should be included unchanged on the generated response to the A leg</td>
@@ -3135,6 +3157,10 @@ in the response to the outgoing INVITE, should be included unchanged on the gene
             
 
             
+                <td class="default">
+                
+                </td>
+            
 
             <td class="description last">a callback that is invoked when a
 provisional response is received from the B leg</td>
@@ -3167,8 +3193,51 @@ provisional response is received from the B leg</td>
             
 
             
+                <td class="default">
+                
+                </td>
+            
 
             <td class="description last">timeout after which to attempt next uri in the destination array (e.g '1s')</td>
+        </tr>
+
+        
+
+    
+
+        <tr>
+            
+                <td class="name"><code>passFailure</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><code>boolean</code></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    true
+                
+                </td>
+            
+
+            <td class="description last">if non-success response from B leg, pass it on to the A leg</td>
         </tr>
 
         
@@ -3209,7 +3278,7 @@ provisional response is received from the B leg</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1092">line 1092</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1096">line 1096</a>
     </li></ul></dd>
     
 
@@ -3392,7 +3461,7 @@ when the returned Promise from the method fulfills.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1109">line 1109</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1114">line 1114</a>
     </li></ul></dd>
     
 
@@ -3470,7 +3539,7 @@ when the returned Promise from the method fulfills.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1190">line 1190</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1195">line 1195</a>
     </li></ul></dd>
     
 
@@ -3605,7 +3674,7 @@ when the returned Promise from the method fulfills.</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1054">line 1054</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1058">line 1058</a>
     </li></ul></dd>
     
 
@@ -3767,7 +3836,7 @@ issuing a createBackToBackDialog request.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1047">line 1047</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1051">line 1051</a>
     </li></ul></dd>
     
 
@@ -3902,7 +3971,7 @@ issuing a createBackToBackDialog request.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1061">line 1061</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1065">line 1065</a>
     </li></ul></dd>
     
 
@@ -4291,7 +4360,7 @@ back upstream without generating a new response</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1122">line 1122</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1127">line 1127</a>
     </li></ul></dd>
     
 
@@ -4470,7 +4539,7 @@ destination in response to the proxy request</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1146">line 1146</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1151">line 1151</a>
     </li></ul></dd>
     
 
@@ -4648,7 +4717,7 @@ destination in response to the proxy request</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1154">line 1154</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1159">line 1159</a>
     </li></ul></dd>
     
 
@@ -4801,7 +4870,7 @@ destination in response to the proxy request</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1140">line 1140</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1145">line 1145</a>
     </li></ul></dd>
     
 
@@ -4879,7 +4948,7 @@ destination in response to the proxy request</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1175">line 1175</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1180">line 1180</a>
     </li></ul></dd>
     
 
@@ -5165,7 +5234,7 @@ want to call "req.on('response', function(res){..}"" in order to handle response
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1168">line 1168</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1173">line 1173</a>
     </li></ul></dd>
     
 
@@ -5367,7 +5436,7 @@ want to call "req.on('response', function(res){..}"" in order to handle response
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1076">line 1076</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1080">line 1080</a>
     </li></ul></dd>
     
 
@@ -5521,7 +5590,7 @@ received cbProvisional: (req) => {..}</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1084">line 1084</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1088">line 1088</a>
     </li></ul></dd>
     
 
@@ -5599,7 +5668,7 @@ received cbProvisional: (req) => {..}</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1032">line 1032</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1036">line 1036</a>
     </li></ul></dd>
     
 
@@ -5851,7 +5920,7 @@ received cbProvisional: (req) => {..}</td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1069">line 1069</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1073">line 1073</a>
     </li></ul></dd>
     
 
@@ -5936,7 +6005,7 @@ received (inbound) or initiated (outbound)
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1202">line 1202</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1207">line 1207</a>
     </li></ul></dd>
     
 
@@ -6124,7 +6193,7 @@ received (inbound) or initiated (outbound)
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1211">line 1211</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1216">line 1216</a>
     </li></ul></dd>
     
 
@@ -6340,7 +6409,7 @@ is acting as a user agent client, user agent server, proxy (sending message), or
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1222">line 1222</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1227">line 1227</a>
     </li></ul></dd>
     
 
@@ -6555,7 +6624,7 @@ with either success or failure
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1195">line 1195</a>
+        <a href="srf.js.html">srf.js</a>, <a href="srf.js.html#line1200">line 1200</a>
     </li></ul></dd>
     
 
@@ -6681,7 +6750,7 @@ with either success or failure
 <br class="clear">
 
 <footer>
-    Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.4</a> on Sat Jan 27 2018 23:00:33 GMT-0500 (EST) using the Minami theme.
+    Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.4</a> on Thu Feb 15 2018 20:17:45 GMT-0500 (EST) using the Minami theme.
 </footer>
 
 <script>prettyPrint();</script>
