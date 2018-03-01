@@ -529,4 +529,50 @@ describe('createB2BUA', function() {
     });
   });
 
+  it.only('should propagate CANCEL on A leg to B leg', function(done) {
+    const srf = new Srf() ;
+    uac = cfg.configureUac(cfg.client[0], Agent) ;
+    srf.connect(cfg.client[1].connect_opts);
+    uas = require('../scripts/uas/app29')(cfg.client[2]) ;
+    cfg.connectAll([uac, srf, uas], (err) => {
+      assert(!err);
+
+      srf.invite((req, res) => {
+        srf.createB2BUA(req, res, {uri: cfg.sipServer[2]})
+          .then(({uas, uac}) => {
+
+            destroyAll([uac, uas])
+              .then(() => {
+                uac.should.be.idle;
+                uas.should.be.idle;
+                done() ;
+              });
+
+          })
+          .catch((err) => {
+            err.status.should.eql(487);
+            done()
+          });
+      });
+
+      uac.request({
+        uri: cfg.sipServer[1],
+        method: 'INVITE',
+        body: cfg.client[0].sdp,
+        headers: {
+          Subject: this.test.fullTitle()
+        }
+      }, (err, req) => {
+        should.not.exist(err) ;
+        req.on('response', (res, ack) => {
+          res.should.have.property('status', 487);
+        });
+
+        setTimeout(() => {
+          debug('canceling INVITE');
+          req.cancel();
+        }, 1);
+      });
+    });
+  });
 });

@@ -1,4 +1,5 @@
 /**
- * @typedef {string} RequestUri - a full sip uri, an address[:port], or a user@address[:port]
+ * @module drachtio-srf
+ * @desc The drachtio signaling resource framework module
  */
 
