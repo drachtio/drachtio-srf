@@ -5,10 +5,11 @@ const fixture = require('drachtio-test-fixtures') ;
 let uac, uas;
 const cfg = fixture(__dirname, [8060, 8061, 8062], [6060, 6061, 6062]) ;
 var Srf = require('../..') ;
-const debug = require('debug')('drachtio-srf');
+const debug = require('debug')('drachtio-srf:test');
 const async = require('async') ;
 const assert = require('assert');
-const Dialog = require('../../lib/dialog');
+const Dialog = Srf.Dialog;
+const parseUri = Srf.parseUri;
 
 process.on('unhandledRejection', (reason, p) => {
   console.log('Unhandled Rejection at: Promise', p, 'reason:', reason);
@@ -36,6 +37,16 @@ describe('createB2BUA', function() {
     cfg.stopServers(done) ;
   }) ;
 
+  it('should provide Srf.parseUri', (done) => {
+    const uri = parseUri('sip:1234@10.101.10.1;transport=udp');
+    uri.should.have.property('params');
+    done();
+  });
+  it('should provide Srf.SipError', (done) => {
+    const err = new Srf.SipError();
+    err.should.be.an.instanceOf(Error);
+    done();
+  });
   it('should work for successful call', function(done) {
     const srf = new Srf() ;
     uac = cfg.configureUac(cfg.client[0], Agent) ;
@@ -48,10 +59,12 @@ describe('createB2BUA', function() {
         srf.createB2BUA(req, res, cfg.sipServer[2])
           .then(({uas, uac}) => {
 
+            debug(`${this.test.fullTitle()} call connected`);
             destroyAll([uac, uas])
               .then(() => {
                 uac.should.be.idle;
                 uas.should.be.idle;
+                debug(`${this.test.fullTitle()} calling done`);
                 done() ;
               });
 
@@ -92,10 +105,12 @@ describe('createB2BUA', function() {
             assert('unexpected success - should have failed with 503');
           })
           .catch((err) => {
+            debug(`${this.test.fullTitle()} call failed as expected`);
+
             err.status.should.eql(503);
             uac.should.be.idle;
             uas.should.be.idle;
-
+            debug(`${this.test.fullTitle()} calling done`);
             done() ;
           });
       });
@@ -149,6 +164,7 @@ describe('createB2BUA', function() {
         should.not.exist(err) ;
         req.on('response', (res) => {
           res.should.have.property('status', 480);
+          debug(`${this.test.fullTitle()} calling done`);
           done() ;
         });
       });
@@ -173,6 +189,7 @@ describe('createB2BUA', function() {
             uac.should.be.idle;
             uas.should.be.idle;
 
+            debug(`${this.test.fullTitle()} calling done`);
             done() ;
           });
       });
@@ -211,6 +228,7 @@ describe('createB2BUA', function() {
               .then(() => {
                 uac.should.be.idle;
                 uas.should.be.idle;
+                debug(`${this.test.fullTitle()} calling done`);
                 done() ;
               });
 
@@ -254,6 +272,7 @@ describe('createB2BUA', function() {
               .then(() => {
                 uac.should.be.idle;
                 uas.should.be.idle;
+                debug(`${this.test.fullTitle()} calling done`);
                 done() ;
               });
 
@@ -306,6 +325,7 @@ describe('createB2BUA', function() {
               .then(() => {
                 uac.should.be.idle;
                 uas.should.be.idle;
+                debug(`${this.test.fullTitle()} calling done`);
                 done() ;
               });
 
