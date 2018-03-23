@@ -1,0 +1,43 @@
+{
+  "logger": {
+    "level": "fatal"
+  },
+  "drachtio-uac": {
+    "host": "127.0.0.1",
+    "port": 9060,
+    "secret": "cymru"
+  },
+  "freeswitch-uac": {
+    "address": "127.0.0.1",
+    "port": 9070,
+    "secret": "ClueCon"
+  },
+  "drachtio-sut": {
+    "host": "127.0.0.1",
+    "port": 9061,
+    "secret": "cymru"
+  },
+  "freeswitch-sut": {
+    "address": "127.0.0.1",
+    "port": 9071,
+    "secret": "ClueCon"
+  },
+  "freeswitch-uac-fail": {
+    "address": "127.0.0.1",
+    "port": 11070,
+    "secret": "ClueCon"
+  },
+  "call-generator": {
+    "uri": "sip:test2_drachtio-sut_1",
+    "drachtio": {
+      "host": "127.0.0.1",
+      "port": 9060,
+      "secret": "cymru"
+    },
+    "freeswitch": {
+    "address": "127.0.0.1",
+    "port": 9070,
+    "secret": "ClueCon"      
+    }
+  }
+}

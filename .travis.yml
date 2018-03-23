@@ -1,8 +1,17 @@
+sudo: required
+
 language: node_js
+
 node_js:
-  - "6"
-dist: trusty
+  - "8"
 
-before_install: "sudo bash ci/before_install"
+services:
+  - docker
 
-after_script: "sudo bash ci/after_install"
+before_install:
+  - docker pull drachtio/drachtio-server:latest
+  - docker pull drachtio/sipp:latest
+  - docker images
+
+script:
+  - npm test

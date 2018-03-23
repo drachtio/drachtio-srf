@@ -1,0 +1,59 @@
+version: '2.1'
+
+networks:
+  testbed:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.29.0.0/16
+
+services:
+
+  drachtio-sut:
+    image: drachtio/drachtio-server:latest
+    command: drachtio --contact "sip:*;transport=udp" --loglevel debug --sofia-loglevel 9
+    ports:
+      - "9061:9022/tcp"
+    networks:
+      testbed:
+        ipv4_address: 172.29.0.10
+
+  sipp-uas-cancel:
+    image: drachtio/sipp:latest
+    command: sipp -sf /tmp/uas-cancel.xml
+    volumes:
+      - ./scenarios:/tmp
+    tty: true
+    networks:
+      testbed:
+        ipv4_address: 172.29.0.12
+
+  sipp-uas:
+    image: drachtio/sipp:latest
+    command: sipp -sf /tmp/uas.xml
+    volumes:
+      - ./scenarios:/tmp
+    tty: true
+    networks:
+      testbed:
+        ipv4_address: 172.29.0.13
+
+  sipp-uas-404:
+    image: drachtio/sipp:latest
+    command: sipp -sf /tmp/uas-404.xml
+    volumes:
+      - ./scenarios:/tmp
+    tty: true
+    networks:
+      testbed:
+        ipv4_address: 172.29.0.14
+
+  sipp-uas-auth:
+    image: drachtio/sipp:latest
+    command: sipp -sf /tmp/uas-auth.xml
+    volumes:
+      - ./scenarios:/tmp
+    tty: true
+    networks:
+      testbed:
+        ipv4_address: 172.29.0.15
