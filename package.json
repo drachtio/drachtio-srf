@@ -1,13 +1,12 @@
 {
   "name": "drachtio-srf",
-  "version": "4.2.11",
+  "version": "4.2.12",
   "description": "drachtio signaling resource framework",
   "main": "lib/srf.js",
   "scripts": {
     "test": "NODE_ENV=test node test/ | ./node_modules/.bin/tap-spec",
     "coverage": "NODE_ENV=test ./node_modules/.bin/istanbul cover test/ --report html",
-    "jslint": "eslint lib",
-    "jsdoc": "/usr/local/bin/jsdoc -c ./support/jsdoc/jsdoc.json -u ./tutorials && node support/jsdoc/jsdoc-fix-html.js"
+    "jslint": "eslint lib"
   },
   "engines": {
     "node": ">= 6.9.3"
@@ -27,7 +26,8 @@
     "debug": "^2.2.0",
     "delegates": "^0.1.0",
     "deprecate": "^1.0.0",
-    "drachtio": "^4.1.9",
+    "drachtio": "^4.1.10",
+    "drachtio-mw-registration-parser": "0.0.2",
     "drachtio-sip": "^0.3.5",
     "lodash": "^3.10.1",
     "node-noop": "0.0.1",
