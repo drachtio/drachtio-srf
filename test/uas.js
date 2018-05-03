@@ -1,7 +1,7 @@
 const test = require('blue-tape');
 const { output, sippUac } = require('./sipp')('test_testbed');
 const Uas = require('./scripts/uas');
-//const debug = require('debug')('test:drachtio-srf');
+const debug = require('debug')('drachtio:srf');
 
 process.on('unhandledRejection', (reason, p) => {
   console.log('Unhandled Rejection at: Promise', p, 'reason:', reason);
@@ -73,7 +73,7 @@ test('UAS', (t) => {
     .then((uas) => {
       uas
         .on('connected', (uas) => {
-          t.pass('uas dialog created when 200 OK sent (now waiting 32s for ACK timeout..');
+          t.pass('uas dialog created when 200 OK sent (...waiting 32s for ACK timeout');
           uas.on('destroy', (msg, reason) => {
             if (reason === 'ACK timeout') {
               t.pass('uas dialog destroyed with ACK timeout after 32s');
@@ -96,16 +96,35 @@ test('UAS', (t) => {
     })
     .then((uas) => {
       uas.on('connected', (dlg) => {
-        t.pass('creates a dialog on successful SUBSCRIBE');
+        t.ok(1 === dlg.getCountOfSubscriptions(), 'creates a dialog on successful SUBSCRIBE');
 
-        // send immediate NOTIFY
-        dlg.request({
-          method: 'NOTIFY',
-          headers: {
-            'Event': 'message-waiting',
-            'Subscription-State': 'active'
-          }
-        });
+        // send immediate NOTIFY, then another to terminate the subscription
+        Promise.resolve()
+          .then(() => {
+            return dlg.request({
+              method: 'NOTIFY',
+              headers: {
+                'Event': 'presence',
+                'Subscription-State': 'active'
+              }
+            });
+          })
+          .then(() => {
+            return dlg.request({
+              method: 'NOTIFY',
+              headers: {
+                'Event': 'presence',
+                'Subscription-State': 'terminated'
+              }
+            });
+          })
+          .then(() => {
+            return t.ok(0 === dlg.getCountOfSubscriptions(), 'dialog destroyed on terminated subscription');
+          })
+          .catch((err) => {
+            t.end(err);
+          });
+
       });
       return sippUac('uac-subscribe.xml');
     })

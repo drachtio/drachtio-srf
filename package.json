@@ -1,6 +1,6 @@
 {
   "name": "drachtio-srf",
-  "version": "4.2.14",
+  "version": "4.2.15",
   "description": "drachtio signaling resource framework",
   "main": "lib/srf.js",
   "scripts": {
@@ -26,7 +26,7 @@
     "debug": "^2.2.0",
     "delegates": "^0.1.0",
     "deprecate": "^1.0.0",
-    "drachtio": "^4.1.10",
+    "drachtio": "^4.1.11",
     "drachtio-mw-registration-parser": "0.0.2",
     "drachtio-sip": "^0.3.5",
     "lodash": "^3.10.1",
@@ -39,9 +39,9 @@
     "blue-tape": "^1.0.0",
     "cheerio": "^0.22.0",
     "config": "^1.28.1",
-    "drachtio-fsmrf": "^1.1.2",
+    "drachtio-fsmrf": "^1.1.4",
     "drachtio-test-fixtures": "^0.1.7",
-    "eslint": "^4.14.0",
+    "eslint": "^4.19.1",
     "eslint-plugin-promise": "^3.6.0",
     "fs-extra": "^0.26.7",
     "gh-pages-deploy": "^0.4.2",
@@ -54,7 +54,7 @@
     "passport-http": "^0.3.0",
     "recursive-readdir": "^1.3.0",
     "should": "~2.1.1",
-    "tap": "^11.0.0",
+    "tap": "^11.1.4",
     "tap-dot": "^1.0.5",
     "tap-spec": "^4.1.1"
   }
