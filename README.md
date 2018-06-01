@@ -378,16 +378,16 @@ srf.invite((req, res) => {
   srf.proxyRequest(req, res);
 
   // proxy to a specified destination
-  srf.proxyRequest( req, res, 'sip:next.hop.com');
+  srf.proxyRequest( req, 'sip:next.hop.com');
 
   // lots of options available, 
   // plus a callback to indicate success if needed
-  srf.proxyRequest( req, res, ['sip:try.this.com', 'sip:try.that.com'], {
+  srf.proxyRequest( req, ['sip:try.this.com', 'sip:try.that.com'], {
     recordRoute: true,
     forking: 'sequential',
     followRedirects: true,
     provisionalTimeout: '2s',
-    finalTimeout: '20s'
+    finalTimeout: '20s',
     headers: {
       Subject: 'my subject header'
     }
