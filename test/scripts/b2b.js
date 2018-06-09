@@ -7,7 +7,7 @@ class App extends Emitter {
   constructor() {
     super();
 
-    this.srf = new Srf() ;
+    this.srf = new Srf(['tag1', 'tag2']) ;
     this.srf.connect(config.get('drachtio-sut'));
     this.srf.on('error', (err) => { this.emit('error', err);});
   }
