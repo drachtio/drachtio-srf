@@ -78,6 +78,38 @@ test('UAC', (t) => {
       srf.disconnect();
       return t.pass('Srf#createUAC can handle digest authentication');
     })
+
+    .then(() => {
+      srf = new Srf();
+      return connect(srf);
+    })
+
+    .then(() => {
+      return new Promise((resolve, reject) => {
+        srf.request('sip:sipp-uas-auth-register', {
+          method: 'REGISTER',
+          headers: {
+            To: 'sip:dhorton@sip.drachtio.org',
+            From: 'sip:dhorton@sip.drachtio.org',
+            Contact: '<sip:dhorton@localhost>;expires=3600'
+          },
+          auth: {
+            username: 'foo',
+            password: 'bar'
+          }
+        }, (err, req) => {
+          if (err) return reject(err);
+          req.on('response', (res) => {
+            if (res.status === 200) return resolve();
+            reject(new Error(`REGISTER was rejected after auth with ${res.status}`));
+          });
+        });
+      });
+    })
+    .then((uac) => {
+      srf.disconnect();
+      return t.pass('Srf#request can handle digest authentication');
+    })
     .then(() => {
       return t.end();
     })
