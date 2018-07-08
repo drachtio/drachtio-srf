@@ -48,10 +48,25 @@
   </recv>
 
   <nop hide="true" test="authvalid" next="goodauth" />
-  <nop hide="true" next="badauth" />
+
+  <send next="endit">
+    <![CDATA[
+
+      SIP/2.0 403 Forbidden
+      [last_Via:]
+      [last_From:]
+      [last_To:];tag=[pid]SIPpTag01[call_number]
+      [last_Call-ID:]
+      [last_CSeq:]
+      Contact: <sip:[local_ip]:[local_port];transport=[transport]>;expires=60
+      Content-Type: application/sdp
+      Content-Length: 0
+
+    ]]>
+  </send>
 
   <label id="goodauth"/>
-  <send next="endit">
+  <send>
     <![CDATA[
 
       SIP/2.0 200 OK
@@ -68,21 +83,6 @@
   </send>
   
   <label id="badauth"/>
-  <send>
-    <![CDATA[
-
-      SIP/2.0 403 Forbidden
-      [last_Via:]
-      [last_From:]
-      [last_To:];tag=[pid]SIPpTag01[call_number]
-      [last_Call-ID:]
-      [last_CSeq:]
-      Contact: <sip:[local_ip]:[local_port];transport=[transport]>;expires=60
-      Content-Type: application/sdp
-      Content-Length: 0
-
-    ]]>
-  </send>
 
   <label id="endit"/>
 

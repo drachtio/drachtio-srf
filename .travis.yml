@@ -12,6 +12,12 @@ before_install:
   - docker pull drachtio/drachtio-server:latest
   - docker pull drachtio/sipp:latest
   - docker images
+  - docker run -ti drachtio/sipp:latest sipp -v
 
 script:
   - npm test
+
+after_failure:
+  - docker logs test_sipp-uas-auth-register_1
+  - docker logs test_drachtio-sut_1
+  
