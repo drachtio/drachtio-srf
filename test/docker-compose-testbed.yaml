@@ -67,3 +67,13 @@ services:
     networks:
       testbed:
         ipv4_address: 172.29.0.16
+
+  sipp-uas-auth-register-no-realm:
+    image: drachtio/sipp:latest
+    command: sipp -sf /tmp/uas-auth-register-no-realm.xml
+    volumes:
+      - ./scenarios:/tmp
+    tty: true
+    networks:
+      testbed:
+        ipv4_address: 172.29.0.17
