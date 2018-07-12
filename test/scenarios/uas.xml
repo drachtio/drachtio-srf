@@ -49,13 +49,14 @@
       [last_To:];tag=[pid]SIPpTag01[call_number]
       [last_Call-ID:]
       [last_CSeq:]
+      [last_Record-Route:]
       Subject:[$1]
       Content-Length: 0
 
     ]]>
   </send>
 
-  <send retrans="500">
+  <send>
     <![CDATA[
 
       SIP/2.0 200 OK
@@ -64,6 +65,7 @@
       [last_To:];tag=[pid]SIPpTag01[call_number]
       [last_Call-ID:]
       [last_CSeq:]
+      [last_Record-Route:]
       Subject:[$1]
       Contact: <sip:[local_ip]:[local_port];transport=[transport]>
       Content-Type: application/sdp
@@ -81,7 +83,6 @@
   </send>
 
   <recv request="ACK"
-        optional="true"
         rtd="true"
         crlf="true">
   </recv>
