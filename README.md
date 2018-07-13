@@ -2,6 +2,6 @@
 
 [![drachtio logo](http://davehorton.github.io/drachtio-srf/img/definition-only-cropped.png)](https://drachtio.org)
 
-Welcome to the Drachtio Signaling Resource framework (drachtio-srf), a module for building high-performance [SIP](https://www.ietf.org/rfc/rfc3261.txt) server applications in pure javascript.
+Welcome to the Drachtio Signaling Resource framework (drachtio-srf), the Node.js framework for SIP Server applications.
 
 Please visit [drachtio.org](https://drachtio.org) for getting started instructions, API documentation, sample apps and more!
