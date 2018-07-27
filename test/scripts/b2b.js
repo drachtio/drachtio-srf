@@ -129,6 +129,37 @@ class App extends Emitter {
     });
   }
 
+  passHeadersOnResponse(uri, headers) {
+    let uacFinalized = false;
+    this.srf.invite((req, res) => {
+
+      const subject = req.get('Subject');
+      this.srf.createB2BUA(req, res, uri, {
+        responseHeaders: headers,
+        proxyRequestHeaders: ['Subject'],
+        proxyResponseHeaders: ['Subject']
+      }, {
+        cbRequest: (err, uacRequest) => {
+          if (uacRequest.get('Subject') !== subject) throw new Error('request header not proxied');
+        },
+        cbProvisional: (provisionalResponse) => {
+          if (provisionalResponse.get('Subject') !== subject) throw new Error('response header not proxied');
+        },
+        cbFinalizedUac: (uac) => {
+          uacFinalized = true;
+        }
+      })
+        .then(({uas, uac}) => {
+          if (!uacFinalized) throw new Error('cbFinalizedUac not called');
+          this.emit('connected', {uas, uac});
+          return;
+        })
+        .catch((err) => {
+          throw err;
+        });
+    });
+  }
+
   sdpAsPromise(uri) {
 
     function promiseSdp(sdpB, res) {

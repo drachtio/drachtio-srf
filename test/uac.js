@@ -136,7 +136,7 @@ test('UAC', (t) => {
           });
         })
         .catch((err) => {
-          t.end(err, 'srf.request returns a Promise');
+          t.end(err, 'Srf#request returns a Promise');
         });
       });
     })

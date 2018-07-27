@@ -130,6 +130,52 @@ test('B2B', (t) => {
       });
     })
 
+    // pass headers on response
+    .then(() => {
+      debug('starting sipp');
+      return b2b.passHeadersOnResponse('sip:sipp-uas', {'X-Color': 'green'});
+    })
+    .then(() => {
+      debug('start sipp...');
+      return sippUac('uac-success-green.xml');
+    })
+    .then(() => {
+      return t.pass('can supply headers for response to A');
+    })
+    .then(() => {
+      b2b.disconnect();
+      return new Promise((resolve, reject) => {
+        setTimeout(() => {
+          b2b = new B2b();
+          resolve();
+        }, 500);
+      });
+    })
+
+        // pass headers on response as function
+        .then(() => {
+          debug('starting sipp');
+          return b2b.passHeadersOnResponse('sip:sipp-uas', (uacRes, headers) => {
+            return {'X-Color': 'green'};
+          });
+        })
+        .then(() => {
+          debug('start sipp...');
+          return sippUac('uac-success-green.xml');
+        })
+        .then(() => {
+          return t.pass('can supply response headers as a function returning an object');
+        })
+        .then(() => {
+          b2b.disconnect();
+          return new Promise((resolve, reject) => {
+            setTimeout(() => {
+              b2b = new B2b();
+              resolve();
+            }, 500);
+          });
+        })
+    
     .then(() => {
       debug('starting sipp');
       return b2b.sdpAsPromise('sip:sipp-uas');
@@ -150,35 +196,56 @@ test('B2B', (t) => {
         }, 500);
       });
     })
-
-    // uri can be provided in opts
+    
     .then(() => {
       debug('starting sipp');
-      return b2b.uriInOpts('sip:sipp-uas');
+      return b2b.sdpAsPromise('sip:sipp-uas');
     })
     .then(() => {
       debug('start sipp...');
       return sippUac('uac.xml');
     })
     .then(() => {
-      return t.pass('Srf#createB2BUA(req, res, {uri}) is valid signature');
+      return t.pass('provide opts.localSdpA as a function returning a Promise');
     })
     .then(() => {
       b2b.disconnect();
       return new Promise((resolve, reject) => {
         setTimeout(() => {
+          b2b = new B2b();
           resolve();
         }, 500);
       });
     })
-
-    .then(() => {
-      return t.end();
-    })
-    .catch((err) => {
-      console.log(`error received: ${err}`);
-      console.log(output());
-      if (b2b) b2b.disconnect();
-      t.error(err);
+  
+  // uri can be provided in opts
+  .then(() => {
+    debug('starting sipp');
+    return b2b.uriInOpts('sip:sipp-uas');
+  })
+  .then(() => {
+    debug('start sipp...');
+    return sippUac('uac.xml');
+  })
+  .then(() => {
+    return t.pass('Srf#createB2BUA(req, res, {uri}) is valid signature');
+  })
+  .then(() => {
+    b2b.disconnect();
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        resolve();
+      }, 500);
     });
+  })
+
+  .then(() => {
+    return t.end();
+  })
+  .catch((err) => {
+    console.log(`error received: ${err}`);
+    console.log(output());
+    if (b2b) b2b.disconnect();
+    t.error(err);
+  });
 });
