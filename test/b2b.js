@@ -38,7 +38,7 @@ test('B2B', (t) => {
         setTimeout(() => {
           b2b = new B2b();
           resolve();
-        }, 500);
+        }, 100);
       });
     })
 
@@ -60,7 +60,7 @@ test('B2B', (t) => {
         setTimeout(() => {
           b2b = new B2b();
           resolve();
-        }, 500);
+        }, 100);
       });
     })
 
@@ -82,7 +82,7 @@ test('B2B', (t) => {
         setTimeout(() => {
           b2b = new B2b();
           resolve();
-        }, 500);
+        }, 100);
       });
     })
 
@@ -104,7 +104,7 @@ test('B2B', (t) => {
         setTimeout(() => {
           b2b = new B2b();
           resolve();
-        }, 500);
+        }, 100);
       });
     })
 
@@ -126,7 +126,7 @@ test('B2B', (t) => {
         setTimeout(() => {
           b2b = new B2b();
           resolve();
-        }, 500);
+        }, 100);
       });
     })
 
@@ -148,7 +148,7 @@ test('B2B', (t) => {
         setTimeout(() => {
           b2b = new B2b();
           resolve();
-        }, 500);
+        }, 100);
       });
     })
 
@@ -172,7 +172,7 @@ test('B2B', (t) => {
             setTimeout(() => {
               b2b = new B2b();
               resolve();
-            }, 500);
+            }, 100);
           });
         })
     
@@ -193,7 +193,7 @@ test('B2B', (t) => {
         setTimeout(() => {
           b2b = new B2b();
           resolve();
-        }, 500);
+        }, 100);
       });
     })
     
@@ -214,7 +214,7 @@ test('B2B', (t) => {
         setTimeout(() => {
           b2b = new B2b();
           resolve();
-        }, 500);
+        }, 100);
       });
     })
   
@@ -235,7 +235,7 @@ test('B2B', (t) => {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         resolve();
-      }, 500);
+      }, 100);
     });
   })
 

@@ -73,7 +73,7 @@ test('UAS', (t) => {
     .then((uas) => {
       uas
         .on('connected', (uas) => {
-          t.pass('uas dialog created when 200 OK sent (...waiting 32s for ACK timeout');
+          t.pass('uas dialog created when 200 OK sent');
           uas.on('destroy', (msg, reason) => {
             if (reason === 'ACK timeout') {
               t.pass('uas dialog destroyed with ACK timeout after 32s');
@@ -134,7 +134,7 @@ test('UAS', (t) => {
       return new Promise((resolve, reject) => {
         setTimeout(() => {
           resolve();
-        }, 500);
+        }, 100);
       });
     })
     .then(() => {
