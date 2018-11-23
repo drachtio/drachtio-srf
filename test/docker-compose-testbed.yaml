@@ -1,4 +1,4 @@
-version: '2.1'
+version: '2'
 
 networks:
   testbed:
@@ -12,6 +12,7 @@ services:
   drachtio-sut:
     image: drachtio/drachtio-server:latest
     command: drachtio --contact "sip:*;transport=udp" --loglevel debug --sofia-loglevel 9
+    container_name: drachtio-sut
     ports:
       - "9061:9022/tcp"
     networks:
@@ -21,6 +22,7 @@ services:
   sipp-uas-cancel:
     image: drachtio/sipp:latest
     command: sipp -sf /tmp/uas-cancel.xml
+    container_name: sipp-uas-cancel
     volumes:
       - ./scenarios:/tmp
     tty: true
@@ -31,6 +33,7 @@ services:
   sipp-uas:
     image: drachtio/sipp:latest
     command: sipp -sf /tmp/uas.xml
+    container_name: sipp-uas
     volumes:
       - ./scenarios:/tmp
     tty: true
@@ -40,6 +43,7 @@ services:
 
   sipp-uas-404:
     image: drachtio/sipp:latest
+    container_name: sipp-uas-404
     command: sipp -sf /tmp/uas-404.xml
     volumes:
       - ./scenarios:/tmp
@@ -51,6 +55,7 @@ services:
   sipp-uas-auth:
     image: drachtio/sipp:latest
     command: sipp -sf /tmp/uas-auth.xml
+    container_name: sipp-uas-auth
     volumes:
       - ./scenarios:/tmp
     tty: true
@@ -61,6 +66,7 @@ services:
   sipp-uas-auth-register:
     image: drachtio/sipp:latest
     command: sipp -sf /tmp/uas-auth-register.xml
+    container_name: sipp-uas-auth-register
     volumes:
       - ./scenarios:/tmp
     tty: true
@@ -71,6 +77,7 @@ services:
   sipp-uas-auth-register-no-realm:
     image: drachtio/sipp:latest
     command: sipp -sf /tmp/uas-auth-register-no-realm.xml
+    container_name: sipp-uas-auth-register-no-realm
     volumes:
       - ./scenarios:/tmp
     tty: true

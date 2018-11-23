@@ -16,7 +16,7 @@ test('proxy', (t) => {
 
     // proxy uses Promise
     .then(() => {
-      return proxy.proxyPromise('test_sipp-uas_1');
+      return proxy.proxyPromise('sipp-uas');
     })
     .then((proxy) => {
       return sippUac('uac-proxy.xml');
@@ -29,7 +29,7 @@ test('proxy', (t) => {
     //proxy provides callback
     .then(() => {
       proxy = new Proxy();
-      return proxy.proxyCb('test_sipp-uas_1');
+      return proxy.proxyCb('sipp-uas');
     })
     .then((uas) => {
       return sippUac('uac-proxy.xml');

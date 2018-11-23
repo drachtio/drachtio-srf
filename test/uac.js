@@ -76,6 +76,27 @@ test('UAC', (t) => {
     })
     .then((uac) => {
       srf.disconnect();
+      return t.pass('Srf#createUAC can handle digest authentication, sending to same server');
+    })
+    .then(() => {
+      srf = new Srf();
+      return connect(srf);
+    })
+    .then(() => {
+      return srf.createUAC('sip:172.29.0.15', {
+        method: 'INVITE',
+        headers: {
+          To: 'sip:dhorton@sip.drachtio.org',
+          From: 'sip:dhorton@sip.drachtio.org'
+        },
+        auth: {
+          username: 'foo',
+          password: 'bar'
+        }
+      });
+    })
+    .then((uac) => {
+      srf.disconnect();
       return t.pass('Srf#createUAC can handle digest authentication');
     })
 
