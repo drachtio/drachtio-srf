@@ -27,7 +27,7 @@
     "delegates": "^0.1.0",
     "deprecate": "^1.0.0",
     "drachtio-mw-registration-parser": "0.0.2",
-    "drachtio-sip": "^0.3.6",
+    "drachtio-sip": "^0.3.8",
     "lodash": "^4.17.10",
     "node-noop": "0.0.1",
     "only": "0.0.2",
