@@ -182,6 +182,28 @@ class App extends Emitter {
     });
   }
 
+  sdpAsFunctionReturningString(uri) {
+
+    function fnSdp(sdpB, res) {
+      return sdpB.replace(/^c=IN IP4\s(.*)$/mg, 'c=IN IP4 127.0.0.1');
+    }
+
+    this.srf.invite((req, res) => {
+
+      this.srf.createB2BUA(req, res, uri, {
+        localSdpA: fnSdp
+      })
+        .then(({uas, uac}) => {
+          if (!uas.local.sdp.match(/^c=IN IP4\s(.*)$/mg)) throw new Error('failed to change sdp');
+          this.emit('connected', {uas, uac});
+          return;
+        })
+        .catch((err) => {
+          throw err;
+        });
+    });
+  }
+
   disconnect() {
     this.srf.disconnect();
     return this;
