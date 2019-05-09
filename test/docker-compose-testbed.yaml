@@ -84,3 +84,24 @@ services:
     networks:
       testbed:
         ipv4_address: 172.29.0.17
+
+  sipp-uas-refer:
+    image: drachtio/sipp:latest
+    command: sipp -sf /tmp/uas-refer.xml
+    container_name: sipp-uas-refer
+    volumes:
+      - ./scenarios:/tmp
+    tty: true
+    networks:
+      testbed:
+        ipv4_address: 172.29.0.18
+
+  drachtio-uas:
+    image: drachtio/drachtio-server:latest
+    command: drachtio --contact "sip:*;transport=udp" --loglevel debug --sofia-loglevel 9
+    container_name: drachtio-uas
+    ports:
+      - "9062:9022/tcp"
+    networks:
+      testbed:
+        ipv4_address: 172.29.0.19

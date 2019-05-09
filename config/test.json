@@ -17,6 +17,11 @@
     "port": 9061,
     "secret": "cymru"
   },
+  "drachtio-uas": {
+    "host": "127.0.0.1",
+    "port": 9062,
+    "secret": "cymru"
+  },
   "freeswitch-sut": {
     "address": "127.0.0.1",
     "port": 9071,
