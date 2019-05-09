@@ -5,7 +5,7 @@
   "main": "lib/srf.js",
   "scripts": {
     "test": "NODE_ENV=test node test/ | ./node_modules/.bin/tap-spec",
-    "coverage": "NODE_ENV=test ./node_modules/.bin/istanbul cover test/ --report html",
+    "coverage": "./node_modules/.bin/nyc --reporter html --report-dir ./coverage npm run test",
     "jslint": "eslint lib"
   },
   "engines": {
@@ -28,7 +28,7 @@
     "deprecate": "^1.0.0",
     "drachtio-mw-registration-parser": "0.0.2",
     "drachtio-sip": "^0.3.9",
-    "lodash": "^4.17.10",
+    "lodash": "^4.17.11",
     "node-noop": "0.0.1",
     "only": "0.0.2",
     "sip-methods": "^0.3.0",
@@ -41,16 +41,15 @@
     "cheerio": "^0.22.0",
     "config": "^1.28.1",
     "drachtio-test-fixtures": "^0.1.7",
-    "eslint": "^4.19.1",
+    "eslint": "^5.16.0",
     "eslint-plugin-promise": "^3.6.0",
     "fs-extra": "^0.26.7",
-    "istanbul": "^0.4.5",
-    "jsdoc": "^3.5.5",
     "minimist": "^1.1.0",
+    "nyc": "^14.1.0",
     "passport": "^0.3.2",
     "passport-http": "^0.3.0",
-    "tap": "^12.0.1",
-    "tap-dot": "^1.0.5",
+    "tap": "^13.1.6",
+    "tap-dot": "^2.0.0",
     "tap-spec": "^5.0.0"
   }
 }
