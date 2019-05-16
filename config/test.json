@@ -15,7 +15,9 @@
   "drachtio-sut": {
     "host": "127.0.0.1",
     "port": 9061,
-    "secret": "cymru"
+    "secret": "cymru",
+    "enablePing": true,
+    "pingInterval": 5000
   },
   "drachtio-uas": {
     "host": "127.0.0.1",
