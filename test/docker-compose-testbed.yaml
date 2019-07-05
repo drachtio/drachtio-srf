@@ -10,7 +10,7 @@ networks:
 services:
 
   drachtio-sut:
-    image: drachtio/drachtio-server:0.8.2
+    image: drachtio/drachtio-server:latest
     command: drachtio --contact "sip:*;transport=udp" --loglevel debug --sofia-loglevel 9
     container_name: drachtio-sut
     ports:

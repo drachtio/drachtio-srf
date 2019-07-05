@@ -42,6 +42,33 @@ test('B2B', (t) => {
       });
     })
 
+    // specify tag on 200 OK
+    .then(() => {
+      debug('starting sipp');
+      
+      return b2b.expectSuccess('sip:sipp-uas', {
+        responseHeaders: (uacResponse) => {
+          return {'To': `tag=${uacResponse.get('Call-ID')}`}
+        }
+      });
+    })
+    .then(() => {
+      debug('start sipp...');
+      return sippUac('uac.xml');
+    })
+    .then(() => {
+      return t.pass('b2b sets tag on 200 OK');
+    })
+    .then(() => {
+      b2b.disconnect();
+      return new Promise((resolve, reject) => {
+        setTimeout(() => {
+          b2b = new B2b();
+          resolve();
+        }, 100);
+      });
+    })
+    
     // CANCEL from A
     .then(() => {
       debug('starting sipp');
