@@ -52,7 +52,7 @@ test('UAS', (t) => {
       return t.pass('Srf#createUAS accepts a callback');
     })
 
-    //Srf#createUAS returns a Promise
+    //opts.body is an alias for opts.localSdp
     .then(() => {
       uas = new Uas();
       return uas.accept(null, true);

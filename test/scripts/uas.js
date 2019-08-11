@@ -2,6 +2,7 @@ const Emitter = require('events');
 const Srf = require('../..');
 const config = require('config');
 const debug = require('debug')('drachtio:test');
+const assert = require('assert');
 
 class App extends Emitter {
   constructor() {
@@ -20,6 +21,11 @@ class App extends Emitter {
 
   accept(sdp, useBody) {
     this.srf.invite((req, res) => {
+
+      // validate that req.server properties are in place,
+      // describing the drachtio server instance that received the invite
+      assert(req.server.address);
+      assert(req.server.hostport);
 
       req.on('cancel', () => {
         req.canceled = true;
