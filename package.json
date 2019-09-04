@@ -1,6 +1,6 @@
 {
   "name": "drachtio-srf",
-  "version": "4.4.15",
+  "version": "4.4.17",
   "description": "drachtio signaling resource framework",
   "main": "lib/srf.js",
   "scripts": {
@@ -33,8 +33,7 @@
     "only": "0.0.2",
     "sip-methods": "^0.3.0",
     "utils-merge": "1.0.0",
-    "uuid": "^3.0.0",
-    "winston": "^2.4.2"
+    "uuid": "^3.0.0"
   },
   "devDependencies": {
     "blue-tape": "^1.0.0",
