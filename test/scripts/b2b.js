@@ -85,6 +85,29 @@ class App extends Emitter {
     });
   }
 
+  immediateReinviteFromB(uri) {
+    this.srf.invite((req, res) => {
+
+      this.srf.createB2BUA(req, res, uri)
+        .then(({uas, uac}) => {
+          this.emit('connected', {uas, uac});
+          uac.on('modify', async(req, res) => {
+            try {
+              debug('got reinvite');
+              const sdp = await uas.modify(req.body);
+              res.send(200, {body: sdp});
+              debug('finished handling reinvite');
+            } catch (err) {
+              console.error(err, 'error handling reinvite');
+            }
+          });
+          return;
+        })
+        .catch((err) => {
+          throw err;
+        });
+    }); 
+  }
   uriInOpts(uri) {
     this.srf.invite((req, res) => {
 

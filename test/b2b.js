@@ -261,11 +261,33 @@ test('B2B', (t) => {
       b2b.disconnect();
       return new Promise((resolve, reject) => {
         setTimeout(() => {
+          b2b = new B2b();
           resolve();
         }, 100);
       });
     })
 
+    // very fast reinvite from B, before ACK from A
+    .then(() => {
+      debug('starting sipp');
+      return b2b.immediateReinviteFromB('sip:sipp-uas-fast-reinvite');
+    })
+    .then(() => {
+      debug('start sipp...');
+      return sippUac('uac-delayed-ack.xml');
+    })
+    .then(() => {
+      return t.pass('Srf#createB2BUA queues fast requests from B until receiving ACK from A');
+    })
+    .then(() => {
+      b2b.disconnect();
+      return new Promise((resolve, reject) => {
+        setTimeout(() => {
+          resolve();
+        }, 800);
+      });
+    })
+    
     .then(() => {
       return t.end();
     })

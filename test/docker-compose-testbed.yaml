@@ -105,3 +105,14 @@ services:
     networks:
       testbed:
         ipv4_address: 172.29.0.19
+
+  sipp-uas-fast-reinvite:
+    image: drachtio/sipp:latest
+    command: sipp -sf /tmp/uas-reinvite.xml
+    container_name: sipp-uas-fast-reinvite
+    volumes:
+      - ./scenarios:/tmp
+    tty: true
+    networks:
+      testbed:
+        ipv4_address: 172.29.0.20
