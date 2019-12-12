@@ -90,6 +90,51 @@ class App extends Emitter {
     return this;
   }
 
+  handleReinviteScenario(sdp, useBody) {
+    return new Promise((resolve, reject) => {
+      this.srf.invite((req, res) => {
+
+        // validate that req.server properties are in place,
+        // describing the drachtio server instance that received the invite
+        assert(req.server.address);
+        assert(req.server.hostport);
+  
+        req.on('cancel', () => {
+          req.canceled = true;
+        });
+        const localSdp = sdp || req.body.replace(/m=audio\s+(\d+)/, 'm=audio 15000');
+  
+        if (req.canceled) return;
+  
+        const opts = {};
+        if (useBody) Object.assign(opts, {body: localSdp});
+        else Object.assign(opts, {localSdp});
+  
+        this.srf.createUAS(req, res, opts)
+          .then((uas) => {
+            this.emit('connected', uas);
+            uas.on('modify', (req, res) => {
+              console.log('re-invite received');
+              res.send(200, {
+                body: localSdp
+                }, (err, response) => {
+                  console.log(`response sent: ${response}`);
+                }, (ack) => {
+                  console.log(`received ack: ${ack}`);
+                  uas.destroy();
+                  resolve();
+                }
+              );
+            });
+          })
+          .catch((err) => {
+            console.error(`Uas: failed to connect: ${err}`);
+            this.emit('error', err);
+          });
+      });
+    });
+  }
+
   disconnect() {
     debug('disconnecting from drachtio');
     this.srf.disconnect();
