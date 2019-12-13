@@ -1,6 +1,6 @@
 {
   "name": "drachtio-srf",
-  "version": "4.4.25",
+  "version": "4.4.26",
   "description": "drachtio signaling resource framework",
   "main": "lib/srf.js",
   "scripts": {
