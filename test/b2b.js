@@ -23,7 +23,11 @@ test('B2B', (t) => {
     // 200 OK from B
     .then(() => {
       debug('starting sipp');
-      return b2b.expectSuccess('sip:sipp-uas');
+      return b2b.expectSuccess('sip:sipp-uas', {
+        responseHeaders: {
+          'Contact': 'sip:foo@localhost'
+        }
+      });
     })
     .then(() => {
       debug('start sipp...');

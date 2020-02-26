@@ -60,6 +60,65 @@ test('UAC', (t) => {
       srf = new Srf();
       return connect(srf);
     })
+    .then(() => {
+      return srf.createUAC('sip:sipp-uas', {
+          method: 'INVITE',
+          callingNumber: '12345',
+          headers: {
+            'Subject': 'sending Contact based on callingNumber'
+          }
+        });
+    })
+    .then((uac) => uac.destroy())
+    .then(() => {
+      srf.disconnect();
+      return t.pass('Srf#createUAC accepts opts.callingNumber');
+    })
+    
+    .then(() => {
+      srf = new Srf();
+      return connect(srf);
+    })
+    .then(() => {
+      return srf.createUAC('sip:sipp-uas', {
+          method: 'INVITE',
+          callingNumber: '12345',
+          headers: {
+            'Subject': 'sending explicit Contact',
+            'Contact': 'sip:foo@localhost'
+          }
+        });
+    })
+    .then((uac) => uac.destroy())
+    .then(() => {
+      srf.disconnect();
+      return t.pass('Srf#createUAC accepts opts.callingNumber');
+    })
+    
+    .then(() => {
+      srf = new Srf();
+      return connect(srf);
+    })
+    .then(() => {
+      return srf.createUAC('sip:sipp-uas', {
+          method: 'INVITE',
+          callingNumber: '12345',
+          headers: {
+            'Subject': 'sending explicit contact',
+            'contact': 'sip:foo@localhost'
+          }
+        });
+    })
+    .then((uac) => uac.destroy())
+    .then(() => {
+      srf.disconnect();
+      return t.pass('Srf#createUAC accepts opts.callingNumber');
+    })
+    
+    .then(() => {
+      srf = new Srf();
+      return connect(srf);
+    })
 
     .then(() => {
       return srf.createUAC('sip:sipp-uas-auth', {
