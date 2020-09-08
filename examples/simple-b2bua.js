@@ -1,4 +1,4 @@
-var drachtio = require('drachtio');
+var drachtio = require('drachtio-srf');
 var app = drachtio() ;
 var Srf = require('..') ;
 var srf = new Srf(app) ;
