@@ -207,6 +207,28 @@ test('B2B', (t) => {
       });
     })
 
+    // pass display name in From header
+    .then(() => {
+      debug('starting sipp');
+      return b2b.passHeaders('sip:sipp-uas');
+    })
+    .then(() => {
+      debug('start sipp...');
+      return sippUac('uac-displayname-from.xml');
+    })
+    .then(() => {
+      return t.pass('pass displayname in From header from A to B');
+    })
+    .then(() => {
+      b2b.disconnect();
+      return new Promise((resolve, reject) => {
+        setTimeout(() => {
+          b2b = new B2b();
+          resolve();
+        }, 100);
+      });
+    })
+    
     .then(() => {
       debug('starting sipp');
       return b2b.sdpAsPromise('sip:sipp-uas');

@@ -152,6 +152,25 @@ class App extends Emitter {
     });
   }
 
+  passDisplayName(uri) {
+    let uacFinalized = false;
+    this.srf.invite((req, res) => {
+
+      this.srf.createB2BUA(req, res, uri, {}, {
+        cbRequest: (err, uacRequest) => {
+          if (uacRequest.callingName !== 'Dave H') throw new Error('display name on From not passed');
+        }
+      })
+        .then(({uas, uac}) => {
+          this.emit('connected', {uas, uac});
+          return;
+        })
+        .catch((err) => {
+          throw err;
+        });
+    });
+  }
+
   passHeadersOnResponse(uri, headers) {
     let uacFinalized = false;
     this.srf.invite((req, res) => {
