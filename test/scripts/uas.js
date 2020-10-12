@@ -114,13 +114,11 @@ class App extends Emitter {
           .then((uas) => {
             this.emit('connected', uas);
             uas.on('modify', (req, res) => {
-              console.log('re-invite received');
               res.send(200, {
                 body: localSdp
                 }, (err, response) => {
-                  console.log(`response sent: ${response}`);
+                  //console.log(`response sent: ${response}`);
                 }, (ack) => {
-                  console.log(`received ack: ${ack}`);
                   uas.destroy();
                   resolve();
                 }
@@ -137,8 +135,7 @@ class App extends Emitter {
 
   disconnect() {
     debug('disconnecting from drachtio');
-    this.srf.disconnect();
-    return this;
+    return this.srf.disconnect();
   }
 }
 

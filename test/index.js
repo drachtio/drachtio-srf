@@ -1,5 +1,5 @@
 require('./docker_start');
-//require('./reinvite-tests');
+require('./reinvite-tests');
 require('./uac');
 require('./uas');
 require('./b2b');

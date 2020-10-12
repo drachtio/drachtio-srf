@@ -17,6 +17,7 @@ function connect(srf) {
 test('UAC', (t) => {
   t.timeoutAfter(60000);
 
+  let uacOverlap;
   let srf = new Srf();
   connect(srf)
     .then(() => {
@@ -114,12 +115,37 @@ test('UAC', (t) => {
       srf.disconnect();
       return t.pass('Srf#createUAC accepts opts.callingNumber');
     })
-    
+
     .then(() => {
       srf = new Srf();
       return connect(srf);
     })
+    .then(() => {
+      return srf.createUAC('sip:sipp-uas-reinvite-overlap', {
+        method: 'INVITE',
+        headers: {
+          To: 'sip:dhorton@sip.drachtio.org',
+          From: 'sip:dhorton@sip.drachtio.org'
+        }
+      });
+    })
+    .then((uac) => {
+      uacOverlap = uac;
+      const p1 = uac.modify(uac.local.sdp);
+      const p2 = uac.modify(uac.local.sdp);
+      const p3 = uac.modify(uac.local.sdp);
+      return Promise.all([p1, p2, p3]);
+    })
+    .then(() => uacOverlap.destroy())
+    .then(() => {
+      srf.disconnect();
+      return t.pass('SipDialog will not send overlapping re-invites');
+    })
 
+    .then(() => {
+      srf = new Srf();
+      return connect(srf);
+    })
     .then(() => {
       return srf.createUAC('sip:sipp-uas-auth', {
         method: 'INVITE',
@@ -137,6 +163,7 @@ test('UAC', (t) => {
       srf.disconnect();
       return t.pass('Srf#createUAC can handle digest authentication, sending to same server');
     })
+
     .then(() => {
       srf = new Srf();
       return connect(srf);
@@ -329,4 +356,5 @@ test('UAC', (t) => {
       if (srf) srf.disconnect();
       t.error(err);
     });
-});
+
+  });

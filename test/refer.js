@@ -34,11 +34,9 @@ test('REFER tests', (t) => {
     .then(() => Promise.all([p1, p2]))
     .then(() => t.pass('attended transfer success'))
 
-    .then(() => {
-      b2b.disconnect();
-      uas.disconnect();
-      t.end();
-    })
+    .then(() => b2b.disconnect())
+    .then(() => uas.disconnect())
+    .then(() => t.end())
     .catch((err) => {
       t.error(err);
       b2b.disconnect();

@@ -116,3 +116,14 @@ services:
     networks:
       testbed:
         ipv4_address: 172.29.0.20
+
+  sipp-uas-reinvite-overlap:
+    image: drachtio/sipp:latest
+    command: sipp -sf /tmp/uas-reinvite-overlap.xml
+    container_name: sipp-uas-reinvite-overlap
+    volumes:
+      - ./scenarios:/tmp
+    tty: true
+    networks:
+      testbed:
+        ipv4_address: 172.29.0.21
