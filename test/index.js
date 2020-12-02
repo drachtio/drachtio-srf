@@ -1,8 +1,8 @@
 require('./docker_start');
+require('./b2b');
 require('./reinvite-tests');
 require('./uac');
 require('./uas');
-require('./b2b');
 require('./proxy');
 require('./utils');
 require('./refer');

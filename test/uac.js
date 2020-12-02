@@ -15,7 +15,7 @@ function connect(srf) {
 }
 
 test('UAC', (t) => {
-  t.timeoutAfter(60000);
+  t.timeoutAfter(80000);
 
   let uacOverlap;
   let srf = new Srf();

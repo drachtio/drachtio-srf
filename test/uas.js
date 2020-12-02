@@ -8,7 +8,7 @@ process.on('unhandledRejection', (reason, p) => {
 });
 
 test('UAS', (t) => {
-  t.timeoutAfter(60000);
+  t.timeoutAfter(80000);
 
   let uas = new Uas();
 

@@ -8,7 +8,7 @@ process.on('unhandledRejection', (reason, p) => {
 });
 
 test('B2B', (t) => {
-  t.timeoutAfter(60000);
+  t.timeoutAfter(180000);
 
   let b2b = new B2b();
   b2b.on('connected', ({uas, uac}) => {
