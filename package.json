@@ -1,6 +1,6 @@
 {
   "name": "drachtio-srf",
-  "version": "4.4.42",
+  "version": "4.4.43",
   "description": "drachtio signaling resource framework",
   "main": "lib/srf.js",
   "scripts": {
@@ -41,7 +41,7 @@
     "cheerio": "^1.0.0-rc.3",
     "config": "^3.3.3",
     "drachtio-test-fixtures": "^0.1.7",
-    "eslint": "^7.14.0",
+    "eslint": "^7.15.0",
     "eslint-plugin-promise": "^4.2.1",
     "fs-extra": "^9.0.1",
     "passport": "^0.4.1",
