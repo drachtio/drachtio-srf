@@ -8,7 +8,7 @@
       "jsx": false,
       "modules": false
     },
-    "ecmaVersion": 2017
+    "ecmaVersion": 2018
   },
   "plugins": ["promise"],
   "rules": {
