@@ -1,6 +1,6 @@
 {
   "name": "drachtio-srf",
-  "version": "4.4.44",
+  "version": "4.5.0",
   "description": "drachtio signaling resource framework",
   "main": "lib/srf.js",
   "scripts": {
@@ -9,7 +9,7 @@
     "jslint": "eslint lib"
   },
   "engines": {
-    "node": ">= 6.9.3"
+    "node": ">= 10.0.0"
   },
   "repository": {
     "type": "git",
@@ -22,13 +22,9 @@
   },
   "homepage": "https://github.com/davehorton/drachtio-srf#readme",
   "dependencies": {
-    "async": "^1.4.2",
     "debug": "^3.2.7",
     "delegates": "^0.1.0",
-    "deprecate": "^1.1.1",
-    "drachtio-mw-registration-parser": "0.0.2",
     "drachtio-sip": "^0.5.1",
-    "lodash": "^4.17.20",
     "node-noop": "0.0.1",
     "only": "0.0.2",
     "sdp-transform": "^2.14.1",
@@ -39,16 +35,9 @@
   },
   "devDependencies": {
     "blue-tape": "^1.0.0",
-    "cheerio": "^1.0.0-rc.3",
     "config": "^3.3.3",
-    "drachtio-test-fixtures": "^0.1.7",
     "eslint": "^7.15.0",
     "eslint-plugin-promise": "^4.2.1",
-    "fs-extra": "^9.0.1",
-    "passport": "^0.4.1",
-    "passport-http": "^0.3.0",
-    "tap": "^14.11.0",
-    "tap-dot": "^2.0.0",
     "tap-spec": "^5.0.0"
   }
 }
