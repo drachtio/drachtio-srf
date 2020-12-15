@@ -1,4 +1,4 @@
-# drachtio-srf [![Build Status](https://secure.travis-ci.org/davehorton/drachtio-srf.png)](http://travis-ci.org/davehorton/drachtio-srf) [![NPM version](https://badge.fury.io/js/drachtio-srf.svg)](http://badge.fury.io/js/drachtio-srf)
+# drachtio-srf ![Build Status](https://github.com/jambonz/drachtio-srf/workflows/CI/badge.svg)
 
 [![drachtio logo](http://davehorton.github.io/drachtio-srf/img/definition-only-cropped.png)](https://drachtio.org)
 

@@ -27,7 +27,7 @@ obj.output = () => {
 obj.sippUac = (file) => {
   const cmd = 'docker';
   const args = [
-    'run', '-ti', '--rm', '--net', `${network}`,
+    'run', '--rm', '--net', `${network}`,
     '-v', `${__dirname}/scenarios:/tmp/scenarios`,
     'drachtio/sipp', 'sipp', '-sf', `/tmp/scenarios/${file}`,
     '-m', '1',
