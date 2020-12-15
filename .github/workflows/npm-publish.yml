@@ -13,7 +13,7 @@ jobs:
         with:
           node-version: 12
       - run: npm install
-#      - run: npm run jslint
+      - run: npm run jslint
       - run: npm test
 
  
