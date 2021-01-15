@@ -13,14 +13,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/davehorton/drachtio-srf.git"
+    "url": "git+https://github.com/drachtio/drachtio-srf.git"
   },
   "author": "Dave Horton",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/davehorton/drachtio-srf/issues"
+    "url": "https://github.com/drachtio/drachtio-srf/issues"
   },
-  "homepage": "https://github.com/davehorton/drachtio-srf#readme",
+  "homepage": "https://github.com/drachtio/drachtio-srf#readme",
   "dependencies": {
     "async": "^1.4.2",
     "debug": "^3.2.7",
