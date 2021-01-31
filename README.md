@@ -1,4 +1,4 @@
-# drachtio-srf ![Build Status](https://github.com/jambonz/drachtio-srf/workflows/CI/badge.svg)
+# drachtio-srf ![Build Status](https://github.com/drachtio/drachtio-srf/workflows/CI/badge.svg)
 
 [![drachtio logo](http://davehorton.github.io/drachtio-srf/img/definition-only-cropped.png)](https://drachtio.org)
 
