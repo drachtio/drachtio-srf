@@ -6,4 +6,4 @@ require('./uas');
 require('./proxy');
 require('./utils');
 require('./refer');
-//require('./docker_stop');
+require('./docker_stop');
