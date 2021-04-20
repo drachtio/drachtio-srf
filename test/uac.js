@@ -141,7 +141,6 @@ test('UAC', (t) => {
       srf.disconnect();
       return t.pass('SipDialog will not send overlapping re-invites');
     })
-
     .then(() => {
       srf = new Srf();
       return connect(srf);
