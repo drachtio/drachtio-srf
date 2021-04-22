@@ -19,6 +19,31 @@ test('B2B', (t) => {
   });
 
   Promise.resolve()
+    // INVITE with no SDP
+    .then(() => {
+      debug('starting sipp');
+      return b2b.expectSuccess('sip:sipp-uas', {
+        responseHeaders: {
+          'Contact': 'sip:foo@localhost'
+        }
+      });
+    })
+    .then(() => {
+      debug('start sipp...');
+      return sippUac('uac-nosdp.xml');
+    })
+    .then(() => {
+      return t.pass('b2b handles INVITE with late sdp');
+    })
+    .then(() => {
+      b2b.disconnect();
+      return new Promise((resolve, reject) => {
+        setTimeout(() => {
+          b2b = new B2b();
+          resolve();
+        }, 100);
+      });
+    })
 
     // 200 OK from B
     .then(() => {
