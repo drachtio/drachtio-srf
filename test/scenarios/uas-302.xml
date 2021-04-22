@@ -49,7 +49,7 @@
       [last_To:];tag=[pid]SIPpTag01[call_number]
       [last_Call-ID:]
       [last_CSeq:]
-      Contact: <sip:sipp-uas>
+      Contact: <sip:172.29.0.13>
       Content-Length: 0
 
     ]]>

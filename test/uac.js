@@ -27,11 +27,12 @@ test('UAC', (t) => {
           To: 'sip:dhorton@sip.drachtio.org',
           From: 'sip:dhorton@sip.drachtio.org'
         }, 
-        followRedirects: true
+        followRedirects: true,
+        keepUriOnRedirect: true
       });
     })
     .then((uac) => {
-      t.pass('Srf#createUAC: follows redirect');
+      t.pass('Srf#createUAC follows 3XX redirect when asked');
       uac.destroy();
       return;
     })
