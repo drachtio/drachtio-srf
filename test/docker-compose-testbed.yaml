@@ -127,3 +127,15 @@ services:
     networks:
       testbed:
         ipv4_address: 172.29.0.21
+
+  sipp-uas-302:
+    image: drachtio/sipp:latest
+    command: sipp -sf /tmp/uas-302.xml
+    container_name: sipp-uas-302
+    volumes:
+      - ./scenarios:/tmp
+    tty: true
+    networks:
+      testbed:
+        ipv4_address: 172.29.0.22
+      

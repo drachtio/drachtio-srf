@@ -21,6 +21,22 @@ test('UAC', (t) => {
   let srf = new Srf();
   connect(srf)
     .then(() => {
+      return srf.createUAC('sip:sipp-uas-302', {
+        method: 'INVITE',
+        headers: {
+          To: 'sip:dhorton@sip.drachtio.org',
+          From: 'sip:dhorton@sip.drachtio.org'
+        }, 
+        followRedirects: true,
+        keepUriOnRedirect: true
+      });
+    })
+    .then((uac) => {
+      t.pass('Srf#createUAC follows 3XX redirect when asked');
+      uac.destroy();
+      return;
+    })
+    .then(() => {
       return srf.createUAC('sip:sipp-uas', {
         method: 'INVITE',
         headers: {
@@ -29,7 +45,7 @@ test('UAC', (t) => {
         }
       });
     })
-    .then((uac) => {
+  .then((uac) => {
       srf.disconnect();
       return t.pass('Srf#createUAC returns a Promise that resolves with the uac dialog');
     })
@@ -141,7 +157,6 @@ test('UAC', (t) => {
       srf.disconnect();
       return t.pass('SipDialog will not send overlapping re-invites');
     })
-
     .then(() => {
       srf = new Srf();
       return connect(srf);
@@ -343,7 +358,7 @@ test('UAC', (t) => {
         });
       });
     })
-    .then((uac) => {
+    .then(() => {
       srf.disconnect();
       return t.pass('Srf#request can be canceled');
     })

@@ -66,6 +66,27 @@ class App extends Emitter {
 
   expectSuccess(uri, opts = {}) {
     this.srf.invite((req, res) => {
+      this.srf.createB2BUA(req, res, uri, opts, {
+        cbRequest: (err, uacRequest) => {
+          //console.log(`sent request with Subject: ${uacRequest.get('Subject')}`);
+        },
+        cpProvisional: (provisionalResponse) => {
+
+        }
+      })
+        .then(({uas, uac}) => {
+          this.emit('connected', {uas, uac});
+          return;
+        })
+        .catch((err) => {
+          throw err;
+        });
+    });
+  }
+
+  handle3PCC(uri, opts = {}) {
+    debug('got invite');
+    this.srf.invite((req, res) => {
 
       this.srf.createB2BUA(req, res, uri, opts, {
         cbRequest: (err, uacRequest) => {
