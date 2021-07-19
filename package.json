@@ -32,17 +32,15 @@
     "sdp-transform": "^2.14.1",
     "short-uuid": "^4.1.0",
     "sip-methods": "^0.3.0",
+    "sip-status": "^0.1.0",
     "utils-merge": "1.0.0",
     "uuid": "^3.4.0"
   },
   "devDependencies": {
-    "blue-tape": "^1.0.0",
-    "clear-module": "^4.1.1",
     "config": "^3.3.3",
     "eslint": "^7.18.0",
     "eslint-plugin-promise": "^4.2.1",
     "nyc": "^15.1.0",
-    "sip-status": "^0.1.0",
-    "tape": "^5.1.1"
+    "tape": "^5.2.2"
   }
 }

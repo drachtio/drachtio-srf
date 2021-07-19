@@ -1,4 +1,4 @@
-const test = require('blue-tape').test ;
+const test = require('tape') ;
 const exec = require('child_process').exec ;
 
 test('stopping docker network..', (t) => {

@@ -1,4 +1,4 @@
-const test = require('blue-tape');
+const test = require('tape');
 const Srf = require('..');
 const assert = require('assert');
 

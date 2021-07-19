@@ -1,4 +1,4 @@
-const test = require('blue-tape');
+const test = require('tape');
 const config = require('config');
 const Srf = require('..');
 //const debug = require('debug')('drachtio:test');
