@@ -21,6 +21,20 @@ test('UAC', (t) => {
   let srf = new Srf();
   connect(srf)
     .then(() => {
+      return srf.createUAC('sip:sipp-uas-prack', {
+        method: 'INVITE',
+        headers: {
+          To: 'sip:dhorton@sip.drachtio.org',
+          From: 'sip:dhorton@sip.drachtio.org'
+        }
+      });
+    })
+    .then((uac) => {
+      t.pass('Srf#createUAC sends PRACK when received RSeq');
+      uac.destroy();
+      return;
+    })
+    .then(() => {
       return srf.createUAC('sip:sipp-uas-302', {
         method: 'INVITE',
         headers: {
@@ -36,6 +50,7 @@ test('UAC', (t) => {
       uac.destroy();
       return;
     })
+
     .then(() => {
       return srf.createUAC('sip:sipp-uas', {
         method: 'INVITE',
@@ -362,7 +377,6 @@ test('UAC', (t) => {
       srf.disconnect();
       return t.pass('Srf#request can be canceled');
     })
-
     .then(() => {
       return t.end();
     })
