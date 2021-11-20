@@ -1,6 +1,6 @@
 {
   "name": "drachtio-srf",
-  "version": "4.4.57",
+  "version": "4.4.58",
   "description": "drachtio signaling resource framework",
   "main": "lib/srf.js",
   "scripts": {
@@ -26,7 +26,7 @@
     "debug": "^3.2.7",
     "delegates": "^0.1.0",
     "deprecate": "^1.1.1",
-    "drachtio-sip": "^0.6.0",
+    "drachtio-sip": "^0.6.1",
     "node-noop": "0.0.1",
     "only": "0.0.2",
     "sdp-transform": "^2.14.1",
