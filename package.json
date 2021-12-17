@@ -33,7 +33,7 @@
     "short-uuid": "^4.1.0",
     "sip-methods": "^0.3.0",
     "sip-status": "^0.1.0",
-    "utils-merge": "1.0.0",
+    "utils-merge": "1.0.1",
     "uuid": "^3.4.0"
   },
   "devDependencies": {
