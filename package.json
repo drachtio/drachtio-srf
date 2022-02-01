@@ -34,7 +34,7 @@
     "sip-methods": "^0.3.0",
     "sip-status": "^0.1.0",
     "utils-merge": "1.0.0",
-    "uuid": "^3.4.0"
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "config": "^3.3.3",
