@@ -1,4 +1,4 @@
-const test = require('blue-tape');
+const test = require('tape');
 const { output, sippUac } = require('./sipp')('test_testbed');
 const B2b = require('./scripts/b2b');
 const debug = require('debug')('drachtio:test');
@@ -8,7 +8,7 @@ process.on('unhandledRejection', (reason, p) => {
 });
 
 test('B2B', (t) => {
-  t.timeoutAfter(60000);
+  t.timeoutAfter(180000);
 
   let b2b = new B2b();
   b2b.on('connected', ({uas, uac}) => {
@@ -19,6 +19,31 @@ test('B2B', (t) => {
   });
 
   Promise.resolve()
+    // INVITE with no SDP
+    .then(() => {
+      debug('starting sipp');
+      return b2b.expectSuccess('sip:sipp-uas', {
+        responseHeaders: {
+          'Contact': 'sip:foo@localhost'
+        }
+      });
+    })
+    .then(() => {
+      debug('start sipp...');
+      return sippUac('uac-nosdp.xml');
+    })
+    .then(() => {
+      return t.pass('b2b handles INVITE with late sdp');
+    })
+    .then(() => {
+      b2b.disconnect();
+      return new Promise((resolve, reject) => {
+        setTimeout(() => {
+          b2b = new B2b();
+          resolve();
+        }, 100);
+      });
+    })
 
     // 200 OK from B
     .then(() => {
@@ -207,6 +232,28 @@ test('B2B', (t) => {
       });
     })
 
+    // pass display name in From header
+    .then(() => {
+      debug('starting sipp');
+      return b2b.passHeaders('sip:sipp-uas');
+    })
+    .then(() => {
+      debug('start sipp...');
+      return sippUac('uac-displayname-from.xml');
+    })
+    .then(() => {
+      return t.pass('pass displayname in From header from A to B');
+    })
+    .then(() => {
+      b2b.disconnect();
+      return new Promise((resolve, reject) => {
+        setTimeout(() => {
+          b2b = new B2b();
+          resolve();
+        }, 100);
+      });
+    })
+    
     .then(() => {
       debug('starting sipp');
       return b2b.sdpAsPromise('sip:sipp-uas');

@@ -1,4 +1,4 @@
-const test = require('blue-tape');
+const test = require('tape');
 const { output, sippUac } = require('./sipp')('test_testbed');
 const Uas = require('./scripts/uas');
 const debug = require('debug')('drachtio:test');
@@ -15,24 +15,13 @@ test('reinvite tests', (t) => {
 
   Promise.resolve()
     .then(() => {
-      uas = new Uas();
       p = uas.handleReinviteScenario();
       return;
     })
-    .then((uas) => {
-      return sippUac('uac-send-reinvite-no-sdp.xml');
-    })
-    .then(() => {
-      return p;
-    })
-    .then(() => {
-      uas.disconnect();
-      return t.pass('res#send of 200 OK supports fnAck');
-    })
-
-    .then(() => {
-      return t.end();
-    })
+    .then(() => sippUac('uac-send-reinvite-no-sdp.xml'))
+    .then(() => uas.disconnect())
+    .then(() => t.pass('res#send of 200 OK supports fnAck'))
+    .then(() => t.end())
     .catch((err) => {
       if (uas) uas.disconnect();
       console.log(`error received: ${err}`);

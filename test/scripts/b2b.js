@@ -66,6 +66,27 @@ class App extends Emitter {
 
   expectSuccess(uri, opts = {}) {
     this.srf.invite((req, res) => {
+      this.srf.createB2BUA(req, res, uri, opts, {
+        cbRequest: (err, uacRequest) => {
+          //console.log(`sent request with Subject: ${uacRequest.get('Subject')}`);
+        },
+        cpProvisional: (provisionalResponse) => {
+
+        }
+      })
+        .then(({uas, uac}) => {
+          this.emit('connected', {uas, uac});
+          return;
+        })
+        .catch((err) => {
+          throw err;
+        });
+    });
+  }
+
+  handle3PCC(uri, opts = {}) {
+    debug('got invite');
+    this.srf.invite((req, res) => {
 
       this.srf.createB2BUA(req, res, uri, opts, {
         cbRequest: (err, uacRequest) => {
@@ -143,6 +164,25 @@ class App extends Emitter {
       })
         .then(({uas, uac}) => {
           if (!uacFinalized) throw new Error('cbFinalizedUac not called');
+          this.emit('connected', {uas, uac});
+          return;
+        })
+        .catch((err) => {
+          throw err;
+        });
+    });
+  }
+
+  passDisplayName(uri) {
+    let uacFinalized = false;
+    this.srf.invite((req, res) => {
+
+      this.srf.createB2BUA(req, res, uri, {}, {
+        cbRequest: (err, uacRequest) => {
+          if (uacRequest.callingName !== 'Dave H') throw new Error('display name on From not passed');
+        }
+      })
+        .then(({uas, uac}) => {
           this.emit('connected', {uas, uac});
           return;
         })

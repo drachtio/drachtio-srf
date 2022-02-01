@@ -1,4 +1,4 @@
-const test = require('blue-tape');
+const test = require('tape');
 const { output, sippUac } = require('./sipp')('test_testbed');
 const Uas = require('./scripts/uas');
 const debug = require('debug')('drachtio:srf');
@@ -8,13 +8,11 @@ process.on('unhandledRejection', (reason, p) => {
 });
 
 test('UAS', (t) => {
-  t.timeoutAfter(60000);
+  t.timeoutAfter(80000);
 
   let uas = new Uas();
 
   Promise.resolve()
-
-    // return 503
     .then(() => {
       return uas.reject(503);
     })
@@ -26,7 +24,6 @@ test('UAS', (t) => {
       return uas.disconnect();
     }).
 
-    //Srf#createUAS returns a Promise
     then(() => {
       uas = new Uas();
       return uas.accept();
@@ -39,7 +36,6 @@ test('UAS', (t) => {
       return t.pass('Srf#createUAS returns a promise');
     })
 
-    //Srf#createUAS can accept a callback
     .then(() => {
       uas = new Uas();
       return uas.acceptCb();
@@ -52,7 +48,6 @@ test('UAS', (t) => {
       return t.pass('Srf#createUAS accepts a callback');
     })
 
-    //opts.body is an alias for opts.localSdp
     .then(() => {
       uas = new Uas();
       return uas.accept(null, true);
@@ -65,7 +60,6 @@ test('UAS', (t) => {
       return t.pass('Srf#createUAS opts.body is an alias for opts.localSdp');
     })
 
-    //Srf#createUAS creates a dialog on 200 OK, not ACK
     .then(() => {
       uas = new Uas();
       return uas.accept();
@@ -89,7 +83,6 @@ test('UAS', (t) => {
       uas.disconnect();
       return;
     })
-
     .then(() => {
       uas = new Uas();
       return uas.acceptSubscribe();
@@ -98,7 +91,6 @@ test('UAS', (t) => {
       uas.on('connected', (dlg) => {
         t.ok(1 === dlg.getCountOfSubscriptions(), 'creates a dialog on successful SUBSCRIBE');
 
-        // send immediate NOTIFY, then another to terminate the subscription
         Promise.resolve()
           .then(() => {
             return dlg.request({
