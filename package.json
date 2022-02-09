@@ -6,6 +6,7 @@
   "scripts": {
     "test": "NODE_ENV=test node test/ ",
     "coverage": "./node_modules/.bin/nyc --reporter html --report-dir ./coverage npm run test",
+    "unittests": "./node_modules/.bin/mocha ./test/unit-tests/",
     "jslint": "eslint lib"
   },
   "engines": {
@@ -26,7 +27,6 @@
     "debug": "^3.2.7",
     "delegates": "^0.1.0",
     "deprecate": "^1.1.1",
-    "drachtio-sip": "^0.6.3",
     "node-noop": "0.0.1",
     "only": "0.0.2",
     "sdp-transform": "^2.14.1",
@@ -40,7 +40,10 @@
     "config": "^3.3.3",
     "eslint": "^7.18.0",
     "eslint-plugin-promise": "^4.2.1",
+    "mocha": "^9.2.0",
     "nyc": "^15.1.0",
+    "should": "^13.2.3",
+    "sip-message-examples": "0.0.6",
     "tape": "^5.2.2"
   }
 }
