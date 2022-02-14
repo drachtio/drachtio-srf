@@ -150,3 +150,14 @@ services:
     networks:
       testbed:
         ipv4_address: 172.29.0.23
+
+  sipp-uas-bye-with-auth:
+    image: drachtio/sipp:latest
+    command: sipp -sf /tmp/uas-bye-with-auth.xml
+    container_name: sipp-uas-bye-with-auth
+    volumes:
+      - ./scenarios:/tmp
+    tty: true
+    networks:
+      testbed:
+        ipv4_address: 172.29.0.24

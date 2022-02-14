@@ -10,7 +10,7 @@ process.on('unhandledRejection', (reason, p) => {
 function connect(srf) {
   return new Promise((resolve, reject) => {
     srf.connect(config.get('drachtio-sut'));
-    srf.on('connect', () => { resolve();});
+    srf.on('connect', () => { resolve(); });
   });
 }
 
@@ -40,7 +40,7 @@ test('UAC', (t) => {
         headers: {
           To: 'sip:dhorton@sip.drachtio.org',
           From: 'sip:dhorton@sip.drachtio.org'
-        }, 
+        },
         followRedirects: true,
         keepUriOnRedirect: true
       });
@@ -60,7 +60,7 @@ test('UAC', (t) => {
         }
       });
     })
-  .then((uac) => {
+    .then((uac) => {
       srf.disconnect();
       return t.pass('Srf#createUAC returns a Promise that resolves with the uac dialog');
     })
@@ -94,52 +94,52 @@ test('UAC', (t) => {
     })
     .then(() => {
       return srf.createUAC('sip:sipp-uas', {
-          method: 'INVITE',
-          callingNumber: '12345',
-          headers: {
-            'Subject': 'sending Contact based on callingNumber'
-          }
-        });
+        method: 'INVITE',
+        callingNumber: '12345',
+        headers: {
+          'Subject': 'sending Contact based on callingNumber'
+        }
+      });
     })
     .then((uac) => uac.destroy())
     .then(() => {
       srf.disconnect();
       return t.pass('Srf#createUAC accepts opts.callingNumber');
     })
-    
+
     .then(() => {
       srf = new Srf();
       return connect(srf);
     })
     .then(() => {
       return srf.createUAC('sip:sipp-uas', {
-          method: 'INVITE',
-          callingNumber: '12345',
-          headers: {
-            'Subject': 'sending explicit Contact',
-            'Contact': 'sip:foo@localhost'
-          }
-        });
+        method: 'INVITE',
+        callingNumber: '12345',
+        headers: {
+          'Subject': 'sending explicit Contact',
+          'Contact': 'sip:foo@localhost'
+        }
+      });
     })
     .then((uac) => uac.destroy())
     .then(() => {
       srf.disconnect();
       return t.pass('Srf#createUAC accepts opts.callingNumber');
     })
-    
+
     .then(() => {
       srf = new Srf();
       return connect(srf);
     })
     .then(() => {
       return srf.createUAC('sip:sipp-uas', {
-          method: 'INVITE',
-          callingNumber: '12345',
-          headers: {
-            'Subject': 'sending explicit contact',
-            'contact': 'sip:foo@localhost'
-          }
-        });
+        method: 'INVITE',
+        callingNumber: '12345',
+        headers: {
+          'Subject': 'sending explicit contact',
+          'contact': 'sip:foo@localhost'
+        }
+      });
     })
     .then((uac) => uac.destroy())
     .then(() => {
@@ -215,6 +215,29 @@ test('UAC', (t) => {
       srf.disconnect();
       return t.pass('Srf#createUAC can handle digest authentication');
     })
+    .then(() => {
+      srf = new Srf();
+      return connect(srf);
+    })
+    .then(() => {
+      return srf.createUAC('sip:172.29.0.24', {
+        method: 'INVITE',
+        headers: {
+          To: 'sip:dhorton@sip.drachtio.org',
+          From: 'sip:dhorton@sip.drachtio.org'
+        },
+        auth: {
+          username: 'foo',
+          password: 'bar'
+        }
+      });
+    })
+    .then((uac) => {
+      return uac.destroy().then(() => {
+        srf.disconnect();
+        return t.pass('Srf#createUAC can handle bye with digest authentication');
+      });
+    })
 
     .then(() => {
       srf = new Srf();
@@ -266,15 +289,15 @@ test('UAC', (t) => {
             password: 'bar'
           }
         })
-        .then((req) => {
-          req.on('response', (res) => {
-            if (res.status === 200) return resolve();
-            reject(new Error(`REGISTER was rejected after auth with ${res.status}`));
+          .then((req) => {
+            req.on('response', (res) => {
+              if (res.status === 200) return resolve();
+              reject(new Error(`REGISTER was rejected after auth with ${res.status}`));
+            });
+          })
+          .catch((err) => {
+            t.end(err, 'Srf#request returns a Promise');
           });
-        })
-        .catch((err) => {
-          t.end(err, 'Srf#request returns a Promise');
-        });
       });
     })
     .then((uac) => {
@@ -301,15 +324,15 @@ test('UAC', (t) => {
             password: 'bar'
           }
         })
-        .then((req) => {
-          req.on('response', (res) => {
-            if (res.status === 200) return resolve();
-            reject(new Error(`REGISTER was rejected after auth with ${res.status}`));
+          .then((req) => {
+            req.on('response', (res) => {
+              if (res.status === 200) return resolve();
+              reject(new Error(`REGISTER was rejected after auth with ${res.status}`));
+            });
+          })
+          .catch((err) => {
+            t.end(err, 'srf.request accepts opts.uri');
           });
-        })
-        .catch((err) => {
-          t.end(err, 'srf.request accepts opts.uri');
-        });
       });
     })
     .then((uac) => {
@@ -364,7 +387,7 @@ test('UAC', (t) => {
           cbRequest: (err, req) => inviteSent = req,
           cbProvisional: (response) => {
             if (response.status < 200) {
-              inviteSent.cancel({headers: {'Reason': 'SIP;cause=200;text="Call completed elsewhere"'}});
+              inviteSent.cancel({ headers: { 'Reason': 'SIP;cause=200;text="Call completed elsewhere"' } });
             }
           }
         }, (err, dlg) => {
@@ -386,4 +409,4 @@ test('UAC', (t) => {
       t.error(err);
     });
 
-  });
+});
