@@ -23,7 +23,7 @@
   },
   "homepage": "https://github.com/drachtio/drachtio-srf#readme",
   "dependencies": {
-    "async": "^1.4.2",
+    "async": "^2.6.4",
     "debug": "^3.2.7",
     "delegates": "^0.1.0",
     "deprecate": "^1.1.1",
