@@ -1,6 +1,6 @@
 {
   "name": "drachtio-srf",
-  "version": "4.4.64",
+  "version": "4.5.0",
   "description": "drachtio signaling resource framework",
   "main": "lib/srf.js",
   "scripts": {
@@ -23,27 +23,25 @@
   },
   "homepage": "https://github.com/drachtio/drachtio-srf#readme",
   "dependencies": {
-    "async": "^1.4.2",
     "debug": "^3.2.7",
     "delegates": "^0.1.0",
-    "deprecate": "^1.1.1",
-    "node-noop": "0.0.1",
-    "only": "0.0.2",
+    "node-noop": "^0.0.1",
+    "only": "^0.0.2",
     "sdp-transform": "^2.14.1",
-    "short-uuid": "^4.1.0",
+    "short-uuid": "^4.2.0",
     "sip-methods": "^0.3.0",
     "sip-status": "^0.1.0",
-    "utils-merge": "1.0.0",
+    "utils-merge": "^1.0.0",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
-    "config": "^3.3.3",
-    "eslint": "^7.18.0",
-    "eslint-plugin-promise": "^4.2.1",
-    "mocha": "^9.2.0",
+    "config": "^3.3.7",
+    "eslint": "^7.32.0",
+    "eslint-plugin-promise": "^4.3.1",
+    "mocha": "^9.2.2",
     "nyc": "^15.1.0",
     "should": "^13.2.3",
-    "sip-message-examples": "0.0.6",
-    "tape": "^5.2.2"
+    "sip-message-examples": "^0.0.6",
+    "tape": "^5.5.3"
   }
 }
