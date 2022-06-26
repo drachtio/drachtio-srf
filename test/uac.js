@@ -177,6 +177,32 @@ test('UAC', (t) => {
       return connect(srf);
     })
     .then(() => {
+      return srf.createUAC('sip:172.29.0.25', {
+        method: 'INVITE',
+        headers: {
+          To: 'sip:dhorton@sip.drachtio.org',
+          From: 'sip:dhorton@sip.drachtio.org'
+        },
+        auth: {
+          username: 'foo',
+          password: 'bar'
+        }
+      });
+    })
+    .then((uac) => {
+      uacOverlap = uac;
+      return uac.modify('hold');
+    })
+    .then(() => uacOverlap.destroy())
+    .then(() => {
+      srf.disconnect();
+      return t.pass('SipDialog will handle authentication on re-invites');
+    })
+    .then(() => {
+      srf = new Srf();
+      return connect(srf);
+    })
+    .then(() => {
       return srf.createUAC('sip:sipp-uas-auth', {
         method: 'INVITE',
         headers: {
