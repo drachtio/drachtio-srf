@@ -2,10 +2,16 @@ require('assert');
 require('mocha');
 require('should');
 
+const assert = require('assert');
 const examples = require('sip-message-examples');
 const SipMessage = require('../../lib/sip-parser/message');
 const parser = require('../../lib/sip-parser/parser');
 const parseUri = parser.parseUri;
+const Srf = require('../..');
+assert.ok(typeof parseUri === 'function');
+assert.ok(typeof Srf.parseUri === 'function');
+console.log(`typeof parseUri is ${typeof parseUri}`);
+console.log(`typeof Srf.parseUri is ${typeof Srf.parseUri}`);
 
 describe('Parser', function () {
   it('should provide headers as string values', function () {
