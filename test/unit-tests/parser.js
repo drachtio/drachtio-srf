@@ -40,6 +40,10 @@ describe('Parser', function () {
     msg.set('From', '<sip:daveh@localhost>;tag=1234');
     msg.get('from').should.eql('<sip:daveh@localhost>;tag=1234');
   });
+  it('should not parse a header when not available', function () {
+    var msg = new SipMessage();
+    should.throws(msg.getParsedHeader.bind(msg, 'contact'));
+  });
   it('should parse multiple headers into an array', function () {
     var msg = new SipMessage(examples('invite'));
     var via = msg.getParsedHeader('via');
@@ -139,6 +143,12 @@ describe('Parser', function () {
     var uri = parseUri('sip:service@test_sipp-uas_1.com');
     uri.family.should.eql('ipv4');
     uri.host.should.eql('test_sipp-uas_1.com');
+  });
+  it('should parse calling name', function () {
+    var msg = new SipMessage();
+    msg.set('From', '"Dave" <sip:daveh@localhost>;tag=1234');
+    msg.get('From').should.eql('"Dave" <sip:daveh@localhost>;tag=1234');
+    msg.callingName.should.eql('Dave');
   });
   it('should parse calling name', function () {
     var msg = new SipMessage();
