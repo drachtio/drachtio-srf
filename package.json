@@ -25,19 +25,19 @@
   "dependencies": {
     "debug": "^3.2.7",
     "delegates": "^0.1.0",
+    "eslint": "^8.30.0",
+    "eslint-plugin-promise": "^6.1.1",
     "node-noop": "^0.0.1",
     "only": "^0.0.2",
+    "random-uuid": "^1.0.2",
     "sdp-transform": "^2.14.1",
     "short-uuid": "^4.2.0",
     "sip-methods": "^0.3.0",
     "sip-status": "^0.1.0",
-    "utils-merge": "^1.0.0",
-    "uuid": "^8.3.2"
+    "utils-merge": "^1.0.0"
   },
   "devDependencies": {
     "config": "^3.3.7",
-    "eslint": "^7.32.0",
-    "eslint-plugin-promise": "^4.3.1",
     "mocha": "^9.2.2",
     "nyc": "^15.1.0",
     "should": "^13.2.3",
