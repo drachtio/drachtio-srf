@@ -11,7 +11,7 @@ services:
 
   drachtio-sut:
     image: drachtio/drachtio-server:latest
-    command: drachtio --contact "sip:*;transport=udp" --loglevel debug --sofia-loglevel 9
+    command: drachtio --contact "sip:*;transport=udp" --loglevel info --sofia-loglevel 3
     container_name: drachtio-sut
     ports:
       - "9061:9022/tcp"
@@ -172,3 +172,14 @@ services:
     networks:
       testbed:
         ipv4_address: 172.29.0.25
+
+  sipp-uas-options:
+    image: drachtio/sipp:latest
+    command: sipp -sf /tmp/uas-options-expect-200.xml
+    container_name: sipp-uas-options
+    volumes:
+      - ./scenarios:/tmp
+    tty: true
+    networks:
+      testbed:
+        ipv4_address: 172.29.0.26
