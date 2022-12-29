@@ -10,7 +10,7 @@
     "jslint": "eslint lib"
   },
   "engines": {
-    "node": ">= 6.9.3"
+    "node": ">= 10.x"
   },
   "repository": {
     "type": "git",
