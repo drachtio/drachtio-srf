@@ -1,0 +1,15 @@
+{
+  "name": "drachtio-srf-benchmark",
+  "version": "1.0.0",
+  "description": "Benchmark drachtio-srf performance",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "benchmark": "^2.1.4",
+    "drachtio-srf": "^4.5.19"
+  }
+}
