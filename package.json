@@ -1,8 +1,9 @@
 {
   "name": "drachtio-srf",
-  "version": "4.5.23",
+  "version": "4.5.24",
   "description": "drachtio signaling resource framework",
   "main": "lib/srf.js",
+  "types": "lib/@types/index.d.ts",
   "scripts": {
     "test": "NODE_ENV=test node test/ ",
     "coverage": "./node_modules/.bin/nyc --reporter html --report-dir ./coverage npm run test",
@@ -35,6 +36,7 @@
     "uuid-random": "^1.3.2"
   },
   "devDependencies": {
+    "@types/node": "^16.0.0",
     "config": "^3.3.7",
     "eslint": "^8.30.0",
     "eslint-plugin-promise": "^6.1.1",
@@ -42,6 +44,7 @@
     "nyc": "^15.1.0",
     "should": "^13.2.3",
     "sip-message-examples": "^0.0.6",
-    "tape": "^5.5.3"
+    "tape": "^5.5.3",
+    "typescript": "^4.3.2"
   }
 }
