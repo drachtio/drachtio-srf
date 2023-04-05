@@ -34,7 +34,7 @@ declare module 'drachtio-srf' {
       get(name: string): string;
     }
   
-    interface Srf extends EventEmitter {
+    class Srf extends EventEmitter {
       connect(config?: SrfConfig): Promise<void>;
       disconnect(): void;
       register(options: any): void;
@@ -59,6 +59,6 @@ declare module 'drachtio-srf' {
       socket: Socket;
     }
   
-    export default function srf(config?: SrfConfig): Srf;
+    export default Srf
   }
   
