@@ -156,5 +156,9 @@ describe('Parser', function () {
     msg.get('From').should.eql('"Dave" <sip:daveh@localhost>;tag=1234');
     msg.callingName.should.eql('Dave');
   });
+  it('should parse request with carriage return on last line', function () {
+    var msg = new SipMessage(examples('options-carriage-return'));
+    (typeof msg.get('from')).should.eql('string');
+  });
 });
 
