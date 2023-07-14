@@ -122,7 +122,7 @@ test('B2B', (t) => {
 
     .then(() => {
       debug('starting sipp');
-      return b2b.expectCancelForwardAllHeaders('sip:sipp-uas-cancel');
+      return b2b.expectCancelForwardReasonHeader('sip:sipp-uas-cancel');
     })
     .then(() => {
       debug('start sipp...');
