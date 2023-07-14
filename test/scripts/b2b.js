@@ -36,7 +36,7 @@ class App extends Emitter {
     });
   }
 
-  expectCancelForwardAllHeaders(uri) {
+  expectCancelForwardReasonHeader(uri) {
     this.srf.invite((req, res) => {
 
       this.srf.createB2BUA(req, res, uri, {
