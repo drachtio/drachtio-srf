@@ -24,9 +24,24 @@ class App extends Emitter {
   expectCancel(uri) {
     this.srf.invite((req, res) => {
 
+      this.srf.createB2BUA(req, res, uri)
+        .then(({uas, uac}) => {
+          throw new Error('unexpected dialog success - expected CANCEL from uac');
+        })
+        .catch((err) => {
+          debug(`expectCancel: expected a final 487, got ${err}`);
+          if (err.status === 487) return;
+          throw err;
+        });
+    });
+  }
+
+  expectCancelForwardAllHeaders(uri) {
+    this.srf.invite((req, res) => {
+
       this.srf.createB2BUA(req, res, uri, {
         proxyRequestHeaders: [
-          'all'
+          'reason'
         ]
       })
         .then(({uas, uac}) => {
