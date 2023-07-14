@@ -24,7 +24,11 @@ class App extends Emitter {
   expectCancel(uri) {
     this.srf.invite((req, res) => {
 
-      this.srf.createB2BUA(req, res, uri)
+      this.srf.createB2BUA(req, res, uri, {
+        proxyRequestHeaders: [
+          'all'
+        ]
+      })
         .then(({uas, uac}) => {
           throw new Error('unexpected dialog success - expected CANCEL from uac');
         })

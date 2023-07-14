@@ -67,6 +67,7 @@
     To: [service] <sip:[service]@[remote_ip]:[remote_port]>
     Call-ID: [call_id]
     CSeq: 1 CANCEL
+    Reason: SIP;cause=200;text="Call completed elsewhere"
     Content-Length: 0
 
   ]]>
