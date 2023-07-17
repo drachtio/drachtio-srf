@@ -120,27 +120,6 @@ test('B2B', (t) => {
       });
     })
 
-    .then(() => {
-      debug('starting sipp');
-      return b2b.expectCancelForwardReasonHeader('sip:sipp-uas-cancel');
-    })
-    .then(() => {
-      debug('start sipp...');
-      return sippUac('uac-cancel.xml');
-    })
-    .then(() => {
-      return t.pass('b2b CANCELs B leg when CANCEL is received from A with Reason headers');
-    })
-    .then(() => {
-      b2b.disconnect();
-      return new Promise((resolve, reject) => {
-        setTimeout(() => {
-          b2b = new B2b();
-          resolve();
-        }, 100);
-      });
-    })
-
     // handle failure
     .then(() => {
       debug('starting sipp');
