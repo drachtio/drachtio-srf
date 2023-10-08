@@ -11,7 +11,7 @@ test('utils', (t) => {
   t.ok(uri.params.transport === 'udp', 'exposes Srf.parseUri');
   const telUri = Srf.parseUri('tel:+1-201-555-0123;phone-context=drachtio.org;ext=1');
   t.ok(telUri.number === '+1-201-555-0123', 'Srf.parseUri can parse tel uri');
-  t.ok(telUri.params['phone-context'] === 'drachtio.org', 'Srf.parseUri can parse tel uri');
+  t.ok(telUri.context === 'drachtio.org', 'Srf.parseUri can parse tel uri');
   t.ok(telUri.params.ext === '1', 'Srf.parseUri can parse tel uri');
   const err = new Srf.SipError(404);
   t.ok(err instanceof Error && err.status === 404, 'exposes Srf.SipError');
