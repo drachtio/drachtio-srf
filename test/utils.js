@@ -9,10 +9,14 @@ process.on('unhandledRejection', (reason, p) => {
 test('utils', (t) => {
   const uri = Srf.parseUri('sip:1234@10.101.10.1;transport=udp');
   t.ok(uri.params.transport === 'udp', 'exposes Srf.parseUri');
-  const telUri = Srf.parseUri('<tel:+1-201-555-0123;phone-context=drachtio.org;ext=1>');
+  let telUri = Srf.parseUri('<tel:+1-201-555-0123;phone-context=drachtio.org;ext=1>');
+  t.ok(telUri.scheme === 'tel', 'Srf.parseUri can parse tel uri');
   t.ok(telUri.number === '+1-201-555-0123', 'Srf.parseUri can parse tel uri');
   t.ok(telUri.context === 'drachtio.org', 'Srf.parseUri can parse tel uri');
   t.ok(telUri.params.ext === '1', 'Srf.parseUri can parse tel uri');
+  telUri = Srf.parseUri('<tel:+1-201-555-0123>');
+  t.ok(telUri.scheme === 'tel', 'Srf.parseUri can parse tel uri');
+  t.ok(telUri.number === '+1-201-555-0123', 'Srf.parseUri can parse tel uri');
   const err = new Srf.SipError(404);
   t.ok(err instanceof Error && err.status === 404, 'exposes Srf.SipError');
   t.throws((() => new Srf('bad,tag')), assert.AssertionError, 'tags may not contain commas');
