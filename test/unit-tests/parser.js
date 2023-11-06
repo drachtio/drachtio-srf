@@ -127,6 +127,13 @@ describe('Parser', function () {
     uri.user.should.eql('116751x0');
     uri.scheme.should.eql('sips');
   });
+  it('should parse a sip uri with host part being simple label', function () {
+    var uri = parseUri('sip:116751@feature-server');
+    uri.family.should.eql('ipv4');
+    uri.host.should.eql('feature-server');
+    uri.user.should.eql('116751');
+    uri.scheme.should.eql('sip');
+  });
   it('should parse a multi-part header', function () {
     var msg = new SipMessage(examples('siprec'));
     msg.payload.length.should.eql(2);
