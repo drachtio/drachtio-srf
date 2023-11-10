@@ -114,8 +114,8 @@ declare module 'drachtio-srf' {
     export interface CreateB2BUAOptions {
       headers?: SipMessageHeaders;
       responseHeaders?: SipMessageHeaders | ((uacRes: SipMessageHeaders, headers: SipMessageHeaders) => SipMessageHeaders | null);
-      localSdpA?: string | Function;
-      localSdpB?: string;
+      localSdpA?: string | ((sdp: string, res: SrfResponse) => string | Promise<string>);
+      localSdpB?: string | ((sdp: string) => string | Promise<string>);
       proxyRequestHeaders?: string[];
       proxyResponseHeaders?: string[];
       passFailure?: boolean;
