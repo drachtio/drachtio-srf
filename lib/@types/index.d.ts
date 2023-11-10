@@ -4,6 +4,7 @@ declare module 'drachtio-srf' {
 
     type SipMethod = 'ACK' | 'BYE' | 'CANCEL' | 'INFO' | 'INVITE' | 'MESSAGE' | 'NOTIFY' | 'OPTIONS' | 'PRACK' | 'PUBLISH' | 'REFER' | 'REGISTER' | 'SUBSCRIBE' | 'UPDATE';
     type SipMessageHeaders = Record<string, string>;
+    type AOR = { name: string; uri: string; params?: Record<string, any>; };
 
     export interface SrfConfig {
       apiSecret?: string;
