@@ -40,6 +40,16 @@ describe('Parser', function () {
     msg.set('From', '<sip:daveh@localhost>;tag=1234');
     msg.get('from').should.eql('<sip:daveh@localhost>;tag=1234');
   });
+  it('getting a private header should be case insensitive', function () {
+    var msg = new SipMessage();
+    msg.set('P-Called-Party-ID', '"Dave" <sip:daveh@localhost>');
+    msg.get('p-called-party-id').should.eql('"Dave" <sip:daveh@localhost>');
+  });
+  it('getting a custom header should be case insensitive', function () {
+    var msg = new SipMessage();
+    msg.set('X-Foo', 'bar');
+    msg.get('x-foo').should.eql('bar');
+  });
   it('should not parse a header when not available', function () {
     var msg = new SipMessage();
     should.throws(msg.getParsedHeader.bind(msg, 'contact'));
