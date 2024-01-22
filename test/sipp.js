@@ -34,7 +34,7 @@ obj.sippUac = (file) => {
     '-sleep', '250ms',
     '-nostdin',
     '-cid_str', `%u-%p@%s-${idx++}`,
-    'drachtio-sut'
+    'drachtio-sut', '-trace_msg'
   ];
 
   clearOutput();
