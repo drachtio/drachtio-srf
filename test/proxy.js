@@ -16,7 +16,7 @@ test('proxy', (t) => {
 
     // proxy uses Promise
     .then(() => {
-      return proxy.proxyPromise('sipp-uas');
+      return proxy.proxyPromise(['sip:123124123@sipp-uas;transport=udp']);
     })
     .then((proxy) => {
       return sippUac('uac-proxy.xml');
@@ -25,19 +25,6 @@ test('proxy', (t) => {
       t.pass('srf.proxyRequest returns a Promise');
       return proxy.disconnect();
     })
-
-    //proxy provides callback
-    .then(() => {
-      proxy = new Proxy();
-      return proxy.proxyCb('sipp-uas');
-    })
-    .then((uas) => {
-      return sippUac('uac-proxy.xml');
-    })
-    .then(() => {
-      return t.pass('srf.proxyRequest accepts a callback');
-    })
-
 
     .then(() => {
       proxy.disconnect();

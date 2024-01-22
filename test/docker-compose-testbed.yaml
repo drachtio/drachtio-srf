@@ -10,8 +10,8 @@ networks:
 services:
 
   drachtio-sut:
-    image: drachtio/drachtio-server:latest
-    command: drachtio --contact "sip:*;transport=udp" --loglevel info --sofia-loglevel 3
+    image: drachtio/drachtio-server:0.8.24
+    command: drachtio --contact "sip:172.29.0.10;transport=udp" --loglevel info --sofia-loglevel 3
     container_name: drachtio-sut
     ports:
       - "9061:9022/tcp"
@@ -32,7 +32,7 @@ services:
 
   sipp-uas:
     image: drachtio/sipp:latest
-    command: sipp -sf /tmp/uas.xml
+    command: sipp -sf /tmp/uas.xml -trace_msg
     container_name: sipp-uas
     volumes:
       - ./scenarios:/tmp

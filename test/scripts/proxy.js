@@ -13,10 +13,13 @@ class App extends Emitter {
 
   proxyPromise(dest) {
     this.srf.invite((req, res) => {
-      this.srf.proxyRequest(req, dest, {remainInDialog: true})
-        .then((results) => {
-          this.emit('proxy', results)
-        });
+      this.srf.proxyRequest(req, dest, {
+        remainInDialog: true,
+        followRedirects: false}
+      )
+      .then((results) => {
+        this.emit('proxy', results)
+      });
     });
   }
 
