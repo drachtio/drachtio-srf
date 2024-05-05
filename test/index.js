@@ -7,15 +7,15 @@ exec('"npm" run unittests', (err, stdout, stderr) => {
 
     console.log('Run integration tests');
 
-    // require('./docker_start');
-    // require('./b2b');
-    // require('./reinvite-tests');
-    // require('./uac');
-    // require('./uas');
-    // require('./proxy');
+    require('./docker_start');
+    require('./b2b');
+    require('./reinvite-tests');
+    require('./uac');
+    require('./uas');
+    require('./proxy');
     require('./utils');
-    // require('./refer');
-    // require('./docker_stop');
+    require('./refer');
+    require('./docker_stop');
 });
 
 
