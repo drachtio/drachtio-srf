@@ -7,8 +7,18 @@ process.on('unhandledRejection', (reason, p) => {
 });
 
 test('utils', (t) => {
-  const uri = Srf.parseUri('sip:1234@10.101.10.1;transport=udp');
+  let uri = Srf.parseUri('sip:1234@10.101.10.1;transport=udp');
   t.ok(uri.params.transport === 'udp', 'exposes Srf.parseUri');
+  uri = Srf.parseUri('sip:+12345612341t2@sip.jambonz.xyz;param1=value1?User-To-User=XX12344321&encoding=ascii');
+  t.ok(uri.family === 'ipv4', ' Srf.parseUri can parse sip URI with param and headers');
+  t.ok(uri.scheme === 'sip', ' Srf.parseUri can parse sip URI with param and headers');
+  t.ok(uri.user === '+12345612341t2', ' Srf.parseUri can parse sip URI with param and headers');
+  t.ok(uri.password === undefined, ' Srf.parseUri can parse sip URI with param and headers');
+  t.ok(uri.host === 'sip.jambonz.xyz', ' Srf.parseUri can parse sip URI with param and headers');
+  // t.ok(uri.port === undefined, ' Srf.parseUri can parse sip URI with param and headers');
+  t.ok(uri.params.param1 === 'value1', ' Srf.parseUri can parse sip URI with param and headers');
+  t.ok(uri.headers['User-To-User'] === 'XX12344321', ' Srf.parseUri can parse sip URI with param and headers');
+  t.ok(uri.headers.encoding === 'ascii', ' Srf.parseUri can parse sip URI with param and headers');
   let telUri = Srf.parseUri('<tel:+1-201-555-0123;phone-context=drachtio.org;ext=1>');
   t.ok(telUri.scheme === 'tel', 'Srf.parseUri can parse tel uri');
   t.ok(telUri.number === '+1-201-555-0123', 'Srf.parseUri can parse tel uri');
