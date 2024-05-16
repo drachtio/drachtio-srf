@@ -1,0 +1,10 @@
+REGISTER sip:3.138.164.186 SIP/2.0
+Via: SIP/2.0/UDP 194.195.240.223:43375;rport=43375;branch=z9hG4bK-8ek0DEV2
+Max-Forwards: 70
+From: <sip:45882674@3.138.164.186>;tag=9mqOGacjfIlGT5eA;_sipv="sip:73643012@"
+To: <sip:73643012@3.138.164.186>
+Call-ID: 8ek0DEV2
+CSeq: 14 REGISTER
+Contact: <sip:45882674@194.195.240.223:43375;transport=udp>
+Expires: 60
+Content-Length: 0
