@@ -149,36 +149,36 @@ declare namespace Srf {
     proxy?: string;
     auth?: { username: string; password: string; };
   }
-
-  export class Srf extends EventEmitter {
-    constructor();
-    constructor(tags: string | string[]);
-    connect(config?: SrfConfig): Promise<void>;
-    disconnect(): void;
-    use(callback: (req: SrfRequest, res: SrfResponse, next: Function) => void): void;
-    use(messageType: string, callback: (req: SrfRequest, res: SrfResponse, next: Function) => void): void;
-    invite(callback: (req: SrfRequest, res: SrfResponse) => void): void;
-    request(uri: string, opts: SrfRequest, method: SipMethod, [body]: string[]): Promise<SrfRequest>;
-    request(uri: string, opts: SrfRequest, method: SipMethod, [body]: string[], callback?: (err: any, requestSent: SrfRequest) => void): void;
-    proxyRequest(req: SrfRequest, destination: string | string[], opts?: ProxyRequestOptions, callback?: (err: any, results: string) => void): void;
-    createUAS(req: SrfRequest, res: SrfResponse, opts: CreateUASOptions): Promise<Dialog>;
-    createUAS(req: SrfRequest, res: SrfResponse, opts: CreateUASOptions, callback?: (err: any, dialog: Dialog) => void): this;
-    createUAC(uri: string | CreateUACOptions, opts?: CreateUACOptions, progressCallbacks?: { cbRequest?: (req: SrfRequest) => void; cbProvisional?: (provisionalRes: SrfResponse) => void; }): Promise<Dialog>;
-    createUAC(uri: string | CreateUACOptions, opts?: CreateUACOptions, progressCallbacks?: { cbRequest?: (req: SrfRequest) => void; cbProvisional?: (provisionalRes: SrfResponse) => void; }, callback?: (err: any, dialog: Dialog) => void): this;
-    createB2BUA(req: SrfRequest, res: SrfResponse, uri: string, opts: CreateB2BUAOptions, progressCallbacks?: { cbRequest?: (req: SrfRequest) => void; cbProvisional?: (provisionalRes: Response) => void; cbFinalizedUac?: (uac: Dialog) => void; }): Promise<{ uas: Dialog; uac: Dialog }>;
-    createB2BUA(req: SrfRequest, res: SrfResponse, uri: string, opts: CreateB2BUAOptions, progressCallbacks?: { cbRequest?: (req: SrfRequest) => void; cbProvisional?: (provisionalRes: Response) => void; cbFinalizedUac?: (uac: Dialog) => void; }, callback?: (err: any, dialog: Dialog) => void): this;
-    on(event: 'connect', listener: (err: Error, hostPort: string) => void): this;
-    on(event: 'error', listener: (err: Error) => void): this;
-    on(event: 'disconnect', listener: () => void): this;
-    on(event: 'message', listener: (req: SrfRequest, res: SrfResponse) => void): this;
-    on(event: 'request', listener: (req: SrfRequest, res: SrfResponse) => void): this;
-    on(event: 'register' | 'invite' | 'bye' | 'cancel' | 'ack' | 'info' | 'notify' | 'options' | 'prack' | 'publish' | 'refer' | 'subscribe' | 'update', listener: (req: SrfRequest, res: SrfResponse) => void): this;
-    on(event: 'cdr:attempt', listener: (source: string, time: string, msg: SipMessage) => void): this;
-    on(event: 'cdr:start', listener: (source: string, time: string, role: string, msg: SipMessage) => void): this;
-    on(event: 'cdr:stop', listener: (source: string, time: string, reason: string, msg: SipMessage) => void): this;
-    locals: { [name: string]: any };
-    socket: Socket;
-  }
 }
 
-export = Srf.Srf;
+declare class Srf extends EventEmitter {
+  constructor();
+  constructor(tags: string | string[]);
+  connect(config?: Srf.SrfConfig): Promise<void>;
+  disconnect(): void;
+  use(callback: (req: Srf.SrfRequest, res: Srf.SrfResponse, next: Function) => void): void;
+  use(messageType: string, callback: (req: Srf.SrfRequest, res: Srf.SrfResponse, next: Function) => void): void;
+  invite(callback: (req: Srf.SrfRequest, res: Srf.SrfResponse) => void): void;
+  request(uri: string, opts: Srf.SrfRequest, method: Srf.SipMethod, [body]: string[]): Promise<Srf.SrfRequest>;
+  request(uri: string, opts: Srf.SrfRequest, method: Srf.SipMethod, [body]: string[], callback?: (err: any, requestSent: Srf.SrfRequest) => void): void;
+  proxyRequest(req: Srf.SrfRequest, destination: string | string[], opts?: Srf.ProxyRequestOptions, callback?: (err: any, results: string) => void): void;
+  createUAS(req: Srf.SrfRequest, res: Srf.SrfResponse, opts: Srf.CreateUASOptions): Promise<Srf.Dialog>;
+  createUAS(req: Srf.SrfRequest, res: Srf.SrfResponse, opts: Srf.CreateUASOptions, callback?: (err: any, dialog: Srf.Dialog) => void): this;
+  createUAC(uri: string | Srf.CreateUACOptions, opts?: Srf.CreateUACOptions, progressCallbacks?: { cbRequest?: (req: Srf.SrfRequest) => void; cbProvisional?: (provisionalRes: Srf.SrfResponse) => void; }): Promise<Srf.Dialog>;
+  createUAC(uri: string | Srf.CreateUACOptions, opts?: Srf.CreateUACOptions, progressCallbacks?: { cbRequest?: (req: Srf.SrfRequest) => void; cbProvisional?: (provisionalRes: Srf.SrfResponse) => void; }, callback?: (err: any, dialog: Srf.Dialog) => void): this;
+  createB2BUA(req: Srf.SrfRequest, res: Srf.SrfResponse, uri: string, opts: Srf.CreateB2BUAOptions, progressCallbacks?: { cbRequest?: (req: Srf.SrfRequest) => void; cbProvisional?: (provisionalRes: Response) => void; cbFinalizedUac?: (uac: Srf.Dialog) => void; }): Promise<{ uas: Srf.Dialog; uac: Srf.Dialog }>;
+  createB2BUA(req: Srf.SrfRequest, res: Srf.SrfResponse, uri: string, opts: Srf.CreateB2BUAOptions, progressCallbacks?: { cbRequest?: (req: Srf.SrfRequest) => void; cbProvisional?: (provisionalRes: Response) => void; cbFinalizedUac?: (uac: Srf.Dialog) => void; }, callback?: (err: any, dialog: Srf.Dialog) => void): this;
+  on(event: 'connect', listener: (err: Error, hostPort: string) => void): this;
+  on(event: 'error', listener: (err: Error) => void): this;
+  on(event: 'disconnect', listener: () => void): this;
+  on(event: 'message', listener: (req: Srf.SrfRequest, res: Srf.SrfResponse) => void): this;
+  on(event: 'request', listener: (req: Srf.SrfRequest, res: Srf.SrfResponse) => void): this;
+  on(event: 'register' | 'invite' | 'bye' | 'cancel' | 'ack' | 'info' | 'notify' | 'options' | 'prack' | 'publish' | 'refer' | 'subscribe' | 'update', listener: (req: Srf.SrfRequest, res: Srf.SrfResponse) => void): this;
+  on(event: 'cdr:attempt', listener: (source: string, time: string, msg: Srf.SipMessage) => void): this;
+  on(event: 'cdr:start', listener: (source: string, time: string, role: string, msg: Srf.SipMessage) => void): this;
+  on(event: 'cdr:stop', listener: (source: string, time: string, reason: string, msg: Srf.SipMessage) => void): this;
+  locals: { [name: string]: any };
+  socket: Socket;
+}
+
+export = Srf;
