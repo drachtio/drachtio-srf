@@ -5,6 +5,7 @@ declare namespace Srf {
   type SipMethod = 'ACK' | 'BYE' | 'CANCEL' | 'INFO' | 'INVITE' | 'MESSAGE' | 'NOTIFY' | 'OPTIONS' | 'PRACK' | 'PUBLISH' | 'REFER' | 'REGISTER' | 'SUBSCRIBE' | 'UPDATE';
   type SipMessageHeaders = Record<string, string>;
   type AOR = { name: string; uri: string; params?: Record<string, any>; };
+  type Via = { version: string; protocol: string; host: string; port: string; };
 
   export interface SrfConfig {
     apiSecret?: string;
@@ -13,7 +14,19 @@ declare namespace Srf {
     secret?: string;
   }
 
-  export function parseUri(uri: string): { user: string; host: string; params?: Record<string, any>; };
+  interface ParseUriResult {
+    family?: 'ipv6' | 'ipv4';
+    scheme: 'sip' | 'sips' | 'tel';
+    user?: string;
+    password?: string;
+    host?: string;
+    port?: string;
+    params: Record<string, string | null>;
+    headers: Record<string, string>;
+    context?: string;
+  }
+
+  export function parseUri(uri: string): ParseUriResult;
   export function stringifyUri(uri: object): string;
 
   export interface SipMessage {
@@ -30,7 +43,7 @@ declare namespace Srf {
     raw: string;
     get(name: string): string;
     has(name: string): boolean;
-    set(name: string, value: string);
+    set(name: string, value: string): void;
     getParsedHeader(name: "contact" | "Contact"): Array<AOR>;
     getParsedHeader(name: "via" | "Via"): Array<Via>;
     getParsedHeader(name: "To" | "to" | "From" | "from" | "refer-to" | "referred-by" | "p-asserted-identity" | "remote-party-id"): AOR;
@@ -39,8 +52,10 @@ declare namespace Srf {
 
   export interface SrfRequest extends SipMessage {
     method: SipMethod;
-    isNewInvite(): boolean
-    cancel(callback: () => {})
+    get isNewInvite(): boolean
+    cancel(callback: (err: any, req: SrfRequest) => void): void;
+    on(event: 'response', callback: (res?: SrfResponse, ack?: (opts?: { sdp: string }) => void) => void): void;
+    on(event: 'cancel', callback: (res: SipMessage) => void): void;
     branch: string;
     callId: string;
     from: string;
@@ -58,16 +73,24 @@ declare namespace Srf {
     };
   }
 
+  export interface ProxyRequestOptions {
+    forking?: 'sequential' | 'simultaneous';
+    remainInDialog?: boolean;
+    recordRoute?: boolean;
+    provisionalTimeout?: string;
+    finalTimeout?: string;
+    followRedirects?: boolean
+  }
+
   export interface SrfResponse extends SipMessage {
     status: number;
     statusCode: number;
     reason: string;
     finalResponseSent: boolean;
-    send(status: number);
-    send(status: number, opts: object);
-    send(status: number, reason: string, opts: object);
-    send(status: number, reason: string, opts: object, callback: (err, msg) => {});
-    end();
+    send(status: number, opts?: object): void;
+    send(status: number, reason: string, opts: object): void;
+    send(status: number, reason: string, opts: object, callback: (err: any, msg: SipMessage) => void): void;
+    end(): void;
   }
 
   export interface Dialog {
@@ -78,9 +101,11 @@ declare namespace Srf {
     local: { uri: string; sdp: string; };
     remote: { uri: string; sdp: string; };
     req: SrfRequest;
-    destroy(opts?: { headers: Record<string, string>; }, callback?: (err, msg) => {}): void;
-    modify(sdp, callback?: (err: any, msg: SrfResponse) => void): void;
-    modify({ noAck: boolean }, callback?: (err: any, resp: any, resAck: any) => void): void;
+    destroy(opts?: { headers: Record<string, string>; }, callback?: (err: any, msg: SrfRequest) => void): void;
+    modify(sdp: string, opts?: { noAck: boolean }): Promise<string>;
+    modify(opts: { noAck: boolean }): Promise<string>;
+    modify(sdp: string, opts?: { noAck: boolean }, callback?: (err: any, msg: SrfResponse) => void): void;
+    modify(opts: { noAck: boolean }, callback?: (err: any, resp?: string, resAck?: (sdp: string) => void) => void): void;
     on(messageType: "ack", callback: (msg: SrfRequest) => void): void;
     on(messageType: "destroy", callback: (msg: SrfRequest) => void): void;
     on(messageType: "info", callback: (req: SrfRequest, res: SrfResponse) => void): void;
@@ -94,7 +119,8 @@ declare namespace Srf {
     on(messageType: "modify", callback: (req: SrfRequest, res: SrfResponse) => void): void;
     once(messageType: string, callback: (msg: SrfResponse) => void): void;
     listeners(messageType: string): any[];
-    request(opts?: { method: SipMethod; headers?: Record<string, string | number>; body?: string; }, callback?: (err, msg) => {});
+    request(opts?: SrfRequest): Promise<SrfResponse>;
+    request(opts: SrfRequest, callback?: (err: any, msg: SrfResponse) => void): void;
   }
 
   export interface CreateUASOptions {
@@ -124,7 +150,7 @@ declare namespace Srf {
     auth?: { username: string; password: string; };
   }
 
-  class Srf extends EventEmitter {
+  export class Srf extends EventEmitter {
     constructor();
     constructor(tags: string | string[]);
     connect(config?: SrfConfig): Promise<void>;
@@ -132,11 +158,15 @@ declare namespace Srf {
     use(callback: (req: SrfRequest, res: SrfResponse, next: Function) => void): void;
     use(messageType: string, callback: (req: SrfRequest, res: SrfResponse, next: Function) => void): void;
     invite(callback: (req: SrfRequest, res: SrfResponse) => void): void;
-    request(uri: string, opts, method, [body], callback?: (err, requestSent: SrfRequest) => void);
-    proxyRequest(req: SrfRequest, destination: string | string[], [opts], callback?: (err, results) => {}): void;
-    createUAS(req: SrfRequest, res: SrfResponse, opts: CreateUASOptions, callback?: (err, dialog: Dialog) => void): Promise<Dialog>;
-    createUAC(uri: string | CreateUACOptions, opts?: CreateUACOptions, progressCallbacks?: { cbRequest?: (req: SrfRequest) => void; cbProvisional?: (provisionalRes: SrfResponse) => void; }, callback?: (err, dialog: Dialog) => void): Promise<Dialog>;
-    createB2BUA(req: SrfRequest, res: SrfResponse, uri: string, opts: CreateB2BUAOptions, progressCallbacks?: { cbRequest?: (req: SrfRequest) => void; cbProvisional?: (provisionalRes: Response) => void; cbFinalizedUac?: (uac: Dialog) => void; }, callback?: (err, dialog: Dialog) => {}): Promise<{ uas: Dialog; uac: Dialog }>;
+    request(uri: string, opts: SrfRequest, method: SipMethod, [body]: string[]): Promise<SrfRequest>;
+    request(uri: string, opts: SrfRequest, method: SipMethod, [body]: string[], callback?: (err: any, requestSent: SrfRequest) => void): void;
+    proxyRequest(req: SrfRequest, destination: string | string[], opts?: ProxyRequestOptions, callback?: (err: any, results: string) => void): void;
+    createUAS(req: SrfRequest, res: SrfResponse, opts: CreateUASOptions): Promise<Dialog>;
+    createUAS(req: SrfRequest, res: SrfResponse, opts: CreateUASOptions, callback?: (err: any, dialog: Dialog) => void): this;
+    createUAC(uri: string | CreateUACOptions, opts?: CreateUACOptions, progressCallbacks?: { cbRequest?: (req: SrfRequest) => void; cbProvisional?: (provisionalRes: SrfResponse) => void; }): Promise<Dialog>;
+    createUAC(uri: string | CreateUACOptions, opts?: CreateUACOptions, progressCallbacks?: { cbRequest?: (req: SrfRequest) => void; cbProvisional?: (provisionalRes: SrfResponse) => void; }, callback?: (err: any, dialog: Dialog) => void): this;
+    createB2BUA(req: SrfRequest, res: SrfResponse, uri: string, opts: CreateB2BUAOptions, progressCallbacks?: { cbRequest?: (req: SrfRequest) => void; cbProvisional?: (provisionalRes: Response) => void; cbFinalizedUac?: (uac: Dialog) => void; }): Promise<{ uas: Dialog; uac: Dialog }>;
+    createB2BUA(req: SrfRequest, res: SrfResponse, uri: string, opts: CreateB2BUAOptions, progressCallbacks?: { cbRequest?: (req: SrfRequest) => void; cbProvisional?: (provisionalRes: Response) => void; cbFinalizedUac?: (uac: Dialog) => void; }, callback?: (err: any, dialog: Dialog) => void): this;
     on(event: 'connect', listener: (err: Error, hostPort: string) => void): this;
     on(event: 'error', listener: (err: Error) => void): this;
     on(event: 'disconnect', listener: () => void): this;
