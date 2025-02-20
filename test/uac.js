@@ -225,6 +225,32 @@ test('UAC', (t) => {
       return connect(srf);
     })
     .then(() => {
+      return srf.createUAC('sip:sipp-uas-407-no-auth-header', {
+        method: 'INVITE',
+        headers: {
+          To: 'sip:dhorton@sip.drachtio.org',
+          From: 'sip:dhorton@sip.drachtio.org'
+        },
+        auth: {
+          username: 'foo',
+          password: 'bar'
+        }
+      });
+    })
+    .then((uac, err) => {
+      srf.disconnect();
+      return t.fail('Srf#createUAC should not handle digest without authentication');
+    })
+    .catch((err) => {
+      srf.disconnect();
+      return t.pass('Srf#createUAC cannot handle digest without authentication');
+    })
+
+    .then(() => {
+      srf = new Srf();
+      return connect(srf);
+    })
+    .then(() => {
       return srf.createUAC('sip:172.29.0.15', {
         method: 'INVITE',
         headers: {
