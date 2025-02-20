@@ -183,3 +183,14 @@ services:
     networks:
       testbed:
         ipv4_address: 172.29.0.26
+
+  sipp-uas-407-no-auth-header:
+    image: drachtio/sipp:latest
+    command: sipp -sf /tmp/uas-407-no-auth-header.xml
+    container_name: sipp-uas-407-no-auth-header
+    volumes:
+      - ./scenarios:/tmp
+    tty: true
+    networks:
+      testbed:
+        ipv4_address: 172.29.0.27
