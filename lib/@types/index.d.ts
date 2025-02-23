@@ -8,10 +8,10 @@ declare namespace Srf {
   type Via = { version: string; protocol: string; host: string; port: string; };
 
   export interface SrfConfig {
-    apiSecret?: string;
     host?: string;
     port?: number;
     secret?: string;
+    logger?: (message: string) => void;
   }
 
   interface ParseUriResult {
@@ -32,7 +32,10 @@ declare namespace Srf {
   export interface SipMessage {
     type: "request" | "response";
     body: string;
-    payload: object[];
+    payload: {
+      type: string | null;
+      content?: string;
+    }[];
     source: "network" | "application";
     source_address: string;
     source_port: string;
@@ -60,9 +63,9 @@ declare namespace Srf {
     callId: string;
     from: string;
     headers: Record<string, string>;
-    msg: any;
+    msg: SipMessage;
     sdp: string;
-    srf: any;
+    srf: Srf;
     to: string;
     uri: string;
     registration?: {
@@ -93,7 +96,7 @@ declare namespace Srf {
     end(): void;
   }
 
-  export interface Dialog {
+  export class Dialog extends EventEmitter {
     sip: { callId: string; localTag: string; remoteTag: string; };
     onHold: boolean;
     other: Dialog;
@@ -106,19 +109,17 @@ declare namespace Srf {
     modify(opts: { noAck: boolean }): Promise<string>;
     modify(sdp: string, opts?: { noAck: boolean }, callback?: (err: any, msg: SrfResponse) => void): void;
     modify(opts: { noAck: boolean }, callback?: (err: any, resp?: string, resAck?: (sdp: string) => void) => void): void;
-    on(messageType: "ack", callback: (msg: SrfRequest) => void): void;
-    on(messageType: "destroy", callback: (msg: SrfRequest) => void): void;
-    on(messageType: "info", callback: (req: SrfRequest, res: SrfResponse) => void): void;
-    on(messageType: "message", callback: (req: SrfRequest, res: SrfResponse) => void): void;
-    on(messageType: "modify", callback: (req: SrfRequest, res: SrfResponse) => void): void;
-    on(messageType: "notify", callback: (req: SrfRequest, res: SrfResponse) => void): void;
-    on(messageType: "options", callback: (req: SrfRequest, res: SrfResponse) => void): void;
-    on(messageType: "refer", callback: (req: SrfRequest, res: SrfResponse) => void): void;
-    on(messageType: "refresh", callback: (msg: SrfRequest) => void): void;
-    on(messageType: "update", callback: (req: SrfRequest, res: SrfResponse) => void): void;
-    on(messageType: "modify", callback: (req: SrfRequest, res: SrfResponse) => void): void;
-    once(messageType: string, callback: (msg: SrfResponse) => void): void;
-    listeners(messageType: string): any[];
+    on(messageType: "ack", callback: (msg: SrfRequest) => void): this;
+    on(messageType: "destroy", callback: (msg: SrfRequest) => void): this;
+    on(messageType: "info", callback: (req: SrfRequest, res: SrfResponse) => void): this;
+    on(messageType: "message", callback: (req: SrfRequest, res: SrfResponse) => void): this;
+    on(messageType: "modify", callback: (req: SrfRequest, res: SrfResponse) => void): this;
+    on(messageType: "notify", callback: (req: SrfRequest, res: SrfResponse) => void): this;
+    on(messageType: "options", callback: (req: SrfRequest, res: SrfResponse) => void): this;
+    on(messageType: "refer", callback: (req: SrfRequest, res: SrfResponse) => void): this;
+    on(messageType: "refresh", callback: (msg: SrfRequest) => void): this;
+    on(messageType: "update", callback: (req: SrfRequest, res: SrfResponse) => void): this;
+    once(messageType: string, callback: (msg: SrfResponse) => void): this;
     request(opts?: SrfRequest): Promise<SrfResponse>;
     request(opts: SrfRequest, callback?: (err: any, msg: SrfResponse) => void): void;
   }
@@ -155,6 +156,7 @@ declare class Srf extends EventEmitter {
   constructor();
   constructor(tags: string | string[]);
   connect(config?: Srf.SrfConfig): Promise<void>;
+  listen(opts?: Srf.SrfConfig): Promise<void>;
   disconnect(): void;
   use(callback: (req: Srf.SrfRequest, res: Srf.SrfResponse, next: Function) => void): void;
   use(messageType: string, callback: (req: Srf.SrfRequest, res: Srf.SrfResponse, next: Function) => void): void;
