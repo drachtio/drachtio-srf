@@ -19,6 +19,34 @@ test('B2B', (t) => {
   });
 
   Promise.resolve()
+    // B2BUA with PRACK
+    .then(() => {
+      debug('starting sipp');
+      return b2b.expectSuccess('sip:sipp-uas-prack', {
+        proxyResponseHeaders: [
+          'all'
+        ],
+        responseHeaders: {
+          'Contact': 'sip:foo@localhost'
+        }
+      });
+    })
+    .then(() => {
+      debug('start sipp...');
+      return sippUac('uac-prack.xml');
+    })
+    .then(() => {
+      return t.pass('b2b handles PRACK for both UAS and UAC');
+    })
+    .then(() => {
+      b2b.disconnect();
+      return new Promise((resolve, reject) => {
+        setTimeout(() => {
+          b2b = new B2b();
+          resolve();
+        }, 100);
+      });
+    })
     // INVITE with no SDP
     .then(() => {
       debug('starting sipp');
