@@ -194,3 +194,14 @@ services:
     networks:
       testbed:
         ipv4_address: 172.29.0.27
+
+  sipp-uas-200-ok-no-contact-cancel:
+    image: drachtio/sipp:latest
+    command: sipp -sf /tmp/uas-200-ok-no-contact-cancel.xml
+    container_name: sipp-uas-200-ok-no-contact-cancel
+    volumes:
+      - ./scenarios:/tmp
+    tty: true
+    networks:
+      testbed:
+        ipv4_address: 172.29.0.28
