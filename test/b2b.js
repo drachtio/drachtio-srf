@@ -214,6 +214,50 @@ test('B2B', (t) => {
       });
     })
 
+    // reject no contact headers in sip request
+    .then(() => {
+      debug('starting sipp');
+      return b2b.expectFailure('sip:sipp-uas-404', 404, 400);
+    })
+    .then(() => {
+      debug('start sipp...');
+      return sippUac('uac-expect-400-no-contact-header.xml');
+    })
+    .then(() => {
+      return t.pass('reject if no contact headers in request');
+    })
+    .then(() => {
+      b2b.disconnect();
+      return new Promise((resolve, reject) => {
+        setTimeout(() => {
+          b2b = new B2b();
+          resolve();
+        }, 100);
+      });
+    })
+
+    // reject no contact headers in sip response
+    .then(() => {
+      debug('starting sipp');
+      return b2b.expectFailure('sipp-uas-200-ok-no-contact-cancel', 500, 480);
+    })
+    .then(() => {
+      debug('start sipp...');
+      return sippUac('uac-expect-480.xml');
+    })
+    .then(() => {
+      return t.pass('reject if no contact headers in response');
+    })
+    .then(() => {
+      b2b.disconnect();
+      return new Promise((resolve, reject) => {
+        setTimeout(() => {
+          b2b = new B2b();
+          resolve();
+        }, 100);
+      });
+    })
+
     // pass headers on response
     .then(() => {
       debug('starting sipp');
