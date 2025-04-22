@@ -11,7 +11,7 @@
     "jslint": "eslint lib"
   },
   "engines": {
-    "node": ">= 10.x"
+    "node": ">= 18.x"
   },
   "repository": {
     "type": "git",
