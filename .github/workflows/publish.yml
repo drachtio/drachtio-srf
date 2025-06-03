@@ -1,6 +1,5 @@
 name: npm-publish
 
-# run when a tag is pushed or kick off manually
 on:
   push:
     tags:
@@ -10,7 +9,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
@@ -18,6 +16,17 @@ jobs:
           node-version: lts/*
           registry-url: 'https://registry.npmjs.org'
       - run: npm install
-      - run: npm publish --access public
+      
+      # Publish with beta tag if it's a beta version
+      - name: Publish Beta
+        if: contains(github.ref, 'beta')
+        run: npm publish --access public --tag beta
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          
+      # Publish normally for production tags
+      - name: Publish Production
+        if: "!contains(github.ref, 'beta')"
+        run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
