@@ -410,7 +410,30 @@ test('B2B', (t) => {
         }, 800);
       });
     })
-    
+    // verify contact header is copied for 3xx responses
+    .then(() => {
+      debug('starting sipp uas 302');
+      return b2b.expectSuccess('sip:sipp-uas-302', {
+        proxyResponseHeaders: [
+          'all'
+        ]
+      });
+    })
+    .then(() => {
+      debug('start sipp uac 302...');
+      return sippUac('uac-302.xml');
+    })
+    .then(() => {
+      return t.pass('b2b handles 302 Response from UAC to UAS with copied contact headers');
+    })
+    .then(() => {
+      b2b.disconnect();
+      return new Promise((resolve, reject) => {
+        setTimeout(() => {
+          resolve();
+        }, 800);
+      });
+    })
     .then(() => {
       return t.end();
     })
