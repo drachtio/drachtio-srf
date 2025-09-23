@@ -452,6 +452,32 @@ test('UAC', (t) => {
       srf.disconnect();
       return t.pass('Srf#request can be canceled');
     })
+    // update with sdp
+    .then(() => {
+      return srf.createUAC('sip:sipp-uas-fast-update', {
+        method: 'INVITE',
+        headers: {
+          To: 'sip:dhorton@sip.drachtio.org',
+          From: 'sip:dhorton@sip.drachtio.org'
+        },
+        localSdp: 'v=0\r\n' +
+          'o=- 1608559736530 1 IN IP4 127.0.0.1\r\n' +
+          's=-\r\n' +
+          'c=IN IP4 127.0.0.1\r\n' +
+          't=0 0\r\n' +
+          'm=audio 49170 RTP/AVP 0\r\n' +
+          'a=rtpmap:0 PCMU/8000\r\n'
+      });
+    })
+    .then(() => {
+      return new Promise((resolve) => {
+        setTimeout(resolve, 1000);
+      });
+    })
+    .then(() => {
+      srf.disconnect();
+      return t.pass('SipDialog will send SDP with 200 OK to UPDATE');
+    })
     .then(() => {
       return t.end();
     })

@@ -205,3 +205,14 @@ services:
     networks:
       testbed:
         ipv4_address: 172.29.0.28
+
+  sipp-uas-fast-update:
+    image: drachtio/sipp:latest
+    command: sipp -sf /tmp/uas-update-with-sdp.xml -trace_msg
+    container_name: sipp-uas-fast-update
+    volumes:
+      - ./scenarios:/tmp
+    tty: true
+    networks:
+      testbed:
+        ipv4_address: 172.29.0.29
