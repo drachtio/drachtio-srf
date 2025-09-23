@@ -454,6 +454,10 @@ test('UAC', (t) => {
     })
     // update with sdp
     .then(() => {
+      srf = new Srf();
+      return connect(srf);
+    })
+    .then(() => {
       return srf.createUAC('sip:sipp-uas-fast-update', {
         method: 'INVITE',
         headers: {

@@ -208,7 +208,7 @@ services:
 
   sipp-uas-fast-update:
     image: drachtio/sipp:latest
-    command: sipp -sf /tmp/uas-update-with-sdp.xml -trace_msg
+    command: sipp -sf /tmp/uas-update-with-sdp.xml
     container_name: sipp-uas-fast-update
     volumes:
       - ./scenarios:/tmp
