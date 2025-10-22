@@ -114,6 +114,7 @@ export default [
     "@stylistic/js/no-trailing-spaces": [2, { skipBlankLines: false }],
     "@stylistic/js/quotes": [2, "single", { avoidEscape: true }],
     "@stylistic/js/semi": 2,
+    "@stylistic/js/semi-spacing": ["error", {"before": false, "after": true}],
     "@stylistic/js/space-before-blocks": [2, "always"],
     "@stylistic/js/space-before-function-paren": [2, "never"],
     "@stylistic/js/space-in-parens": [2, "never"],

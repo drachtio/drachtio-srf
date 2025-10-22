@@ -15,7 +15,7 @@ Please visit [drachtio.org](https://drachtio.org) for getting started instructio
     host: '192.168.32.5',
     port: 9022,
     secret: 'cymru'
-  }) ;
+  });
   
   srf.invite((req, res) => {
     srf.proxyRequest(req, ['sip.example1.com', 'sip.example2.com'], {
@@ -37,7 +37,7 @@ Please visit [drachtio.org](https://drachtio.org) for getting started instructio
     host: '192.168.32.5',
     port: 9022,
     secret: 'cymru'
-  }) ;
+  });
     const Srf = require('drachtio-srf');
   const srf = new Srf();
 
