@@ -133,6 +133,56 @@ class App extends Emitter {
     });
   }
 
+  handleOutboundReinviteAuthScenario(sdp, useBody) {
+    return new Promise((resolve, reject) => {
+      this.srf.invite((req, res) => {
+
+        // validate that req.server properties are in place,
+        // describing the drachtio server instance that received the invite
+        assert(req.server.address);
+        assert(req.server.hostport);
+  
+        req.on('cancel', () => {
+          req.canceled = true;
+        });
+        const localSdp = sdp || req.body.replace(/m=audio\s+(\d+)/, 'm=audio 15000');
+  
+        if (req.canceled) return;
+  
+        const opts = {
+          auth: {
+            username: 'foo',
+            password: 'bar'
+        }};
+        if (useBody) Object.assign(opts, {body: localSdp});
+        else Object.assign(opts, {localSdp});
+  
+        this.srf.createUAS(req, res, opts)
+          .then((uas) => {
+            this.emit('connected', uas);
+            
+            // Initiate re-INVITE after 100ms
+            setTimeout(() => {
+              uas.modify(localSdp)
+                .then(() => {
+                  uas.destroy();
+                  resolve();
+                })
+                .catch((err) => {
+                  console.error(`Failed to modify: ${err}`);
+                  reject(err);
+                });
+            }, 100);
+          })
+          .catch((err) => {
+            console.error(`Uas: failed to connect: ${err}`);
+            this.emit('error', err);
+            reject(err);
+          });
+      });
+    });
+  }
+
   disconnect() {
     debug('disconnecting from drachtio');
     return this.srf.disconnect();

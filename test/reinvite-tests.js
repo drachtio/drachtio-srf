@@ -8,7 +8,7 @@ process.on('unhandledRejection', (reason, p) => {
 });
 
 test('reinvite tests', (t) => {
-  t.timeoutAfter(20000);
+  t.timeoutAfter(40000);
 
   let uas = new Uas();
   let p;
@@ -21,6 +21,16 @@ test('reinvite tests', (t) => {
     .then(() => sippUac('uac-send-reinvite-no-sdp.xml'))
     .then(() => uas.disconnect())
     .then(() => t.pass('res#send of 200 OK supports fnAck'))
+    
+    .then(() => {
+      uas = new Uas();
+      p = uas.handleOutboundReinviteAuthScenario();
+      return;
+    })
+    .then(() => sippUac('uac-receive-reinvite-auth.xml'))
+    .then(() => uas.disconnect())
+    .then(() => t.pass('UAC receives re-invite and challenges with 407 auth'))
+    
     .then(() => t.end())
     .catch((err) => {
       if (uas) uas.disconnect();
