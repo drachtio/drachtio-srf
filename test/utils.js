@@ -31,6 +31,11 @@ test('utils', (t) => {
   telUri = Srf.parseUri('<tel:+1-201-555-0123>');
   t.ok(telUri.scheme === 'tel', 'Srf.parseUri can parse tel uri');
   t.ok(telUri.number === '+1-201-555-0123', 'Srf.parseUri can parse tel uri');
+  const telUri3 = 'tel:+4921326905534';
+  telUri = Srf.parseUri(telUri3);
+  t.ok(telUri.scheme === 'tel', 'Srf.parseUri can parse simple tel uri');
+  t.ok(telUri.number === '+4921326905534', 'Srf.parseUri extracts number from tel uri');
+  t.ok(Srf.stringifyUri(telUri) === telUri3, 'Srf.stringifyUri can stringify tel uri');
   const err = new Srf.SipError(404);
   t.ok(err instanceof Error && err.status === 404, 'exposes Srf.SipError');
   t.throws((() => new Srf('bad,tag')), assert.AssertionError, 'tags may not contain commas');
