@@ -5,6 +5,7 @@
   "main": "lib/srf.js",
   "types": "lib/srf.d.ts",
   "scripts": {
+    "prepare": "npm run build",
     "build": "tsc",
     "test": "npm run build && NODE_ENV=test node test/ ",
     "coverage": "./node_modules/.bin/nyc --reporter html --report-dir ./coverage npm run test",
