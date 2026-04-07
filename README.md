@@ -35,8 +35,8 @@ You can now natively cancel outgoing SIP dialog creations using the modern `Abor
 ## Examples
 
 *Example proxy*
-```js
-  const Srf = require('drachtio-srf');
+```ts
+  import Srf, { Request, Response } from 'drachtio-srf';
   const srf = new Srf();
 
   srf.connect({
@@ -45,12 +45,12 @@ You can now natively cancel outgoing SIP dialog creations using the modern `Abor
     secret: 'cymru'
   });
   
-  srf.invite((req, res) => {
+  srf.invite((req: Request, res: Response) => {
     srf.proxyRequest(req, ['sip.example1.com', 'sip.example2.com'], {
       recordRoute: true,
       followRedirects: true,
       provisionalTimeout: '2s'
-    }).then((results) => {
+    }).then((results: any) => {
       console.log(JSON.stringify(results)); 
       // {finalStatus: 200, finalResponse:{..}, responses: [..]}
     });
@@ -58,8 +58,8 @@ You can now natively cancel outgoing SIP dialog creations using the modern `Abor
 ```
 
 *Example Back-to-back user agent*
-```js
-  const Srf = require('drachtio-srf');
+```ts
+  import Srf, { Request, Response } from 'drachtio-srf';
   const srf = new Srf();
 
   srf.connect({
@@ -68,30 +68,30 @@ You can now natively cancel outgoing SIP dialog creations using the modern `Abor
     secret: 'cymru'
   });
 
-  srf.invite((req, res) => {
-    srf.createB2BUA('sip:1234@10.10.100.1', req, res, {localSdpB: req.body})
-      .then(({uas, uac}) => {
+  srf.invite((req: Request, res: Response) => {
+    srf.createB2BUA('sip:1234@10.10.100.1', req, res, { localSdpB: req.body })
+      .then(({ uas, uac }) => {
         console.log('call connected');
 
         // when one side terminates, hang up the other
         uas.on('destroy', () => { uac.destroy(); });
         uac.on('destroy', () => { uas.destroy(); });
       })
-      .catch((err) => {
-        console.log(`call failed to connect: ${err}`);
+      .catch((err: Error) => {
+        console.log(`call failed to connect: ${err.message}`);
       });
   });
 ```
 
 *Example sending a request (OPTIONS ping)*
-```js
-  const Srf = require('drachtio-srf');
+```ts
+  import Srf, { Request, Response } from 'drachtio-srf';
   const srf = new Srf();
 
   srf.connect({host: '127.0.0.1', port: 9022, secret: 'cymru'});
 
-  srf.on('connect', (err, hp) => {
-    if (err) return console.log(`Error connecting: ${err}`);
+  srf.on('connect', (err: Error | null, hp: string) => {
+    if (err) return console.log(`Error connecting: ${err.message}`);
     console.log(`connected to server listening on ${hp}`);
 
     setInterval(optionsPing, 10000);
@@ -103,26 +103,26 @@ You can now natively cancel outgoing SIP dialog creations using the modern `Abor
       headers: {
         'Subject': 'OPTIONS Ping'
       }
-    }, (err, req) => {
-      if (err) return console.log(`Error sending OPTIONS: ${err}`);
-      req.on('response', (res) => {
-        console.log(`Response to OPTIONS ping: ${res.status}`);
+    }, (err: Error | null, req: Request) => {
+      if (err) return console.log(`Error sending OPTIONS: ${err.message}`);
+      req.on('response', (res: Response) => {
+        console.log(`Response to OPTIONS ping: ${res.statusCode}`);
       });
     });
   }
 ```
 
 *Example: Using AbortSignal during outbound dialing*
-```js
-  const { AbortController } = require('abort-controller'); // if below Node 15
-  const Srf = require('drachtio-srf');
+```ts
+  // modern Node.js includes AbortController globally
+  import Srf from 'drachtio-srf';
   const srf = new Srf();
   
   srf.connect({host: '127.0.0.1', port: 9022, secret: 'cymru'});
 
   // Dial out but cancel if they don't answer within 3 seconds
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort('No Answer'), 3000);
+  const timeoutId = setTimeout(() => controller.abort(new Error('No Answer Timeout')), 3000);
 
   srf.createUAC('sip:1234@10.10.100.1', { signal: controller.signal })
     .then((uac) => {
@@ -130,7 +130,7 @@ You can now natively cancel outgoing SIP dialog creations using the modern `Abor
       console.log('Call answered!');
       uac.on('destroy', () => console.log('Call ended'));
     })
-    .catch((err) => {
+    .catch((err: Error) => {
       if (err.message.includes('AbortError')) {
         console.log('Call was cancelled due to timeout');
       } else {
