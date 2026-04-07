@@ -103,24 +103,24 @@ declare interface Dialog {
 class Dialog extends Emitter {
   srf: any;
   type: string;
-  req: any;
-  res: any;
+  req: Request;
+  res: Response;
   auth: any;
   agent: any;
   onHold: boolean;
   connected: boolean;
-  queuedRequests: any[];
+  queuedRequests: { req: Request, res: Response }[];
   _queueRequests: boolean;
-  _reinvitesInProgress: any;
-  sip: any;
-  local: any;
-  remote: any;
-  subscriptions: any[];
-  _emitter: any;
-  _state: any;
+  _reinvitesInProgress: { count: number; admitOne: (() => void)[] };
+  sip: { callId: string; remoteTag: string; localTag: string };
+  local: { uri: string; sdp: string; contact: string };
+  remote: { uri: string; sdp: string };
+  subscriptions: string[];
+  _emitter?: Emitter;
+  _state?: any;
   other?: Dialog; // Add if used by srf
 
-  constructor(srf: any, type: string, opts: any) {
+  constructor(srf: any, type: string, opts: { req: Request; res: Response; auth?: any; sent?: any }) {
     super();
 
     const types = ['uas', 'uac'];
@@ -169,7 +169,7 @@ class Dialog extends Emitter {
   }
 
   get id(): string {
-    return this.res.stackDialogId;
+    return this.res.stackDialogId || '';
   }
 
   get dialogType(): string {
@@ -238,6 +238,8 @@ class Dialog extends Emitter {
     return this.subscriptions.length;
   }
 
+  destroy(opts?: { headers?: Record<string, string>; auth?: Dialog.DialogRequestOptions['auth']; }): Promise<SipMessage | Request>;
+  destroy(opts: { headers?: Record<string, string>; auth?: Dialog.DialogRequestOptions['auth']; } | undefined, callback: (err: Error | null, msg?: SipMessage | Request) => void): this;
   destroy(opts?: { headers?: Record<string, string>; auth?: Dialog.DialogRequestOptions['auth']; } | ((err: Error | null, msg?: SipMessage | Request) => void), callback?: (err: Error | null, msg?: SipMessage | Request) => void): Promise<SipMessage | Request> | this {
     opts = opts || {};
     if (typeof opts === 'function') {
@@ -276,7 +278,7 @@ class Dialog extends Emitter {
         if (this._emitter) {
           Object.assign(this._state, {state: 'terminated'});
           this._emitter.emit('stateChange', this._state);
-          this._emitter = null;
+          this._emitter = undefined;
         }
       }
       else if (this.dialogType === 'SUBSCRIBE') {
@@ -311,6 +313,10 @@ class Dialog extends Emitter {
     });
   }
 
+  modify(sdp?: string | { headers?: Record<string, string>; auth?: Dialog.DialogRequestOptions['auth']; noAck?: boolean; }): Promise<string | { sdp: string, ack: (opts?: any) => void }>;
+  modify(sdp: string | { headers?: Record<string, string>; auth?: Dialog.DialogRequestOptions['auth']; noAck?: boolean; } | undefined, callback: (err: Error | null, sdp?: string, ack?: (opts?: any) => void) => void): this;
+  modify(sdp: string, opts: { headers?: Record<string, string>; auth?: Dialog.DialogRequestOptions['auth']; noAck?: boolean; }): Promise<string | { sdp: string, ack: (opts?: any) => void }>;
+  modify(sdp: string, opts: { headers?: Record<string, string>; auth?: Dialog.DialogRequestOptions['auth']; noAck?: boolean; } | undefined, callback: (err: Error | null, sdp?: string, ack?: (opts?: any) => void) => void): this;
   modify(sdp?: string | { headers?: Record<string, string>; auth?: Dialog.DialogRequestOptions['auth']; noAck?: boolean; } | ((err: Error | null, sdp?: string, ack?: (opts?: any) => void) => void), opts?: { headers?: Record<string, string>; auth?: Dialog.DialogRequestOptions['auth']; noAck?: boolean; } | ((err: Error | null, sdp?: string, ack?: (opts?: any) => void) => void), callback?: (err: Error | null, sdp?: string, ack?: (opts?: any) => void) => void): Promise<string | { sdp: string, ack: (opts?: any) => void }> | this {
     if (typeof sdp === 'object') {
       callback = opts as any;
@@ -336,7 +342,7 @@ class Dialog extends Emitter {
       if (!this.connected) return cb(new Error('invalid request to modify a completed dialog'));
 
       if (this._reinvitesInProgress.count++ > 0) {
-        await new Promise((resolve) => this._reinvitesInProgress.admitOne.push(resolve));
+        await new Promise((resolve) => this._reinvitesInProgress.admitOne.push(resolve as () => void));
 
         if (!this.connected) {
           this._reinvitesInProgress.count--;
@@ -363,7 +369,7 @@ class Dialog extends Emitter {
           }
           break;
         default:
-          if (sdp) this.local.sdp = sdp;
+          if (typeof sdp === 'string') this.local.sdp = sdp;
           break;
       }
 
@@ -508,7 +514,7 @@ class Dialog extends Emitter {
         if (this._emitter) {
           Object.assign(this._state, {state: 'terminated'});
           this._emitter.emit('stateChange', this._state);
-          this._emitter = null;
+          this._emitter = undefined;
         }
 
         let reason = 'normal release';

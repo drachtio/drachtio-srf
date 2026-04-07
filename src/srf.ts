@@ -300,6 +300,8 @@ class Srf extends Emitter {
     };
   }
 
+  createUAS(req: Request, res: Response, opts?: Srf.CreateUASOptions): Promise<Dialog>;
+  createUAS(req: Request, res: Response, opts: Srf.CreateUASOptions | undefined, callback: (err: Error | null, dialog: Dialog) => void): this;
   createUAS(req: Request, res: Response, opts: Srf.CreateUASOptions = {}, callback?: any): Promise<Dialog> | this {
     opts.headers = opts.headers || {};
     const body = opts.body || opts.localSdp;
@@ -426,6 +428,10 @@ class Srf extends Emitter {
     });
   }
 
+  createUAC(uri: string, opts?: Srf.CreateUACOptions, progressCallbacks?: Srf.ProgressCallbacks): Promise<Dialog>;
+  createUAC(uri: string, opts?: Srf.CreateUACOptions, progressCallbacks?: Srf.ProgressCallbacks, callback?: (err: Error | null, dialog: Dialog) => void): this;
+  createUAC(opts: Srf.CreateUACOptions, progressCallbacks?: Srf.ProgressCallbacks): Promise<Dialog>;
+  createUAC(opts: Srf.CreateUACOptions, progressCallbacks?: Srf.ProgressCallbacks, callback?: (err: Error | null, dialog: Dialog) => void): this;
   createUAC(uri: string | Srf.CreateUACOptions, opts?: Srf.CreateUACOptions | any, cbRequest?: any, cbProvisional?: any, callback?: any): Promise<Dialog> | this {
     let redirectCount = 0;
     if (typeof uri === 'object') {
@@ -802,7 +808,10 @@ class Srf extends Emitter {
       }
     };
 
+    let uacReqFromB: Request | undefined;
+
     function handleUACSent(err: any, uacReq: any) {
+      uacReqFromB = uacReq;
       if (err) {
         log(`createB2BUA: Error sending uac request: ${err}`);
         res.send(500);
@@ -882,7 +891,7 @@ class Srf extends Emitter {
       log(`createB2BUA: received ${cseq} on UAS leg, countOfOutstandingPracks now: ${countOfOutstandingPracks}`);
     };
 
-    const handleUACProvisionalResponse = async(provisionalRes: any, uacReq: any) => {
+    const handleUACProvisionalResponse = async(provisionalRes: Response) => {
       if (provisionalRes.status > 101) {
         log(`Srf#createB2BUA: received a provisional response ${provisionalRes.status}`);
         if (propagateProvisional) {
@@ -902,7 +911,7 @@ class Srf extends Emitter {
             } catch(err: any) {
               log(`Srf#createB2BUA: failed in call to produceSdpForALeg: ${err.message}`);
               res.send(500);
-              uacReq.cancel();
+              uacReqFromB?.cancel();
             }
           }
           else {
@@ -1028,7 +1037,11 @@ class Srf extends Emitter {
     });
   }
 
-  proxyRequest(req: Request, destination: string | string[] | Srf.ProxyRequestOptions, opts?: Srf.ProxyRequestOptions, callback?: any): Promise<any> | this {
+  proxyRequest(req: Request, destination: string | string[], opts?: Srf.ProxyRequestOptions): Promise<any>;
+  proxyRequest(req: Request, destination: string | string[], opts: Srf.ProxyRequestOptions | undefined, callback: (err: Error | null, results: any) => void): this;
+  proxyRequest(req: Request, opts: Srf.ProxyRequestOptions): Promise<any>;
+  proxyRequest(req: Request, opts: Srf.ProxyRequestOptions, callback: (err: Error | null, results: any) => void): this;
+  proxyRequest(req: Request, destination: string | string[] | Srf.ProxyRequestOptions, opts?: Srf.ProxyRequestOptions | any, callback?: any): Promise<any> | this {
     assert(typeof destination === 'undefined' || typeof destination === 'string' || Array.isArray(destination),
       '\'destination\' is must be a string or an array of strings');
 

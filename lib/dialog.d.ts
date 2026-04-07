@@ -76,23 +76,45 @@ declare interface Dialog {
 declare class Dialog extends Emitter {
     srf: any;
     type: string;
-    req: any;
-    res: any;
+    req: Request;
+    res: Response;
     auth: any;
     agent: any;
     onHold: boolean;
     connected: boolean;
-    queuedRequests: any[];
+    queuedRequests: {
+        req: Request;
+        res: Response;
+    }[];
     _queueRequests: boolean;
-    _reinvitesInProgress: any;
-    sip: any;
-    local: any;
-    remote: any;
-    subscriptions: any[];
-    _emitter: any;
-    _state: any;
+    _reinvitesInProgress: {
+        count: number;
+        admitOne: (() => void)[];
+    };
+    sip: {
+        callId: string;
+        remoteTag: string;
+        localTag: string;
+    };
+    local: {
+        uri: string;
+        sdp: string;
+        contact: string;
+    };
+    remote: {
+        uri: string;
+        sdp: string;
+    };
+    subscriptions: string[];
+    _emitter?: Emitter;
+    _state?: any;
     other?: Dialog;
-    constructor(srf: any, type: string, opts: any);
+    constructor(srf: any, type: string, opts: {
+        req: Request;
+        res: Response;
+        auth?: any;
+        sent?: any;
+    });
     get id(): string;
     get dialogType(): string;
     get subscribeEvent(): string | null;
@@ -107,19 +129,37 @@ declare class Dialog extends Emitter {
     destroy(opts?: {
         headers?: Record<string, string>;
         auth?: Dialog.DialogRequestOptions['auth'];
-    } | ((err: Error | null, msg?: SipMessage | Request) => void), callback?: (err: Error | null, msg?: SipMessage | Request) => void): Promise<SipMessage | Request> | this;
+    }): Promise<SipMessage | Request>;
+    destroy(opts: {
+        headers?: Record<string, string>;
+        auth?: Dialog.DialogRequestOptions['auth'];
+    } | undefined, callback: (err: Error | null, msg?: SipMessage | Request) => void): this;
     modify(sdp?: string | {
         headers?: Record<string, string>;
         auth?: Dialog.DialogRequestOptions['auth'];
         noAck?: boolean;
-    } | ((err: Error | null, sdp?: string, ack?: (opts?: any) => void) => void), opts?: {
+    }): Promise<string | {
+        sdp: string;
+        ack: (opts?: any) => void;
+    }>;
+    modify(sdp: string | {
         headers?: Record<string, string>;
         auth?: Dialog.DialogRequestOptions['auth'];
         noAck?: boolean;
-    } | ((err: Error | null, sdp?: string, ack?: (opts?: any) => void) => void), callback?: (err: Error | null, sdp?: string, ack?: (opts?: any) => void) => void): Promise<string | {
+    } | undefined, callback: (err: Error | null, sdp?: string, ack?: (opts?: any) => void) => void): this;
+    modify(sdp: string, opts: {
+        headers?: Record<string, string>;
+        auth?: Dialog.DialogRequestOptions['auth'];
+        noAck?: boolean;
+    }): Promise<string | {
         sdp: string;
         ack: (opts?: any) => void;
-    }> | this;
+    }>;
+    modify(sdp: string, opts: {
+        headers?: Record<string, string>;
+        auth?: Dialog.DialogRequestOptions['auth'];
+        noAck?: boolean;
+    } | undefined, callback: (err: Error | null, sdp?: string, ack?: (opts?: any) => void) => void): this;
     request(opts: Dialog.DialogRequestOptions): Promise<Response>;
     request(opts: Dialog.DialogRequestOptions, callback: Dialog.DialogRequestCallback): this;
     handle(req: any, res: any): void;

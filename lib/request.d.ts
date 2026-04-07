@@ -31,7 +31,8 @@ declare class Request extends Emitter {
     set meta(meta: any);
     get meta(): any;
     cancel(opts?: any, callback?: any): void;
-    proxy(opts: any, callback?: any): any;
+    proxy(opts: any): Promise<any>;
+    proxy(opts: any, callback: (err: Error | null, results: any) => void): this;
     logIn(user: any, options: any, done: any): void;
     logOut(): void;
     isAuthenticated(): boolean;

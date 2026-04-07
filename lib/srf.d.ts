@@ -194,13 +194,20 @@ declare class Srf extends Emitter {
     connect(opts: any, callback?: any): any;
     listen(opts: any, callback?: any): any;
     dialog(opts?: any): (req: any, res: any, next: any) => void;
-    createUAS(req: Request, res: Response, opts?: Srf.CreateUASOptions, callback?: any): Promise<Dialog> | this;
-    createUAC(uri: string | Srf.CreateUACOptions, opts?: Srf.CreateUACOptions | any, cbRequest?: any, cbProvisional?: any, callback?: any): Promise<Dialog> | this;
+    createUAS(req: Request, res: Response, opts?: Srf.CreateUASOptions): Promise<Dialog>;
+    createUAS(req: Request, res: Response, opts: Srf.CreateUASOptions | undefined, callback: (err: Error | null, dialog: Dialog) => void): this;
+    createUAC(uri: string, opts?: Srf.CreateUACOptions, progressCallbacks?: Srf.ProgressCallbacks): Promise<Dialog>;
+    createUAC(uri: string, opts?: Srf.CreateUACOptions, progressCallbacks?: Srf.ProgressCallbacks, callback?: (err: Error | null, dialog: Dialog) => void): this;
+    createUAC(opts: Srf.CreateUACOptions, progressCallbacks?: Srf.ProgressCallbacks): Promise<Dialog>;
+    createUAC(opts: Srf.CreateUACOptions, progressCallbacks?: Srf.ProgressCallbacks, callback?: (err: Error | null, dialog: Dialog) => void): this;
     createB2BUA(req: Request, res: Response, uri: string | Srf.CreateB2BUAOptions, opts?: Srf.CreateB2BUAOptions | any, cbRequest?: any, cbProvisional?: any, callback?: any): Promise<{
         uac: Dialog;
         uas: Dialog;
     }> | this;
-    proxyRequest(req: Request, destination: string | string[] | Srf.ProxyRequestOptions, opts?: Srf.ProxyRequestOptions, callback?: any): Promise<any> | this;
+    proxyRequest(req: Request, destination: string | string[], opts?: Srf.ProxyRequestOptions): Promise<any>;
+    proxyRequest(req: Request, destination: string | string[], opts: Srf.ProxyRequestOptions | undefined, callback: (err: Error | null, results: any) => void): this;
+    proxyRequest(req: Request, opts: Srf.ProxyRequestOptions): Promise<any>;
+    proxyRequest(req: Request, opts: Srf.ProxyRequestOptions, callback: (err: Error | null, results: any) => void): this;
     request(opts: Srf.OutboundRequestOptions & {
         uri: string;
     }): Promise<Request>;

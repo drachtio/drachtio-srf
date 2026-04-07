@@ -110,7 +110,9 @@ class Request extends Emitter {
     callback);
   }
 
-  proxy(opts: any, callback?: any): any {
+  proxy(opts: any): Promise<any>;
+  proxy(opts: any, callback: (err: Error | null, results: any) => void): this;
+  proxy(opts: any, callback?: any): Promise<any> | this {
     if (this.source !== 'network') {
       throw new Error('Request#proxy can only be used for incoming requests');
     }
