@@ -58,6 +58,7 @@ declare namespace Srf {
     keepUriOnRedirect?: boolean;
     dialogStateEmitter?: Emitter;
     _socket?: net.Socket | tls.TLSSocket;
+		signal?: AbortSignal;
   }
 
   export interface CreateB2BUAOptions {
@@ -80,6 +81,7 @@ declare namespace Srf {
     calledNumber?: string;
     localSdp?: string;
     _socket?: any;
+    signal?: AbortSignal;
   }
 
   export interface ProxyRequestOptions {
@@ -401,6 +403,44 @@ class Srf extends Emitter {
     }
 
     const __x = (cb: any) => {
+      const signal: AbortSignal | undefined = opts.signal;
+      if (signal?.aborted) {
+        return setImmediate(() => cb(new Error(`AbortError: ${signal.reason || 'The operation was aborted'}`)));
+      }
+
+      let isFinished = false;
+      let reqRef: Request | null = null;
+
+      const abortHandler = () => {
+        if (isFinished) return;
+        isFinished = true;
+        if (reqRef) {
+          try {
+            reqRef.cancel();
+          } catch (err) {
+            log(`createUAC: failed to cancel request upon abort: ${err}`);
+          }
+        }
+        cb(new Error(`AbortError: ${signal?.reason || 'The operation was aborted'}`));
+      };
+
+      if (signal) {
+        signal.addEventListener('abort', abortHandler);
+      }
+
+      const cleanupSignal = () => {
+        if (signal) {
+          signal.removeEventListener('abort', abortHandler);
+        }
+      };
+
+      const wrappedCb = (err: any, res?: any) => {
+        if (isFinished) return;
+        isFinished = true;
+        cleanupSignal();
+        cb(err, res);
+      };
+
       const method = opts.method || 'INVITE';
       opts.headers = opts.headers || {};
 
@@ -445,6 +485,7 @@ class Srf extends Emitter {
           _socket: launchOpts._socket
         },
         (err: any, req: any) => {
+          reqRef = req;
           if (err) {
             cbRequest(err);
             return lCb(err);
@@ -596,7 +637,7 @@ class Srf extends Emitter {
           });
         });
       };
-      launchRequest(opts.uri, method, opts, cb);
+      launchRequest(opts.uri, method, opts, wrappedCb);
     };
 
     if (callback) {
