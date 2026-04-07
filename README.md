@@ -1,10 +1,18 @@
 # drachtio-srf ![Build Status](https://github.com/drachtio/drachtio-srf/workflows/CI/badge.svg)
 
+> **Note**: This repository has been refactored into strict, modern TypeScript. The original JavaScript source has been migrated to TypeScript and is now compiled down into the generated `lib/` directory. All credit for the brilliant underlying `drachtio-srf` implementation, API design, and architecture belongs to the original author, **Dave Horton**.
+
 [![drachtio logo](http://davehorton.github.io/drachtio-srf/img/definition-only-cropped.png)](https://drachtio.org)
 
 Welcome to the Drachtio Signaling Resource framework (drachtio-srf), the Node.js framework for SIP Server applications.
 
 Please visit [drachtio.org](https://drachtio.org) for getting started instructions, API documentation, sample apps and more!
+
+## Development and Architecture Changes
+To provide an enhanced developer experience and complete type safety, this project has been updated to native TypeScript:
+- **TypeScript Sources:** All code under `src/` (formerly `lib/`), `test/`, and `examples/` is now written in `.ts`.
+- **Git Tracking & Ignored Files:** The compiled `lib/` and the isolated `test-dist/` directories are untracked and purposefully added to `.gitignore`. They are strictly considered auto-generated outputs and are rebuilt by running `npm run build`.
+- **NPM Compatibility:** When installed via NPM, end-users will seamlessly download the generated vanilla JavaScript contents inside the `lib/` folder. This ensures 100% backward compatibility across standard Node.js applications, leaving typical `require('drachtio-srf')` implementations unbroken.
 
 *Example proxy*
 ```js
