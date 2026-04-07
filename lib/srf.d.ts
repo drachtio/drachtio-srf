@@ -1,0 +1,176 @@
+import Dialog from './dialog';
+import { EventEmitter as Emitter } from 'events';
+import * as parser from './sip-parser/parser';
+import SipError from './sip_error';
+import net from 'net';
+import SipMessage from './sip-parser/message';
+import Request from './request';
+import Response from './response';
+declare class DialogState {
+    static Trying: string;
+    static Proceeding: string;
+    static Early: string;
+    static Confirmed: string;
+    static Terminated: string;
+    static Rejected: string;
+    static Cancelled: string;
+}
+declare class DialogDirection {
+    static Initiator: string;
+    static Recipient: string;
+}
+import tls from 'tls';
+declare namespace Srf {
+    interface CreateUASOptions {
+        localSdp?: string | (() => string | Promise<string>);
+        headers?: Record<string, string>;
+        dialogStateEmitter?: Emitter;
+        body?: string | (() => string | Promise<string>);
+    }
+    interface CreateUACOptions {
+        headers?: Record<string, string>;
+        uri?: string;
+        noAck?: boolean;
+        localSdp?: string;
+        proxy?: string;
+        auth?: {
+            username: string;
+            password: string;
+        } | ((req: Request, res: Response, callback: any) => void);
+        method?: string;
+        calledNumber?: string;
+        callingNumber?: string;
+        callingName?: string;
+        followRedirects?: boolean;
+        keepUriOnRedirect?: boolean;
+        dialogStateEmitter?: Emitter;
+        _socket?: net.Socket | tls.TLSSocket;
+        signal?: AbortSignal;
+    }
+    interface CreateB2BUAOptions {
+        headers?: Record<string, string>;
+        responseHeaders?: Record<string, string> | ((uacRes: any, headers: Record<string, string>) => Record<string, string> | null);
+        localSdpA?: string | ((sdp: string, res: Response) => string | Promise<string>);
+        localSdpB?: string | ((sdp: string) => string | Promise<string>);
+        proxyRequestHeaders?: string[];
+        proxyResponseHeaders?: string[];
+        passFailure?: boolean;
+        passProvisionalResponses?: boolean;
+        proxy?: string;
+        auth?: {
+            username: string;
+            password: string;
+        } | ((req: Request, res: Response, callback: any) => void);
+        uri?: string;
+        noAck?: boolean;
+        dialogStateEmitter?: Emitter;
+        method?: string;
+        callingNumber?: string;
+        callingName?: string;
+        calledNumber?: string;
+        localSdp?: string;
+        _socket?: any;
+        signal?: AbortSignal;
+    }
+    interface ProxyRequestOptions {
+        destination?: string | string[];
+        forking?: 'sequential' | 'simultaneous' | 'parallel';
+        remainInDialog?: boolean;
+        recordRoute?: boolean;
+        path?: boolean;
+        provisionalTimeout?: string;
+        finalTimeout?: string;
+        followRedirects?: boolean;
+        simultaneous?: boolean;
+        fullResponse?: boolean;
+    }
+    interface SrfConfig {
+        host?: string;
+        port?: number;
+        secret?: string;
+        tls?: any;
+        reconnect?: any;
+        enablePing?: boolean;
+        pingInterval?: string | number;
+        tags?: string[];
+    }
+    interface ProgressCallbacks {
+        cbRequest?: (err: Error | null, req: Request) => void;
+        cbProvisional?: (res: Response) => void;
+        cbFinalizedUac?: (uac: Dialog) => void;
+    }
+}
+interface SrfEvents {
+    'connect': (err: Error | null, hostport: string, serverVersion?: string, localHostports?: string) => void;
+    'error': (err: Error, socket?: any) => void;
+    'disconnect': () => void;
+    'message': (req: Request, res: Response) => void;
+    'request': (req: Request, res: Response) => void;
+    'register': (req: Request, res: Response) => void;
+    'invite': (req: Request, res: Response) => void;
+    'bye': (req: Request, res: Response) => void;
+    'cancel': (req: Request, res: Response) => void;
+    'ack': (req: Request, res: Response) => void;
+    'info': (req: Request, res: Response) => void;
+    'notify': (req: Request, res: Response) => void;
+    'options': (req: Request, res: Response) => void;
+    'prack': (req: Request, res: Response) => void;
+    'publish': (req: Request, res: Response) => void;
+    'refer': (req: Request, res: Response) => void;
+    'subscribe': (req: Request, res: Response) => void;
+    'update': (req: Request, res: Response) => void;
+    'cdr:attempt': (source: string, time: string, msg: SipMessage) => void;
+    'cdr:start': (source: string, time: string, role: string, msg: SipMessage) => void;
+    'cdr:stop': (source: string, time: string, reason: string, msg: SipMessage) => void;
+    'listening': () => void;
+    'reconnecting': () => void;
+    'close': () => void;
+    [key: string]: (...args: any[]) => void;
+}
+declare interface Srf {
+    on<U extends keyof SrfEvents>(event: U, listener: SrfEvents[U]): this;
+    on(event: string | symbol, listener: (...args: any[]) => void): this;
+    once<U extends keyof SrfEvents>(event: U, listener: SrfEvents[U]): this;
+    once(event: string | symbol, listener: (...args: any[]) => void): this;
+    off<U extends keyof SrfEvents>(event: U, listener: SrfEvents[U]): this;
+    off(event: string | symbol, listener: (...args: any[]) => void): this;
+    emit<U extends keyof SrfEvents>(event: U, ...args: Parameters<SrfEvents[U]>): boolean;
+    emit(event: string | symbol, ...args: any[]): boolean;
+}
+declare class Srf extends Emitter {
+    _dialogs: Map<string, Dialog>;
+    _tags: string[];
+    _app: any;
+    locals: Record<string, any>;
+    [key: string]: any;
+    constructor(app?: any);
+    get app(): any;
+    connect(opts: any, callback?: any): any;
+    listen(opts: any, callback?: any): any;
+    dialog(opts?: any): (req: any, res: any, next: any) => void;
+    createUAS(req: Request, res: Response, opts?: Srf.CreateUASOptions, callback?: any): Promise<Dialog> | this;
+    createUAC(uri: string | Srf.CreateUACOptions, opts?: Srf.CreateUACOptions | any, cbRequest?: any, cbProvisional?: any, callback?: any): Promise<Dialog> | this;
+    createB2BUA(req: Request, res: Response, uri: string | Srf.CreateB2BUAOptions, opts?: Srf.CreateB2BUAOptions | any, cbRequest?: any, cbProvisional?: any, callback?: any): Promise<{
+        uac: Dialog;
+        uas: Dialog;
+    }> | this;
+    proxyRequest(req: Request, destination: string | string[] | Srf.ProxyRequestOptions, opts?: Srf.ProxyRequestOptions, callback?: any): Promise<any> | this;
+    request(socket: any, uri?: any, opts?: any, callback?: any): Promise<Request> | this;
+    findDialogById(stackDialogId: string): Dialog | undefined;
+    findDialogByCallIDAndFromTag(callId: string, tag: string): Dialog | undefined;
+    addDialog(dialog: Dialog): void;
+    removeDialog(dialog: Dialog): void;
+    unregisterForMessages(sipVerb: string): void;
+    reregisterForMessages(sipVerb: string): void;
+    _b2bRequestWithinDialog(dlg: Dialog, req: any, res: any, proxyRequestHeaders: string[], proxyResponseHeaders: string[], callback?: any): void;
+    static get Dialog(): typeof Dialog;
+    static get SipError(): typeof SipError;
+    static get parseUri(): typeof parser.parseUri;
+    static get stringifyUri(): typeof parser.stringifyUri;
+    static get SipMessage(): typeof SipMessage;
+    static get SipRequest(): typeof Request;
+    static get SipResponse(): typeof Response;
+    static get DialogState(): typeof DialogState;
+    static get DialogDirection(): typeof DialogDirection;
+}
+export = Srf;

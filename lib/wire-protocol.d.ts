@@ -1,0 +1,35 @@
+import { EventEmitter as Emitter } from 'events';
+import net from 'net';
+import tls from 'tls';
+declare class WireProtocol extends Emitter {
+    _logger: any;
+    mapIncomingMsg: Map<any, any>;
+    enablePing: boolean;
+    pingInterval: number;
+    mapTimerPing: Map<any, any>;
+    server?: net.Server | tls.Server;
+    host?: string;
+    port?: number;
+    reconnectOpts?: any;
+    reconnectVars?: any;
+    socket?: any;
+    closing?: boolean;
+    constructor(opts: any);
+    connect(opts: any): void;
+    _evalPingOpts(opts: any): void;
+    startPinging(socket: any): void;
+    _stopPinging(socket: any): void;
+    listen(opts: any): net.Server | tls.Server;
+    get isServer(): boolean;
+    get isClient(): boolean;
+    setLogger(logger: any): void;
+    removeLogger(): void;
+    installListeners(socket: any): void;
+    initializeRetryVars(): void;
+    _onConnectionGone(): void;
+    send(socket: any, msg: string): string;
+    _onData(socket: any, msg: Buffer): void;
+    disconnect(socket: any): void;
+    close(callback?: any): void;
+}
+export = WireProtocol;
