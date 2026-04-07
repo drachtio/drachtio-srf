@@ -33,6 +33,86 @@ class DialogDirection {
   static Recipient = 'recipient';
 }
 
+import tls from 'tls';
+
+declare namespace Srf {
+  export interface CreateUASOptions {
+    localSdp?: string | (() => string | Promise<string>);
+    headers?: Record<string, string>;
+    dialogStateEmitter?: Emitter;
+    body?: string | (() => string | Promise<string>);
+  }
+
+  export interface CreateUACOptions {
+    headers?: Record<string, string>;
+    uri?: string;
+    noAck?: boolean;
+    localSdp?: string;
+    proxy?: string;
+    auth?: { username: string; password: string; } | ((req: Request, res: Response, callback: any) => void);
+    method?: string;
+    calledNumber?: string;
+    callingNumber?: string;
+    callingName?: string;
+    followRedirects?: boolean;
+    keepUriOnRedirect?: boolean;
+    dialogStateEmitter?: Emitter;
+    _socket?: net.Socket | tls.TLSSocket;
+  }
+
+  export interface CreateB2BUAOptions {
+    headers?: Record<string, string>;
+    responseHeaders?: Record<string, string> | ((uacRes: any, headers: Record<string, string>) => Record<string, string> | null);
+    localSdpA?: string | ((sdp: string, res: Response) => string | Promise<string>);
+    localSdpB?: string | ((sdp: string) => string | Promise<string>);
+    proxyRequestHeaders?: string[];
+    proxyResponseHeaders?: string[];
+    passFailure?: boolean;
+    passProvisionalResponses?: boolean;
+    proxy?: string;
+    auth?: { username: string; password: string; } | ((req: Request, res: Response, callback: any) => void);
+    uri?: string;
+    noAck?: boolean;
+    dialogStateEmitter?: Emitter;
+    method?: string;
+    callingNumber?: string;
+    callingName?: string;
+    calledNumber?: string;
+    localSdp?: string;
+    _socket?: any;
+  }
+
+  export interface ProxyRequestOptions {
+    destination?: string | string[];
+    forking?: 'sequential' | 'simultaneous' | 'parallel';
+    remainInDialog?: boolean;
+    recordRoute?: boolean;
+    path?: boolean;
+    provisionalTimeout?: string;
+    finalTimeout?: string;
+    followRedirects?: boolean;
+    simultaneous?: boolean;
+    fullResponse?: boolean;
+  }
+
+  export interface SrfConfig {
+    host?: string;
+    port?: number;
+    secret?: string;
+    tls?: any;
+    reconnect?: any;
+    enablePing?: boolean;
+    pingInterval?: string | number;
+    tags?: string[];
+  }
+
+  export interface ProgressCallbacks {
+    cbRequest?: (err: Error | null, req: Request) => void;
+    cbProvisional?: (res: Response) => void;
+    cbFinalizedUac?: (uac: Dialog) => void;
+  }
+}
+
 const sleepFor = async(ms: number) => await new Promise((resolve) => setTimeout(resolve, ms));
 
 const noncopyableHdrs = ['via', 'from', 'to', 'call-id', 'cseq', 'contact', 'content-length', 'content-type'];
@@ -50,6 +130,45 @@ function possiblyRemoveHeaders(hdrList: any[], obj: any) {
     }
   });
 
+}
+
+interface SrfEvents {
+  'connect': (err: Error | null, hostport: string, serverVersion?: string, localHostports?: string) => void;
+  'error': (err: Error, socket?: any) => void;
+  'disconnect': () => void;
+  'message': (req: Request, res: Response) => void;
+  'request': (req: Request, res: Response) => void;
+  'register': (req: Request, res: Response) => void;
+  'invite': (req: Request, res: Response) => void;
+  'bye': (req: Request, res: Response) => void;
+  'cancel': (req: Request, res: Response) => void;
+  'ack': (req: Request, res: Response) => void;
+  'info': (req: Request, res: Response) => void;
+  'notify': (req: Request, res: Response) => void;
+  'options': (req: Request, res: Response) => void;
+  'prack': (req: Request, res: Response) => void;
+  'publish': (req: Request, res: Response) => void;
+  'refer': (req: Request, res: Response) => void;
+  'subscribe': (req: Request, res: Response) => void;
+  'update': (req: Request, res: Response) => void;
+  'cdr:attempt': (source: string, time: string, msg: SipMessage) => void;
+  'cdr:start': (source: string, time: string, role: string, msg: SipMessage) => void;
+  'cdr:stop': (source: string, time: string, reason: string, msg: SipMessage) => void;
+  'listening': () => void;
+  'reconnecting': () => void;
+  'close': () => void;
+  [key: string]: (...args: any[]) => void;
+}
+
+declare interface Srf {
+  on<U extends keyof SrfEvents>(event: U, listener: SrfEvents[U]): this;
+  on(event: string | symbol, listener: (...args: any[]) => void): this;
+  once<U extends keyof SrfEvents>(event: U, listener: SrfEvents[U]): this;
+  once(event: string | symbol, listener: (...args: any[]) => void): this;
+  off<U extends keyof SrfEvents>(event: U, listener: SrfEvents[U]): this;
+  off(event: string | symbol, listener: (...args: any[]) => void): this;
+  emit<U extends keyof SrfEvents>(event: U, ...args: Parameters<SrfEvents[U]>): boolean;
+  emit(event: string | symbol, ...args: any[]): boolean;
 }
 
 class Srf extends Emitter {
@@ -131,7 +250,7 @@ class Srf extends Emitter {
     };
   }
 
-  createUAS(req: Request, res: Response, opts: any = {}, callback?: any): Promise<Dialog> | this {
+  createUAS(req: Request, res: Response, opts: Srf.CreateUASOptions = {}, callback?: any): Promise<Dialog> | this {
     opts.headers = opts.headers || {};
     const body = opts.body || opts.localSdp;
     const generateSdp = typeof body === 'function' ? body : () => opts.localSdp;
@@ -156,12 +275,12 @@ class Srf extends Emitter {
             localTag: from.params.tag,
             id: idgen.new()
           };
-          opts.dialogStateEmitter.emit('stateChange', req._dialogState);
+          opts.dialogStateEmitter!.emit('stateChange', req._dialogState);
         }
       }
     }
 
-    const __send = (content: string, cb: any) => {
+    const __send = (content: string | undefined, cb: any) => {
       let called = false;
       log('createUAS sending');
 
@@ -169,7 +288,7 @@ class Srf extends Emitter {
         req.canceled = called = true;
         if (req._dialogState) {
           Object.assign(req._dialogState, {state: DialogState.Cancelled});
-          opts.dialogStateEmitter.emit('stateChange', req._dialogState);
+          opts.dialogStateEmitter!.emit('stateChange', req._dialogState);
         }
         cb(new SipError(487, 'Request Terminated'));
       });
@@ -184,7 +303,7 @@ class Srf extends Emitter {
             Object.assign(req._dialogState, {
               state: DialogState.Rejected
             });
-            opts.dialogStateEmitter.emit('stateChange', req._dialogState);
+            opts.dialogStateEmitter!.emit('stateChange', req._dialogState);
           }
           if (!called) {
             called = true;
@@ -199,7 +318,7 @@ class Srf extends Emitter {
             state: DialogState.Confirmed,
             localTag: to.params.tag
           });
-          opts.dialogStateEmitter.emit('stateChange', req._dialogState);
+          opts.dialogStateEmitter!.emit('stateChange', req._dialogState);
         }
 
         let dialog: Dialog;
@@ -236,7 +355,7 @@ class Srf extends Emitter {
         if (!req.has('Contact')) {
           __fail(new Error('createUAS: Request is missing Contact header'), cb);
         }
-        const sdp = await generateSdp();
+        const sdp = await generateSdp() as string | undefined;
         log({sdp}, `createUAS - generateSdp returned ${sdp}`);
         __send(sdp, cb);
       } catch(err) {
@@ -257,7 +376,7 @@ class Srf extends Emitter {
     });
   }
 
-  createUAC(uri: string | any, opts?: any, cbRequest?: any, cbProvisional?: any, callback?: any): Promise<Dialog> | this {
+  createUAC(uri: string | Srf.CreateUACOptions, opts?: Srf.CreateUACOptions | any, cbRequest?: any, cbProvisional?: any, callback?: any): Promise<Dialog> | this {
     let redirectCount = 0;
     if (typeof uri === 'object') {
       callback = cbProvisional;
@@ -493,7 +612,7 @@ class Srf extends Emitter {
     });
   }
 
-  createB2BUA(req: Request, res: Response, uri: any, opts?: any, cbRequest?: any, cbProvisional?: any, callback?: any): Promise<{ uac: Dialog; uas: Dialog }> | this {
+  createB2BUA(req: Request, res: Response, uri: string | Srf.CreateB2BUAOptions, opts?: Srf.CreateB2BUAOptions | any, cbRequest?: any, cbProvisional?: any, callback?: any): Promise<{ uac: Dialog; uas: Dialog }> | this {
     let cbFinalizedUac: any = noop;
     let countOfOutstandingPracks = 0;
 
@@ -725,7 +844,7 @@ class Srf extends Emitter {
             remoteTag: from.params.tag,
             id: idgen.new()
           };
-          opts.dialogStateEmitter.emit('stateChange', req._dialogState);
+          opts.dialogStateEmitter!.emit('stateChange', req._dialogState);
         }
       }
 
@@ -820,7 +939,7 @@ class Srf extends Emitter {
     });
   }
 
-  proxyRequest(req: Request, destination: any, opts?: any, callback?: any): Promise<any> | this {
+  proxyRequest(req: Request, destination: string | string[] | Srf.ProxyRequestOptions, opts?: Srf.ProxyRequestOptions, callback?: any): Promise<any> | this {
     assert(typeof destination === 'undefined' || typeof destination === 'string' || Array.isArray(destination),
       '\'destination\' is must be a string or an array of strings');
 

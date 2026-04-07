@@ -1,6 +1,35 @@
 import only from 'only';
 import * as parser from './parser';
 
+declare namespace SipMessage {
+  export interface AOR {
+    name?: string;
+    uri: string;
+    params: Record<string, string | number | null>;
+  }
+
+  export interface Via {
+    version: string;
+    protocol: string;
+    host: string;
+    port?: number;
+    params: Record<string, string | number | null>;
+  }
+
+  export interface ParsedUri {
+    family: 'ipv4' | 'ipv6';
+    scheme: string;
+    user?: string;
+    password?: string;
+    host: string;
+    port?: number;
+    params: Record<string, string | null>;
+    headers: Record<string, string>;
+    number?: string;
+    context?: string | null;
+  }
+}
+
 class SipMessage {
   headers: Record<string, string>;
   raw?: string;
@@ -10,9 +39,9 @@ class SipMessage {
   reason?: string;
   uri?: string;
   body?: string;
-  payload?: any[];
+  payload?: { type: string | null; content: string }[];
 
-  constructor(msg?: any) {
+  constructor(msg?: string | Partial<SipMessage>) {
     this.headers = {};
 
     if (msg) {
@@ -20,9 +49,9 @@ class SipMessage {
         this.raw = msg;
         const obj = parser.parseSipMessage(msg, true);
         if (!obj) throw new Error('failed to parse sip message');
-        msg = obj;
+        msg = obj as Partial<SipMessage>;
       }
-      Object.assign(this.headers, msg.headers || {});
+      Object.assign(this.headers, (msg as Partial<SipMessage>).headers || {});
       Object.assign(this, only(msg, 'body method version status reason uri payload'));
     }
   }
@@ -117,6 +146,10 @@ class SipMessage {
     return !!this.getHeaderName(hdr);
   }
 
+  getParsedHeader(name: 'contact' | 'Contact'): Array<SipMessage.AOR>;
+  getParsedHeader(name: 'via' | 'Via'): Array<SipMessage.Via>;
+  getParsedHeader(name: 'To' | 'to' | 'From' | 'from' | 'refer-to' | 'referred-by' | 'p-asserted-identity' | 'remote-party-id'): SipMessage.AOR;
+  getParsedHeader(name: string): any;
   getParsedHeader(hdr: string): any {
     const v = this.get(hdr);
 

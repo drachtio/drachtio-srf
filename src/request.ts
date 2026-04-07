@@ -4,13 +4,15 @@ import assert from 'assert';
 import noop from 'node-noop';
 import debug from 'debug';
 import SipMessage from './sip-parser/message';
+import Response from './response';
+import DrachtioAgent from './drachtio-agent';
 
 const log = debug('drachtio:request');
 
 class Request extends Emitter {
   msg: SipMessage;
-  _res?: any;
-  _agent?: any;
+  _res?: Response;
+  _agent?: DrachtioAgent;
   source?: string;
   source_address?: string;
   source_port?: number;
@@ -24,40 +26,43 @@ class Request extends Emitter {
   socket?: any;
   auth?: any;
   _originalParams?: any;
+  canceled?: boolean;
   [key: string]: any; // for delegates and passport
 
-  constructor(msg: SipMessage, meta: any) {
+  constructor(msg?: SipMessage, meta?: any) {
     super();
 
     if (msg) {
       assert(msg instanceof SipMessage);
       this.msg = msg;
-      this.meta = meta;
+      if (meta) {
+        this.meta = meta;
+      }
     } else {
       this.msg = new SipMessage();
     }
   }
 
-  get res() {
+  get res(): Response | undefined {
     return this._res;
   }
-  set res(res) {
+  set res(res: Response | undefined) {
     this._res = res;
   }
 
-  get isNewInvite() {
+  get isNewInvite(): boolean {
     const to = this.getParsedHeader('to');
     return this.method === 'INVITE' && !('tag' in to.params);
   }
 
-  get url() {
+  get url(): string | undefined {
     return this.uri;
   }
 
-  set agent(agent) {
+  set agent(agent: DrachtioAgent | undefined) {
     this._agent = agent;
   }
-  get agent() {
+  get agent(): DrachtioAgent | undefined {
     return this._agent;
   }
 
@@ -96,9 +101,8 @@ class Request extends Emitter {
     if (!this._agent || this.source !== 'application') {
       throw new Error('Request#cancel can only be used for uac Request');
     }
-    this._agent.request(Object.assign(
+    this._agent.request(this.socket, Object.assign(
       {
-        _socket: this.socket,
         uri: this.uri,
         method: 'CANCEL',
         stackTxnId: this.stackTxnId
@@ -137,14 +141,14 @@ class Request extends Emitter {
       responses: []
     };
 
-    const __x = (callback: any) => {
-      this._agent.proxy(this, opts, (token: string[], rawMsg: string, meta: any) => {
+    const __x = (cb: any) => {
+      this._agent!.proxy(this, opts, (token: string[], rawMsg: string, meta: any) => {
         if ('NOK' === token[0]) {
-          return callback(token[1]);
+          return cb(token[1]);
         }
         if ('done' === token[1]) {
           result.connected = (200 === result.finalStatus);
-          return callback(null, result);
+          return cb(null, result);
         }
         else {
           const address = meta.address;
@@ -262,4 +266,4 @@ delegate(Request.prototype, 'msg')
   .getter('calledNumber')
   .getter('canFormDialog');
 
-export = Request;
+export default Request;
