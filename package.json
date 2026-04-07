@@ -3,12 +3,13 @@
   "version": "5.0.20",
   "description": "drachtio signaling resource framework",
   "main": "lib/srf.js",
-  "types": "lib/@types/index.d.ts",
+  "types": "lib/srf.d.ts",
   "scripts": {
-    "test": "NODE_ENV=test node test/ ",
+    "build": "tsc",
+    "test": "npm run build && NODE_ENV=test node test/ ",
     "coverage": "./node_modules/.bin/nyc --reporter html --report-dir ./coverage npm run test",
-    "unittests": "./node_modules/.bin/mocha ./test/unit-tests/",
-    "lint": "eslint lib"
+    "unittests": "npm run build && bunx tsc -p test/tsconfig.json && bunx mocha ./test-dist/test/unit-tests/*.js",
+    "lint": "eslint src"
   },
   "engines": {
     "node": ">= 18.x"
@@ -38,11 +39,16 @@
   "devDependencies": {
     "@eslint/js": "^9.38.0",
     "@stylistic/eslint-plugin": "^5.5.0",
+    "@types/debug": "^4.1.13",
+    "@types/jscodeshift": "^17.3.0",
+    "@types/mocha": "^10.0.10",
     "@types/node": "^22.18.12",
+    "@types/sdp-transform": "^2.15.0",
     "config": "^4.1.1",
     "eslint": "^9.38.0",
     "eslint-plugin-promise": "^7.2.1",
     "globals": "^16.4.0",
+    "jscodeshift": "^17.3.0",
     "mocha": "^11.7.4",
     "nyc": "^17.1.0",
     "should": "^13.2.3",

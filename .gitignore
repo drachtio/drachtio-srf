@@ -38,3 +38,5 @@ node_modules
 examples/*
 
 CLAUDE.md
+test-dist/
+lib/
