@@ -171,6 +171,47 @@ declare interface Srf {
   off(event: string | symbol, listener: (...args: any[]) => void): this;
   emit<U extends keyof SrfEvents>(event: U, ...args: Parameters<SrfEvents[U]>): boolean;
   emit(event: string | symbol, ...args: any[]): boolean;
+
+  // Delegated properties and methods
+  locals: Record<string, any>;
+  readonly idle: boolean;
+  endSession(msg: Request | Response): void;
+  disconnect(socket?: any): void;
+  set(prop: string, val: any): void;
+  get(prop: string): any;
+
+  use(fn: (req: Request, res: Response, next: Function) => void): this;
+  use(path: string, fn: (req: Request, res: Response, next: Function) => void): this;
+  
+  // SIP methods
+  invite(handler: (req: Request, res: Response, next: Function) => void): this;
+  invite(path: string, handler: (req: Request, res: Response, next: Function) => void): this;
+  register(handler: (req: Request, res: Response, next: Function) => void): this;
+  register(path: string, handler: (req: Request, res: Response, next: Function) => void): this;
+  bye(handler: (req: Request, res: Response, next: Function) => void): this;
+  bye(path: string, handler: (req: Request, res: Response, next: Function) => void): this;
+  cancel(handler: (req: Request, res: Response, next: Function) => void): this;
+  cancel(path: string, handler: (req: Request, res: Response, next: Function) => void): this;
+  ack(handler: (req: Request, res: Response, next: Function) => void): this;
+  ack(path: string, handler: (req: Request, res: Response, next: Function) => void): this;
+  info(handler: (req: Request, res: Response, next: Function) => void): this;
+  info(path: string, handler: (req: Request, res: Response, next: Function) => void): this;
+  notify(handler: (req: Request, res: Response, next: Function) => void): this;
+  notify(path: string, handler: (req: Request, res: Response, next: Function) => void): this;
+  options(handler: (req: Request, res: Response, next: Function) => void): this;
+  options(path: string, handler: (req: Request, res: Response, next: Function) => void): this;
+  prack(handler: (req: Request, res: Response, next: Function) => void): this;
+  prack(path: string, handler: (req: Request, res: Response, next: Function) => void): this;
+  publish(handler: (req: Request, res: Response, next: Function) => void): this;
+  publish(path: string, handler: (req: Request, res: Response, next: Function) => void): this;
+  refer(handler: (req: Request, res: Response, next: Function) => void): this;
+  refer(path: string, handler: (req: Request, res: Response, next: Function) => void): this;
+  subscribe(handler: (req: Request, res: Response, next: Function) => void): this;
+  subscribe(path: string, handler: (req: Request, res: Response, next: Function) => void): this;
+  update(handler: (req: Request, res: Response, next: Function) => void): this;
+  update(path: string, handler: (req: Request, res: Response, next: Function) => void): this;
+  message(handler: (req: Request, res: Response, next: Function) => void): this;
+  message(path: string, handler: (req: Request, res: Response, next: Function) => void): this;
 }
 
 class Srf extends Emitter {

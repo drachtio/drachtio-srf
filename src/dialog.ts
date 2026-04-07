@@ -44,6 +44,21 @@ declare interface Dialog {
   off(event: string | symbol, listener: (...args: any[]) => void): this;
   emit<U extends keyof DialogEvents>(event: U, ...args: Parameters<DialogEvents[U]>): boolean;
   emit(event: string | symbol, ...args: any[]): boolean;
+
+  invite(opts?: any, callback?: any): any;
+  register(opts?: any, callback?: any): any;
+  bye(opts?: any, callback?: any): any;
+  cancel(opts?: any, callback?: any): any;
+  ack(opts?: any, callback?: any): any;
+  info(opts?: any, callback?: any): any;
+  notify(opts?: any, callback?: any): any;
+  options(opts?: any, callback?: any): any;
+  prack(opts?: any, callback?: any): any;
+  publish(opts?: any, callback?: any): any;
+  refer(opts?: any, callback?: any): any;
+  subscribe(opts?: any, callback?: any): any;
+  update(opts?: any, callback?: any): any;
+  message(opts?: any, callback?: any): any;
 }
 
 class Dialog extends Emitter {
