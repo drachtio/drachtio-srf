@@ -35,6 +35,18 @@ interface DialogEvents {
   'unhold': (req: Request) => void;
 }
 
+declare namespace Dialog {
+  export interface DialogRequestOptions {
+    method?: string;
+    headers?: Record<string, string>;
+    body?: string;
+    auth?: { username: string; password: string; } | ((req: Request, res: Response, callback: any) => void);
+    noAck?: boolean;
+  }
+
+  export type DialogRequestCallback = (err: Error | null, res?: Response | any, ack?: any) => void;
+}
+
 declare interface Dialog {
   on<U extends keyof DialogEvents>(event: U, listener: DialogEvents[U]): this;
   on(event: string | symbol, listener: (...args: any[]) => void): this;
@@ -45,20 +57,20 @@ declare interface Dialog {
   emit<U extends keyof DialogEvents>(event: U, ...args: Parameters<DialogEvents[U]>): boolean;
   emit(event: string | symbol, ...args: any[]): boolean;
 
-  invite(opts?: any, callback?: any): any;
-  register(opts?: any, callback?: any): any;
-  bye(opts?: any, callback?: any): any;
-  cancel(opts?: any, callback?: any): any;
-  ack(opts?: any, callback?: any): any;
-  info(opts?: any, callback?: any): any;
-  notify(opts?: any, callback?: any): any;
-  options(opts?: any, callback?: any): any;
-  prack(opts?: any, callback?: any): any;
-  publish(opts?: any, callback?: any): any;
-  refer(opts?: any, callback?: any): any;
-  subscribe(opts?: any, callback?: any): any;
-  update(opts?: any, callback?: any): any;
-  message(opts?: any, callback?: any): any;
+  invite(opts?: Dialog.DialogRequestOptions, callback?: Dialog.DialogRequestCallback): Promise<Response> | this;
+  register(opts?: Dialog.DialogRequestOptions, callback?: Dialog.DialogRequestCallback): Promise<Response> | this;
+  bye(opts?: Dialog.DialogRequestOptions, callback?: Dialog.DialogRequestCallback): Promise<Response> | this;
+  cancel(opts?: Dialog.DialogRequestOptions, callback?: Dialog.DialogRequestCallback): Promise<Response> | this;
+  ack(opts?: Dialog.DialogRequestOptions, callback?: Dialog.DialogRequestCallback): Promise<Response> | this;
+  info(opts?: Dialog.DialogRequestOptions, callback?: Dialog.DialogRequestCallback): Promise<Response> | this;
+  notify(opts?: Dialog.DialogRequestOptions, callback?: Dialog.DialogRequestCallback): Promise<Response> | this;
+  options(opts?: Dialog.DialogRequestOptions, callback?: Dialog.DialogRequestCallback): Promise<Response> | this;
+  prack(opts?: Dialog.DialogRequestOptions, callback?: Dialog.DialogRequestCallback): Promise<Response> | this;
+  publish(opts?: Dialog.DialogRequestOptions, callback?: Dialog.DialogRequestCallback): Promise<Response> | this;
+  refer(opts?: Dialog.DialogRequestOptions, callback?: Dialog.DialogRequestCallback): Promise<Response> | this;
+  subscribe(opts?: Dialog.DialogRequestOptions, callback?: Dialog.DialogRequestCallback): Promise<Response> | this;
+  update(opts?: Dialog.DialogRequestOptions, callback?: Dialog.DialogRequestCallback): Promise<Response> | this;
+  message(opts?: Dialog.DialogRequestOptions, callback?: Dialog.DialogRequestCallback): Promise<Response> | this;
 }
 
 class Dialog extends Emitter {
@@ -199,10 +211,10 @@ class Dialog extends Emitter {
     return this.subscriptions.length;
   }
 
-  destroy(opts?: any, callback?: any): any {
+  destroy(opts?: { headers?: Record<string, string>; auth?: Dialog.DialogRequestOptions['auth']; } | ((err: Error | null, msg?: SipMessage | Request) => void), callback?: (err: Error | null, msg?: SipMessage | Request) => void): Promise<SipMessage | Request> | this {
     opts = opts || {};
     if (typeof opts === 'function') {
-      callback = opts;
+      callback = opts as any;
       opts = {};
     }
     this.queuedRequests = [];
@@ -243,7 +255,7 @@ class Dialog extends Emitter {
       else if (this.dialogType === 'SUBSCRIBE') {
         opts.headers = opts.headers || {};
         opts.headers['subscription-state'] = 'terminated';
-        opts.headers['event'] = this.subscribeEvent;
+        opts.headers['event'] = this.subscribeEvent || '';
         try {
           this.agent.request({
             method: 'NOTIFY',
@@ -272,15 +284,15 @@ class Dialog extends Emitter {
     });
   }
 
-  modify(sdp?: any, opts?: any, callback?: any): any {
+  modify(sdp?: string | { headers?: Record<string, string>; auth?: Dialog.DialogRequestOptions['auth']; noAck?: boolean; } | ((err: Error | null, sdp?: string, ack?: (opts?: any) => void) => void), opts?: { headers?: Record<string, string>; auth?: Dialog.DialogRequestOptions['auth']; noAck?: boolean; } | ((err: Error | null, sdp?: string, ack?: (opts?: any) => void) => void), callback?: (err: Error | null, sdp?: string, ack?: (opts?: any) => void) => void): Promise<string | { sdp: string, ack: (opts?: any) => void }> | this {
     if (typeof sdp === 'object') {
-      callback = opts;
+      callback = opts as any;
       opts = sdp;
       sdp = undefined;
     }
     opts = opts || {};
     if (typeof opts === 'function') {
-      callback = opts;
+      callback = opts as any;
       opts = {};
     }
     log(`opts: ${JSON.stringify(opts)}`);
@@ -390,12 +402,12 @@ class Dialog extends Emitter {
     });
   }
 
-  request(opts: any, callback?: any): any {
+  request(opts: Dialog.DialogRequestOptions, callback?: Dialog.DialogRequestCallback): Promise<Response> | this {
     assert.ok(typeof opts.method === 'string' &&
       -1 !== methods.indexOf(opts.method), '\'opts.method\' is required and must be a SIP method');
 
     const __x = (cb: any) => {
-      const method = opts.method.toUpperCase();
+      const method = opts.method!.toUpperCase();
 
       try {
         this.agent.request({
