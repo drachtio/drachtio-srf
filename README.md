@@ -14,6 +14,13 @@ To provide an enhanced developer experience and complete type safety, this proje
 - **Git Tracking & Ignored Files:** The compiled `lib/` and the isolated `test-dist/` directories are untracked and purposefully added to `.gitignore`. They are strictly considered auto-generated outputs and are rebuilt by running `npm run build`.
 - **NPM Compatibility:** When installed via NPM, end-users will seamlessly download the generated vanilla JavaScript contents inside the `lib/` folder. This ensures 100% backward compatibility across standard Node.js applications, leaving typical `require('drachtio-srf')` implementations unbroken.
 
+## New Features & Strict Typing API
+In addition to the fundamental TS transition, several advanced features and typing improvements have been shipped:
+- **`AbortSignal` Support for Outbound Requests (`createUAC`)**: You can now supply an `AbortSignal` inside the `opts.signal` parameter when initiating outgoing dialogs with `srf.createUAC(uri, { signal: ... })` or within `createB2BUA`. If the signal is aborted while a request is pending, it instantly transmits a `CANCEL` to the remote endpoint, terminates all associated listeners/timers, and throws an immediate `AbortError` exception to easily reject the executing promise.
+- **Strictly Typed Event Emitters:** `Srf` and `Dialog` event structures are now mapped against comprehensive interface definitions (`SrfEvents`, `DialogEvents`). Instead of guessing string names and parameters when using `srf.on('message', ...)`, your IDE will automatically validate event names and strictly type your callbacks (e.g. `(req: Request, res: Response) => void`).
+- **Domain-Specific Interfaces:** `CreateUACOptions`, `CreateUASOptions`, `CreateB2BUAOptions`, and `SrfConfig` have been formalized. These interfaces explicitly declare acceptable optional logic like `noAck`, `proxyRequestHeaders`, and `followRedirects`—drastically eliminating loosely tracked `any` configurations across the architecture.
+- **Strict Parser Types:** Output properties parsed using the embedded SIP Parser like `Via` and `AOR` (`ParsedUri`) are natively typed and exported inside `SipMessage` so you safely infer `uri.user` and `uri.host`.
+
 *Example proxy*
 ```js
   const Srf = require('drachtio-srf');
