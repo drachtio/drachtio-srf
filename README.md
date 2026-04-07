@@ -1,25 +1,38 @@
 # drachtio-srf ![Build Status](https://github.com/drachtio/drachtio-srf/workflows/CI/badge.svg)
 
-> **Note**: This repository has been refactored into strict, modern TypeScript. The original JavaScript source has been migrated to TypeScript and is now compiled down into the generated `lib/` directory. All credit for the brilliant underlying `drachtio-srf` implementation, API design, and architecture belongs to the original author, **Dave Horton**.
+> **Notice**: The repository has undergone a major modernization and has been completely rewritten in strict TypeScript. All credit for the brilliant underlying `drachtio-srf` implementation, original API design, and architecture remains with the original author, **Dave Horton**.
 
 [![drachtio logo](http://davehorton.github.io/drachtio-srf/img/definition-only-cropped.png)](https://drachtio.org)
 
 Welcome to the Drachtio Signaling Resource framework (drachtio-srf), the Node.js framework for SIP Server applications.
 
-Please visit [drachtio.org](https://drachtio.org) for getting started instructions, API documentation, sample apps and more!
+Please visit [drachtio.org](https://drachtio.org) for getting started instructions, API documentation, sample apps, and more!
 
-## Development and Architecture Changes
-To provide an enhanced developer experience and complete type safety, this project has been updated to native TypeScript:
-- **TypeScript Sources:** All code under `src/` (formerly `lib/`), `test/`, and `examples/` is now written in `.ts`.
-- **Git Tracking & Ignored Files:** The compiled `lib/` and the isolated `test-dist/` directories are untracked and purposefully added to `.gitignore`. They are strictly considered auto-generated outputs and are rebuilt by running `npm run build`.
-- **NPM Compatibility:** When installed via NPM, end-users will seamlessly download the generated vanilla JavaScript contents inside the `lib/` folder. This ensures 100% backward compatibility across standard Node.js applications, leaving typical `require('drachtio-srf')` implementations unbroken.
+## Modern TypeScript Rewrite (v5+)
+To provide an enhanced developer experience, guarantee complete type safety, and eliminate runtime ambiguity, this project has been fully migrated to native TypeScript. 
 
-## New Features & Strict Typing API
-In addition to the fundamental TS transition, several advanced features and typing improvements have been shipped:
-- **`AbortSignal` Support for Outbound Requests (`createUAC`)**: You can now supply an `AbortSignal` inside the `opts.signal` parameter when initiating outgoing dialogs with `srf.createUAC(uri, { signal: ... })` or within `createB2BUA`. If the signal is aborted while a request is pending, it instantly transmits a `CANCEL` to the remote endpoint, terminates all associated listeners/timers, and throws an immediate `AbortError` exception to easily reject the executing promise.
-- **Strictly Typed Event Emitters:** `Srf` and `Dialog` event structures are now mapped against comprehensive interface definitions (`SrfEvents`, `DialogEvents`). Instead of guessing string names and parameters when using `srf.on('message', ...)`, your IDE will automatically validate event names and strictly type your callbacks (e.g. `(req: Request, res: Response) => void`).
-- **Domain-Specific Interfaces:** `CreateUACOptions`, `CreateUASOptions`, `CreateB2BUAOptions`, and `SrfConfig` have been formalized. These interfaces explicitly declare acceptable optional logic like `noAck`, `proxyRequestHeaders`, and `followRedirects`—drastically eliminating loosely tracked `any` configurations across the architecture.
-- **Strict Parser Types:** Output properties parsed using the embedded SIP Parser like `Via` and `AOR` (`ParsedUri`) are natively typed and exported inside `SipMessage` so you safely infer `uri.user` and `uri.host`.
+### 1. Architectural Changes
+- **TypeScript Sources:** All code under `src/` (formerly `lib/`), `test/`, and `examples/` is now written natively in `.ts`.
+- **Git Tracking & Ignored Files:** The compiled `.js` artifacts output into `lib/` and the isolated `test-dist/` directories are intentionally ignored in `.gitignore`. They are generated automatically by running `npm run build`.
+- **NPM Backward Compatibility:** When installed via NPM, end-users will seamlessly download the generated vanilla JavaScript contents inside the `lib/` folder. This ensures 100% backward compatibility across standard Node.js applications, leaving typical `require('drachtio-srf')` implementations entirely unbroken.
+
+### 2. Strict Typing Enhancements
+- **Strictly Typed Event Emitters:** The `Srf` and `Dialog` event structures are now strictly mapped against interface definitions (`SrfEvents`, `DialogEvents`). Instead of guessing string names and parameters when using `srf.on('message', ...)`, your IDE will automatically validate event names and strongly type your callback parameters (e.g. `(req: Request, res: Response) => void`).
+- **Domain-Specific Configuration Interfaces:** All loosely structured `any` objects have been eliminated. Functions now strictly leverage `CreateUACOptions`, `CreateUASOptions`, `CreateB2BUAOptions`, and `SrfConfig` interfaces. These interfaces explicitly declare acceptable optional logic like `noAck`, `proxyRequestHeaders`, and `followRedirects`.
+- **Strict Parser Types:** Complex output properties generated by the embedded SIP Parser, such as `Via`, `AOR`, and `ParsedUri`, are natively typed and exported inside `SipMessage` so you can safely infer and navigate nested properties like `uri.user` and `uri.host`.
+- **Method Signatures:** Core framework operations have updated, strongly-typed returns mapping accurately to promises (e.g. `Promise<{ uas: Dialog, uac: Dialog }>`).
+
+### 3. New Features: `AbortSignal` Support
+You can now natively cancel outgoing SIP dialog creations using the modern `AbortSignal` standard.
+
+- **`createUAC` & `createB2BUA` Integration:** You can supply an `AbortSignal` inside the `opts.signal` parameter when initiating outgoing dialogs with `srf.createUAC(uri, { signal: ... })`.
+- **Immediate Cancellation:** If the signal is aborted while a transaction is actively pending, it intercepts the workflow and immediately transmits a `CANCEL` request to the remote endpoint.
+- **Memory & Resource Cleanup:** Upon abortion, all associated listeners, network timers, and proxy states are proactively destroyed to prevent memory leaks.
+- **Graceful Promise Rejection:** The overarching endpoint creation promise is immediately rejected with an `AbortError`, allowing your surrounding application logic to halt execution safely without waiting for the slow network `487 Request Terminated` cascade.
+
+---
+
+## Examples
 
 *Example proxy*
 ```js
@@ -38,13 +51,14 @@ In addition to the fundamental TS transition, several advanced features and typi
       followRedirects: true,
       provisionalTimeout: '2s'
     }).then((results) => {
-      console.log(JSON.stringify(result)); 
+      console.log(JSON.stringify(results)); 
       // {finalStatus: 200, finalResponse:{..}, responses: [..]}
     });
   });
-  ```
+```
+
 *Example Back-to-back user agent*
-  ```js
+```js
   const Srf = require('drachtio-srf');
   const srf = new Srf();
 
@@ -53,8 +67,6 @@ In addition to the fundamental TS transition, several advanced features and typi
     port: 9022,
     secret: 'cymru'
   });
-    const Srf = require('drachtio-srf');
-  const srf = new Srf();
 
   srf.invite((req, res) => {
     srf.createB2BUA('sip:1234@10.10.100.1', req, res, {localSdpB: req.body})
@@ -64,15 +76,15 @@ In addition to the fundamental TS transition, several advanced features and typi
         // when one side terminates, hang up the other
         uas.on('destroy', () => { uac.destroy(); });
         uac.on('destroy', () => { uas.destroy(); });
-        return;
       })
       .catch((err) => {
         console.log(`call failed to connect: ${err}`);
       });
   });
-  ```
+```
+
 *Example sending a request (OPTIONS ping)*
-  ```js
+```js
   const Srf = require('drachtio-srf');
   const srf = new Srf();
 
@@ -98,4 +110,31 @@ In addition to the fundamental TS transition, several advanced features and typi
       });
     });
   }
-  ```
+```
+
+*Example: Using AbortSignal during outbound dialing*
+```js
+  const { AbortController } = require('abort-controller'); // if below Node 15
+  const Srf = require('drachtio-srf');
+  const srf = new Srf();
+  
+  srf.connect({host: '127.0.0.1', port: 9022, secret: 'cymru'});
+
+  // Dial out but cancel if they don't answer within 3 seconds
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort('No Answer'), 3000);
+
+  srf.createUAC('sip:1234@10.10.100.1', { signal: controller.signal })
+    .then((uac) => {
+      clearTimeout(timeoutId);
+      console.log('Call answered!');
+      uac.on('destroy', () => console.log('Call ended'));
+    })
+    .catch((err) => {
+      if (err.message.includes('AbortError')) {
+        console.log('Call was cancelled due to timeout');
+      } else {
+        console.error('Call failed:', err);
+      }
+    });
+```
