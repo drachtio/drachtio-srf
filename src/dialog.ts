@@ -57,20 +57,47 @@ declare interface Dialog {
   emit<U extends keyof DialogEvents>(event: U, ...args: Parameters<DialogEvents[U]>): boolean;
   emit(event: string | symbol, ...args: any[]): boolean;
 
-  invite(opts?: Dialog.DialogRequestOptions, callback?: Dialog.DialogRequestCallback): Promise<Response> | this;
-  register(opts?: Dialog.DialogRequestOptions, callback?: Dialog.DialogRequestCallback): Promise<Response> | this;
-  bye(opts?: Dialog.DialogRequestOptions, callback?: Dialog.DialogRequestCallback): Promise<Response> | this;
-  cancel(opts?: Dialog.DialogRequestOptions, callback?: Dialog.DialogRequestCallback): Promise<Response> | this;
-  ack(opts?: Dialog.DialogRequestOptions, callback?: Dialog.DialogRequestCallback): Promise<Response> | this;
-  info(opts?: Dialog.DialogRequestOptions, callback?: Dialog.DialogRequestCallback): Promise<Response> | this;
-  notify(opts?: Dialog.DialogRequestOptions, callback?: Dialog.DialogRequestCallback): Promise<Response> | this;
-  options(opts?: Dialog.DialogRequestOptions, callback?: Dialog.DialogRequestCallback): Promise<Response> | this;
-  prack(opts?: Dialog.DialogRequestOptions, callback?: Dialog.DialogRequestCallback): Promise<Response> | this;
-  publish(opts?: Dialog.DialogRequestOptions, callback?: Dialog.DialogRequestCallback): Promise<Response> | this;
-  refer(opts?: Dialog.DialogRequestOptions, callback?: Dialog.DialogRequestCallback): Promise<Response> | this;
-  subscribe(opts?: Dialog.DialogRequestOptions, callback?: Dialog.DialogRequestCallback): Promise<Response> | this;
-  update(opts?: Dialog.DialogRequestOptions, callback?: Dialog.DialogRequestCallback): Promise<Response> | this;
-  message(opts?: Dialog.DialogRequestOptions, callback?: Dialog.DialogRequestCallback): Promise<Response> | this;
+  invite(opts?: Dialog.DialogRequestOptions): Promise<Response>;
+  invite(opts: Dialog.DialogRequestOptions | undefined, callback: Dialog.DialogRequestCallback): this;
+  
+  register(opts?: Dialog.DialogRequestOptions): Promise<Response>;
+  register(opts: Dialog.DialogRequestOptions | undefined, callback: Dialog.DialogRequestCallback): this;
+  
+  bye(opts?: Dialog.DialogRequestOptions): Promise<Response>;
+  bye(opts: Dialog.DialogRequestOptions | undefined, callback: Dialog.DialogRequestCallback): this;
+  
+  cancel(opts?: Dialog.DialogRequestOptions): Promise<Response>;
+  cancel(opts: Dialog.DialogRequestOptions | undefined, callback: Dialog.DialogRequestCallback): this;
+  
+  ack(opts?: Dialog.DialogRequestOptions): Promise<Response>;
+  ack(opts: Dialog.DialogRequestOptions | undefined, callback: Dialog.DialogRequestCallback): this;
+  
+  info(opts?: Dialog.DialogRequestOptions): Promise<Response>;
+  info(opts: Dialog.DialogRequestOptions | undefined, callback: Dialog.DialogRequestCallback): this;
+  
+  notify(opts?: Dialog.DialogRequestOptions): Promise<Response>;
+  notify(opts: Dialog.DialogRequestOptions | undefined, callback: Dialog.DialogRequestCallback): this;
+  
+  options(opts?: Dialog.DialogRequestOptions): Promise<Response>;
+  options(opts: Dialog.DialogRequestOptions | undefined, callback: Dialog.DialogRequestCallback): this;
+  
+  prack(opts?: Dialog.DialogRequestOptions): Promise<Response>;
+  prack(opts: Dialog.DialogRequestOptions | undefined, callback: Dialog.DialogRequestCallback): this;
+  
+  publish(opts?: Dialog.DialogRequestOptions): Promise<Response>;
+  publish(opts: Dialog.DialogRequestOptions | undefined, callback: Dialog.DialogRequestCallback): this;
+  
+  refer(opts?: Dialog.DialogRequestOptions): Promise<Response>;
+  refer(opts: Dialog.DialogRequestOptions | undefined, callback: Dialog.DialogRequestCallback): this;
+  
+  subscribe(opts?: Dialog.DialogRequestOptions): Promise<Response>;
+  subscribe(opts: Dialog.DialogRequestOptions | undefined, callback: Dialog.DialogRequestCallback): this;
+  
+  update(opts?: Dialog.DialogRequestOptions): Promise<Response>;
+  update(opts: Dialog.DialogRequestOptions | undefined, callback: Dialog.DialogRequestCallback): this;
+  
+  message(opts?: Dialog.DialogRequestOptions): Promise<Response>;
+  message(opts: Dialog.DialogRequestOptions | undefined, callback: Dialog.DialogRequestCallback): this;
 }
 
 class Dialog extends Emitter {
@@ -402,6 +429,8 @@ class Dialog extends Emitter {
     });
   }
 
+  request(opts: Dialog.DialogRequestOptions): Promise<Response>;
+  request(opts: Dialog.DialogRequestOptions, callback: Dialog.DialogRequestCallback): this;
   request(opts: Dialog.DialogRequestOptions, callback?: Dialog.DialogRequestCallback): Promise<Response> | this {
     assert.ok(typeof opts.method === 'string' &&
       -1 !== methods.indexOf(opts.method), '\'opts.method\' is required and must be a SIP method');

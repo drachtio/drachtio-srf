@@ -99,6 +99,16 @@ declare namespace Srf {
         cbProvisional?: (res: Response) => void;
         cbFinalizedUac?: (uac: Dialog) => void;
     }
+    interface OutboundRequestOptions {
+        method: string;
+        headers?: Record<string, string>;
+        body?: string;
+        auth?: {
+            username: string;
+            password: string;
+        } | ((req: Request, res: Response, callback: any) => void);
+        proxy?: string;
+    }
 }
 interface SrfEvents {
     'connect': (err: Error | null, hostport: string, serverVersion?: string, localHostports?: string) => void;
@@ -191,7 +201,16 @@ declare class Srf extends Emitter {
         uas: Dialog;
     }> | this;
     proxyRequest(req: Request, destination: string | string[] | Srf.ProxyRequestOptions, opts?: Srf.ProxyRequestOptions, callback?: any): Promise<any> | this;
-    request(socket: any, uri?: any, opts?: any, callback?: any): Promise<Request> | this;
+    request(opts: Srf.OutboundRequestOptions & {
+        uri: string;
+    }): Promise<Request>;
+    request(opts: Srf.OutboundRequestOptions & {
+        uri: string;
+    }, callback: (err: Error | null, req: Request) => void): this;
+    request(uri: string, opts: Srf.OutboundRequestOptions): Promise<Request>;
+    request(uri: string, opts: Srf.OutboundRequestOptions, callback: (err: Error | null, req: Request) => void): this;
+    request(socket: net.Socket | tls.TLSSocket, uri: string, opts: Srf.OutboundRequestOptions): Promise<Request>;
+    request(socket: net.Socket | tls.TLSSocket, uri: string, opts: Srf.OutboundRequestOptions, callback: (err: Error | null, req: Request) => void): this;
     findDialogById(stackDialogId: string): Dialog | undefined;
     findDialogByCallIDAndFromTag(callId: string, tag: string): Dialog | undefined;
     addDialog(dialog: Dialog): void;
