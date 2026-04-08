@@ -19,7 +19,7 @@ const log = debug('drachtio:srf');
 const noop = () => {};
 const idgen = shortUuid();
 
-class DialogState {
+class _DialogState {
   static Trying = 'trying';
   static Proceeding = 'proceeding';
   static Early = 'early';
@@ -28,7 +28,7 @@ class DialogState {
   static Rejected = 'rejected';
   static Cancelled = 'cancelled';
 }
-class DialogDirection {
+class _DialogDirection {
   static Initiator = 'initiator';
   static Recipient = 'recipient';
 }
@@ -36,6 +36,30 @@ class DialogDirection {
 import tls from 'tls';
 
 declare namespace Srf {
+  export type SipRequest = Request;
+  export const SipRequest: typeof Request;
+
+  export type SipResponse = Response;
+  export const SipResponse: typeof Response;
+
+  export type SipMessage = import('./sip-parser/message');
+  export const SipMessage: typeof import('./sip-parser/message');
+
+  export type Dialog = import('./dialog');
+  export const Dialog: typeof import('./dialog');
+
+  export type SipError = import('./sip_error');
+  export const SipError: typeof import('./sip_error');
+
+  export const parseUri: typeof parser.parseUri;
+  export const stringifyUri: typeof parser.stringifyUri;
+
+  export type DialogState = typeof _DialogState;
+  export const DialogState: typeof _DialogState;
+
+  export type DialogDirection = typeof _DialogDirection;
+  export const DialogDirection: typeof _DialogDirection;
+
   export interface SrfEvents {
     'connect': (err: Error | null, hostport: string, serverVersion?: string, localHostports?: string) => void;
     'error': (err: Error, socket?: any) => void;
@@ -317,11 +341,11 @@ class Srf extends Emitter {
       && opts.dialogStateEmitter && opts.dialogStateEmitter.listenerCount('stateChange') > 0) {
       if (!req._dialogState) {
         const from = req.getParsedHeader('from');
-        const uri = Srf.parseUri(from.uri);
+        const uri = parser.parseUri(from.uri);
         if (uri.user && uri.host) {
           req._dialogState = {
-            state: DialogState.Trying,
-            direction: DialogDirection.Initiator,
+            state: _DialogState.Trying,
+            direction: _DialogDirection.Initiator,
             aor: `${uri.user || 'unknown'}@${uri.host || 'unknown'}`,
             callId: req.get('Call-ID'),
             localTag: from.params.tag,
@@ -339,7 +363,7 @@ class Srf extends Emitter {
       req.on('cancel', () => {
         req.canceled = called = true;
         if (req._dialogState) {
-          Object.assign(req._dialogState, {state: DialogState.Cancelled});
+          Object.assign(req._dialogState, {state: _DialogState.Cancelled});
           opts.dialogStateEmitter!.emit('stateChange', req._dialogState);
         }
         cb(new SipError(487, 'Request Terminated'));
@@ -353,7 +377,7 @@ class Srf extends Emitter {
           log(`createUAS: send failed with ${err}`);
           if (req._dialogState) {
             Object.assign(req._dialogState, {
-              state: DialogState.Rejected
+              state: _DialogState.Rejected
             });
             opts.dialogStateEmitter!.emit('stateChange', req._dialogState);
           }
@@ -367,7 +391,7 @@ class Srf extends Emitter {
         if (req._dialogState) {
           const to = response.getParsedHeader('to');
           Object.assign(req._dialogState, {
-            state: DialogState.Confirmed,
+            state: _DialogState.Confirmed,
             localTag: to.params.tag
           });
           opts.dialogStateEmitter!.emit('stateChange', req._dialogState);
@@ -549,11 +573,11 @@ class Srf extends Emitter {
 
             const launchedFrom = req.getParsedHeader('from');
             const launchedTo = req.getParsedHeader('to');
-            const u = Srf.parseUri(launchedTo.uri);
+            const u = parser.parseUri(launchedTo.uri);
             if (u.user && u.host) {
               req._dialogState = {
-                state: DialogState.Trying,
-                direction: DialogDirection.Recipient,
+                state: _DialogState.Trying,
+                direction: _DialogDirection.Recipient,
                 aor: `${u.user || 'unknown'}@${u.host || 'unknown'}`,
                 callId: req.get('Call-ID'),
                 localTag: launchedFrom.params.tag,
@@ -570,14 +594,14 @@ class Srf extends Emitter {
 
           req.on('response', (res: any, ack: any) => {
             if (res.status < 200) {
-              if (req._dialogState && req._dialogState.state !== DialogState.Early) {
+              if (req._dialogState && req._dialogState.state !== _DialogState.Early) {
                 const to = res.getParsedHeader('to');
                 if (to.params.tag) {
-                  Object.assign(req._dialogState, {remoteTag: to.params.tag, state: DialogState.Early});
+                  Object.assign(req._dialogState, {remoteTag: to.params.tag, state: _DialogState.Early});
                   launchOpts.dialogStateEmitter.emit('stateChange', req._dialogState);
                 }
-                else if (req._dialogState.state === DialogState.Trying) {
-                  Object.assign(req._dialogState, {state: DialogState.Proceeding});
+                else if (req._dialogState.state === _DialogState.Trying) {
+                  Object.assign(req._dialogState, {state: _DialogState.Proceeding});
                   launchOpts.dialogStateEmitter.emit('stateChange', req._dialogState);
                 }
               }
@@ -612,8 +636,8 @@ class Srf extends Emitter {
               if (req._dialogState) {
                 const to = res.getParsedHeader('to');
                 const state = (200 === res.status ?
-                  DialogState.Confirmed :
-                  (487 === res.status ? DialogState.Cancelled : DialogState.Rejected));
+                  _DialogState.Confirmed :
+                  (487 === res.status ? _DialogState.Cancelled : _DialogState.Rejected));
                 Object.assign(req._dialogState, {
                   remoteTag: to.params.tag,
                   state});
@@ -932,11 +956,11 @@ class Srf extends Emitter {
 
       if (opts.dialogStateEmitter && opts.dialogStateEmitter.listenerCount('stateChange') > 0) {
         const from = req.getParsedHeader('from');
-        const u = Srf.parseUri(from.uri);
+        const u = parser.parseUri(from.uri);
         if (u.user && u.host) {
           req._dialogState = {
-            state: DialogState.Trying,
-            direction: DialogDirection.Initiator,
+            state: _DialogState.Trying,
+            direction: _DialogDirection.Initiator,
             aor: `${u.user || 'unknown'}@${u.host || 'unknown'}`,
             callId: req.get('Call-ID'),
             remoteTag: from.params.tag,
@@ -1181,41 +1205,17 @@ class Srf extends Emitter {
       callback(null);
     });
   }
-
-  static get Dialog() {
-    return Dialog;
-  }
-
-  static get SipError() {
-    return SipError;
-  }
-
-  static get parseUri() {
-    return parser.parseUri;
-  }
-
-  static get stringifyUri() {
-    return parser.stringifyUri;
-  }
-
-  static get SipMessage() {
-    return SipMessage;
-  }
-
-  static get SipRequest() {
-    return Request;
-  }
-  static get SipResponse() {
-    return Response;
-  }
-
-  static get DialogState() {
-    return DialogState;
-  }
-  static get DialogDirection() {
-    return DialogDirection;
-  }
 }
+
+(Srf as any).Dialog = Dialog;
+(Srf as any).SipError = SipError;
+(Srf as any).parseUri = parser.parseUri;
+(Srf as any).stringifyUri = parser.stringifyUri;
+(Srf as any).SipMessage = SipMessage;
+(Srf as any).SipRequest = Request;
+(Srf as any).SipResponse = Response;
+(Srf as any).DialogState = _DialogState;
+(Srf as any).DialogDirection = _DialogDirection;
 
 delegate(Srf.prototype, '_app')
   .method('endSession')

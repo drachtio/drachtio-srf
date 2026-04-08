@@ -4,6 +4,20 @@
   "description": "drachtio signaling resource framework",
   "main": "lib/srf.js",
   "types": "lib/srf.d.ts",
+  "exports": {
+    ".": {
+      "types": "./lib/srf.d.ts",
+      "default": "./lib/srf.js"
+    },
+    "./lib/*": {
+      "types": "./lib/*.d.ts",
+      "default": "./lib/*.js"
+    },
+    "./*": {
+      "types": "./lib/*.d.ts",
+      "default": "./lib/*.js"
+    }
+  },
   "scripts": {
     "prepare": "npm run build",
     "build": "tsc",

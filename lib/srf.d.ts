@@ -1,12 +1,10 @@
 import Dialog from './dialog';
 import { EventEmitter as Emitter } from 'events';
 import * as parser from './sip-parser/parser';
-import SipError from './sip_error';
 import net from 'net';
-import SipMessage from './sip-parser/message';
 import Request from './request';
 import Response from './response';
-declare class DialogState {
+declare class _DialogState {
     static Trying: string;
     static Proceeding: string;
     static Early: string;
@@ -15,12 +13,28 @@ declare class DialogState {
     static Rejected: string;
     static Cancelled: string;
 }
-declare class DialogDirection {
+declare class _DialogDirection {
     static Initiator: string;
     static Recipient: string;
 }
 import tls from 'tls';
 declare namespace Srf {
+    type SipRequest = Request;
+    const SipRequest: typeof Request;
+    type SipResponse = Response;
+    const SipResponse: typeof Response;
+    type SipMessage = import('./sip-parser/message');
+    const SipMessage: typeof import('./sip-parser/message');
+    type Dialog = import('./dialog');
+    const Dialog: typeof import('./dialog');
+    type SipError = import('./sip_error');
+    const SipError: typeof import('./sip_error');
+    const parseUri: typeof parser.parseUri;
+    const stringifyUri: typeof parser.stringifyUri;
+    type DialogState = typeof _DialogState;
+    const DialogState: typeof _DialogState;
+    type DialogDirection = typeof _DialogDirection;
+    const DialogDirection: typeof _DialogDirection;
     interface SrfEvents {
         'connect': (err: Error | null, hostport: string, serverVersion?: string, localHostports?: string) => void;
         'error': (err: Error, socket?: any) => void;
@@ -225,14 +239,5 @@ declare class Srf extends Emitter {
     unregisterForMessages(sipVerb: string): void;
     reregisterForMessages(sipVerb: string): void;
     _b2bRequestWithinDialog(dlg: Dialog, req: any, res: any, proxyRequestHeaders: string[], proxyResponseHeaders: string[], callback?: any): void;
-    static get Dialog(): typeof Dialog;
-    static get SipError(): typeof SipError;
-    static get parseUri(): typeof parser.parseUri;
-    static get stringifyUri(): typeof parser.stringifyUri;
-    static get SipMessage(): typeof SipMessage;
-    static get SipRequest(): typeof Request;
-    static get SipResponse(): typeof Response;
-    static get DialogState(): typeof DialogState;
-    static get DialogDirection(): typeof DialogDirection;
 }
 export = Srf;
