@@ -50,12 +50,12 @@ declare namespace Srf {
     }
     interface CreateUASOptions {
         localSdp?: string | (() => string | Promise<string>);
-        headers?: Record<string, string>;
+        headers?: Record<string, string | number | undefined>;
         dialogStateEmitter?: Emitter;
         body?: string | (() => string | Promise<string>);
     }
     interface CreateUACOptions {
-        headers?: Record<string, string>;
+        headers?: Record<string, string | number | undefined>;
         uri?: string;
         noAck?: boolean;
         localSdp?: string;
@@ -75,8 +75,8 @@ declare namespace Srf {
         signal?: AbortSignal;
     }
     interface CreateB2BUAOptions {
-        headers?: Record<string, string>;
-        responseHeaders?: Record<string, string> | ((uacRes: any, headers: Record<string, string>) => Record<string, string> | null);
+        headers?: Record<string, string | number | undefined>;
+        responseHeaders?: Record<string, string | number | undefined> | ((uacRes: any, headers: Record<string, string | number | undefined>) => Record<string, string | number | undefined> | null);
         localSdpA?: string | ((sdp: string, res: Response) => string | Promise<string>);
         localSdpB?: string | ((sdp: string) => string | Promise<string>);
         proxyRequestHeaders?: string[];
@@ -128,7 +128,7 @@ declare namespace Srf {
     }
     interface OutboundRequestOptions {
         method: string;
-        headers?: Record<string, string>;
+        headers?: Record<string, string | number | undefined>;
         body?: string;
         auth?: {
             username: string;
