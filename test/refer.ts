@@ -1,29 +1,31 @@
 // @ts-nocheck
 import test from 'tape';
-import { output, sippUac  } from './sipp';('test_testbed');
-import debug from 'debug';('drachtio:test');
+import sippFn from './sipp';
+const { output, sippUac } = sippFn('test_testbed');
+import debugFn from 'debug';
+const debug = debugFn('drachtio:test');
 
 process.on('unhandledRejection', (reason, p) => {
   console.log('Unhandled Rejection at: Promise', p, 'reason:', reason);
 });
 
-function connect(connectable) {
-  return new Promise((resolve, reject) => {
-    connectable.on('connect', (err) => {
-      if (err) reject(err);
+function connect(connectable: any) {
+  return new Promise<void>((resolve, reject) => {
+    connectable.on('connect', (err: any) => {
+      if (err) return reject(err);
       return resolve();
     });
   });
 }
 
-test('REFER tests', (t) => {
+test('REFER tests', async (t) => {
   t.timeoutAfter(20000);
 
-  import b2b from './scripts/refer-b2b.js';
-  import uas from './scripts/refer-uas';
-  let p1, p2;
+  const b2b = (await import('./scripts/refer-b2b')).default;
+  const uas = (await import('./scripts/refer-uas')).default;
+  let p1: any, p2: any;
 
-  Promise.all([connect(b2b), connect(uas)])
+  await Promise.all([connect(b2b), connect(uas)])
     .then(() => {
       p1 = sippUac('uac-recv-reinvite.xml');
       return;

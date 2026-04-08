@@ -1,6 +1,8 @@
 // @ts-nocheck
 import { spawn  } from 'child_process';
-//import debug from 'debug';('test:sipp');
+import { join } from 'path';
+import debugFn from 'debug';
+const debug = debugFn('test:sipp');
 let network;
 const obj = {};
 let output = '';
@@ -27,9 +29,10 @@ obj.output = () => {
 
 obj.sippUac = (file) => {
   const cmd = 'docker';
+  const scenariosPath = join(__dirname, '..', '..', 'test', 'scenarios');
   const args = [
     'run', '--rm', '--net', `${network}`,
-    '-v', `${__dirname}/scenarios:/tmp/scenarios`,
+    '-v', `${scenariosPath}:/tmp/scenarios`,
     'drachtio/sipp', 'sipp', '-sf', `/tmp/scenarios/${file}`,
     '-m', '1',
     '-sleep', '250ms',
@@ -58,9 +61,8 @@ obj.sippUac = (file) => {
       //debug(`stdout: ${data}`);
       addOutput(data.toString());
     });
-    child_process.stdout.on('data', (data) => {
-      //debug(`stdout: ${data}`);
-      addOutput(data.toString());
+    child_process.stderr.on('data', (data) => {
+      console.error(`sipp stderr: ${data.toString()}`);
     });
   });
 };

@@ -44,6 +44,7 @@ class WireProtocol extends Emitter {
     this.port = opts.port;
     this.reconnectOpts = opts.reconnect || {};
     this.reconnectVars = {};
+    this.initializeRetryVars();
     this._evalPingOpts(opts);
     if (opts.tls) {
       log(`wp connecting (tls) to ${this.host}:${this.port}`);

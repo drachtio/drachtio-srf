@@ -2,7 +2,8 @@
 import test from 'tape';
 import config from 'config';
 import Srf from '../src/srf';
-//import debug from 'debug';('drachtio:test');
+import debugFn from 'debug';
+const debug = debugFn('drachtio:test');
 
 process.on('unhandledRejection', (reason, p) => {
   console.log('Unhandled Rejection at: Promise', p, 'reason:', reason);

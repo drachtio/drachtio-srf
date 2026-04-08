@@ -1,8 +1,10 @@
 // @ts-nocheck
 import test from 'tape';
-import { output, sippUac  } from './sipp';('test_testbed');
+import sipp from './sipp';
+const { output, sippUac } = sipp('test_testbed');
 import Proxy from './scripts/proxy';
-import debug from 'debug';('drachtio:srf');
+import debugFn from 'debug';
+const debug = debugFn('drachtio:srf');
 
 process.on('unhandledRejection', (reason, p) => {
   console.log('Unhandled Rejection at: Promise', p, 'reason:', reason);

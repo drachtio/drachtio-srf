@@ -21,7 +21,8 @@
   "scripts": {
     "prepare": "npm run build",
     "build": "tsc",
-    "test": "npm run build && NODE_ENV=test node test/ ",
+    "test": "npm run build && NODE_ENV=test node test-dist/test/index.js",
+    "build-test": "bunx tsc -p test/tsconfig.json",
     "coverage": "./node_modules/.bin/nyc --reporter html --report-dir ./coverage npm run test",
     "unittests": "npm run build && bunx tsc -p test/tsconfig.json && bunx mocha ./test-dist/test/unit-tests/*.js",
     "lint": "eslint src"

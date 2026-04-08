@@ -2,7 +2,8 @@
 import Srf from '../../src/srf';
 const srf = new Srf();
 import config from 'config';
-import debug from 'debug';('drachtio:test');
+import debugFn from 'debug';
+const debug = debugFn('drachtio:test');
 import assert from 'assert';
 const parseUri = Srf.parseUri;
 

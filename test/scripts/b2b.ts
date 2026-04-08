@@ -2,7 +2,8 @@
 import Emitter from 'events';
 import Srf from '../../src/srf';
 import config from 'config';
-import debug from 'debug';('drachtio:test');
+import debugFn from 'debug';
+const debug = debugFn('drachtio:test');
 
 class App extends Emitter {
   constructor() {
