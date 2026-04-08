@@ -18,11 +18,6 @@ declare module 'delegates' {
   export = delegate;
 }
 
-declare module 'node-noop' {
-  function noop(): void;
-  export = noop;
-}
-
 declare module 'sip-status' {
   export const STATUS_CODES: Record<number, string>;
 }

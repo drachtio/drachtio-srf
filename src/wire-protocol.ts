@@ -3,7 +3,7 @@ import net from 'net';
 import tls from 'tls';
 import uuidV4 from 'uuid-random';
 import debug from 'debug';
-import noop from 'node-noop';
+const noop = () => {};
 import assert from 'assert';
 
 const log = debug('drachtio:agent');

@@ -5,7 +5,7 @@ import SipMessage from './sip-parser/message';
 import Request from './request';
 import Response from './response';
 import DigestClient from './digest-client';
-import noop from 'node-noop';
+const noop = () => {};
 import assert from 'assert';
 import net from 'net';
 import delegate from 'delegates';

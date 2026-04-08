@@ -42,7 +42,6 @@
   "dependencies": {
     "debug": "^4.4.3",
     "delegates": "^1.0.0",
-    "node-noop": "^1.0.0",
     "only": "^0.0.2",
     "sdp-transform": "^2.15.0",
     "short-uuid": "^5.2.0",

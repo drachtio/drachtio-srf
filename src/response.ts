@@ -2,7 +2,7 @@ import { EventEmitter as Emitter } from 'events';
 import delegate from 'delegates';
 import { STATUS_CODES } from 'sip-status';
 import only from 'only';
-import noop from 'node-noop';
+const noop = () => {};
 import assert from 'assert';
 import debug from 'debug';
 import SipMessage from './sip-parser/message';

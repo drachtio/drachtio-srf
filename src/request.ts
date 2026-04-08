@@ -1,7 +1,7 @@
 import { EventEmitter as Emitter } from 'events';
 import delegate from 'delegates';
 import assert from 'assert';
-import noop from 'node-noop';
+const noop = () => {};
 import debug from 'debug';
 import SipMessage from './sip-parser/message';
 import Response from './response';
