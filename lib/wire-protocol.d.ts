@@ -1,6 +1,11 @@
 import { EventEmitter as Emitter } from 'events';
 import net from 'net';
 import tls from 'tls';
+/**
+ * Internal class that handles the low-level TCP/TLS socket communication
+ * with the drachtio server, including message framing and keep-alives.
+ * @internal
+ */
 declare class WireProtocol extends Emitter {
     _logger: any;
     mapIncomingMsg: Map<any, any>;

@@ -1,8 +1,9 @@
 import { EventEmitter } from 'events';
 /**
- * Create a new server.
+ * Create a new drachtio-srf connection/app instance.
+ * Serves as the factory function behind `drachtio()`.
  *
- * @return {Function}
+ * @returns An App instance (which is enhanced by Srf)
  * @api public
  */
 interface App extends EventEmitter {

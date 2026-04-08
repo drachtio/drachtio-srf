@@ -54,6 +54,12 @@ function serverVersionAtLeast(serverVersion: string | null, minSupportedVersion:
   return false;
 }
 
+/**
+ * Internal class managing the connection and communication protocol with the drachtio server.
+ * Handles parsing messages from the server, routing them to the correct dialogs/requests,
+ * and formatting outbound messages.
+ * @internal
+ */
 class DrachtioAgent extends Emitter {
   puntUpTheMiddleware: any;
   params: Map<string, any>;

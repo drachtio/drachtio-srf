@@ -1,4 +1,10 @@
 import { EventEmitter as Emitter } from 'events';
+/**
+ * Internal class managing the connection and communication protocol with the drachtio server.
+ * Handles parsing messages from the server, routing them to the correct dialogs/requests,
+ * and formatting outbound messages.
+ * @internal
+ */
 declare class DrachtioAgent extends Emitter {
     puntUpTheMiddleware: any;
     params: Map<string, any>;

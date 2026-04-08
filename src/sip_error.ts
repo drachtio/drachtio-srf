@@ -1,5 +1,9 @@
 import assert from 'assert';
 
+/**
+ * Represents an error caused by a non-success SIP response.
+ * Contains the SIP status code, optional reason phrase, and optionally the original SIP response object.
+ */
 class SipError extends Error {
   status: number;
   reason?: string;

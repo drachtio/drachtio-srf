@@ -8,9 +8,10 @@ import Response from './response';
 import onSend from './on-send';
 
 /**
- * Create a new server.
+ * Create a new drachtio-srf connection/app instance.
+ * Serves as the factory function behind `drachtio()`.
  *
- * @return {Function}
+ * @returns An App instance (which is enhanced by Srf)
  * @api public
  */
 

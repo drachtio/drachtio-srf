@@ -12,6 +12,11 @@ const DEFAULT_PING_INTERVAL = 15000;
 const MIN_PING_INTERVAL = 5000;
 const MAX_PING_INTERVAL = 300000;
 
+/**
+ * Internal class that handles the low-level TCP/TLS socket communication
+ * with the drachtio server, including message framing and keep-alives.
+ * @internal
+ */
 class WireProtocol extends Emitter {
   _logger: any;
   mapIncomingMsg: Map<any, any>;

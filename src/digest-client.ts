@@ -7,6 +7,11 @@ function parseTransportToken(sipString: string): string | undefined {
   }
 }
 
+/**
+ * Internal class handling SIP digest authentication.
+ * Automatically processes 401/407 challenges and generates the proper Authorization header.
+ * @internal
+ */
 export default class DigestClient {
   res: any;
   req: any;

@@ -1,8 +1,8 @@
 /**
- * Execute a listener when a response is about to be sent.
+ * Registers a listener that executes right before a SIP response is sent via `res.send()`.
+ * This allows modifying the response or logging it.
  *
- * @param {Object} res
- * @return {Function} listener
- * @api public
+ * @param res The Response object to attach the listener to.
+ * @param listener A callback function called before the response is sent.
  */
 export default function onSend(res: any, listener: any): void;

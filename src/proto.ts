@@ -74,12 +74,12 @@ app.get = function(this: any, prop: string) {
 
 
 /**
- * Utilize the given middleware `handle` to the given `method`,
- * defaulting to _*_, which means execute for all methods.
+ * Applies the given middleware `handle` to the given `method`,
+ * defaulting to '*', which means execute for all methods.
  *
- * @param {String|Function} method or callback
- * @param {Function} callback
- * @return {Server} for chaining
+ * @param method Optional method string (e.g. 'INVITE') or the middleware callback.
+ * @param args The middleware callback(s).
+ * @returns The app instance for chaining.
  * @api public
  */
 

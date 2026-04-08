@@ -7,6 +7,12 @@ const customHeaderNames = [
   'Diversion'
 ];
 
+/**
+ * Gets the properly cased name of a SIP header.
+ * 
+ * @param hdr The header name to look up.
+ * @returns The standardized header name.
+ */
 export function getHeaderName(hdr: string): string {
   if (process.env.DRACHTIO_PRESERVE_HEADER_NAMES) {
     const preservedHeaders = process.env.DRACHTIO_PRESERVE_HEADER_NAMES.split(',').map((h) => h.trim());
@@ -206,6 +212,12 @@ function parse(data: any, lazy?: boolean) {
   return m;
 }
 
+/**
+ * Parses a SIP URI string into an object.
+ * 
+ * @param s The URI string to parse.
+ * @returns An object containing the parsed URI components, or undefined if parsing fails.
+ */
 export function parseUri(s: any): any {
   if (typeof s === 'object')
     return s;
@@ -281,6 +293,12 @@ function stringifyParams(params: any) {
   return s;
 }
 
+/**
+ * Stringifies a parsed URI object back into a string.
+ * 
+ * @param uri The parsed URI object.
+ * @returns The string representation of the URI.
+ */
 export function stringifyUri(uri: any): string {
   if (typeof uri === 'string')
     return uri;
@@ -320,6 +338,12 @@ function stringifyAOR(aor: any) {
   return (aor.name || '') + ' <' + stringifyUri(aor.uri) + '>' + stringifyParams(aor.params);
 }
 
+/**
+ * Stringifies a parsed Authorization or WWW-Authenticate header.
+ * 
+ * @param a The parsed authentication object.
+ * @returns The string representation of the authentication header.
+ */
 export function stringifyAuthHeader(a: any) {
   const s = [];
 
@@ -378,6 +402,12 @@ const stringifiers: Record<string, any> = {
   'refer-to': function(h: any) { return 'Refer-To: ' + stringifyAOR(h) + '\r\n'; }
 };
 
+/**
+ * Stringifies an entire SIP message object into its raw string format.
+ * 
+ * @param m The parsed SIP message.
+ * @returns The raw string of the SIP message.
+ */
 export function stringifySipMessage(m: any) {
   let s;
   if (m.status) {
@@ -404,6 +434,13 @@ export function stringifySipMessage(m: any) {
   return s;
 }
 
+/**
+ * Parses a raw SIP message string into an object.
+ * 
+ * @param s The raw SIP message (Buffer or string).
+ * @param lazy Whether to do lazy parsing (only splitting headers, not fully parsing them).
+ * @returns An object containing the parsed message components.
+ */
 export function parseSipMessage(s: any, lazy?: boolean) {
   const r = s.toString('utf8').split('\r\n\r\n');
   if (r) {
@@ -451,10 +488,22 @@ export function parseSipMessage(s: any, lazy?: boolean) {
   }
 }
 
+/**
+ * Gets a specific parser function for a given SIP header.
+ * 
+ * @param hdr The header name.
+ * @returns The parsing function for that header.
+ */
 export function getParser(hdr: string): any {
   return parsers[hdr] || parseGenericHeader;
 }
 
+/**
+ * Gets a specific stringifier function for a given SIP header.
+ * 
+ * @param hdr The header name.
+ * @returns The stringifier function for that header.
+ */
 export function getStringifier(hdr: string): any {
   return stringifiers[hdr];
 }
