@@ -1,4 +1,4 @@
-import { STATUS_CODES } from 'sip-status';
+import STATUS_CODES from 'sip-status';
 
 /**
  * Execute a listener when a response is about to be sent.

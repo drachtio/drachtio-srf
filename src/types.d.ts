@@ -19,7 +19,8 @@ declare module 'delegates' {
 }
 
 declare module 'sip-status' {
-  export const STATUS_CODES: Record<number, string>;
+  const sipStatus: Record<number, string>;
+  export = sipStatus;
 }
 
 declare module 'uuid-random' {

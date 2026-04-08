@@ -168,7 +168,7 @@ app.handle = function(this: any, req: any, res: any, out: any) {
         if (err.status) { res.status = err.status; }
 
         // production gets a basic error message
-        const msg = sipStatus.STATUS_CODES[res.status];
+        const msg = sipStatus[res.status as keyof typeof sipStatus];
 
         // log to stderr in a non-test env
         console.error(err.stack || err.toString());

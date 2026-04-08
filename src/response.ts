@@ -1,6 +1,6 @@
 import { EventEmitter as Emitter } from 'events';
 import delegate from 'delegates';
-import { STATUS_CODES } from 'sip-status';
+import STATUS_CODES from 'sip-status';
 import only from 'only';
 const noop = () => {};
 import assert from 'assert';
