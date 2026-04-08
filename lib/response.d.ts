@@ -1,5 +1,40 @@
 import { EventEmitter as Emitter } from 'events';
 import SipMessage from './sip-parser/message';
+declare namespace Response {
+    interface ResponseEvents {
+        'end': (info: {
+            status: number;
+            reason?: string;
+        }) => void;
+        'finish': () => void;
+    }
+}
+declare interface Response {
+    on<U extends keyof Response.ResponseEvents>(event: U, listener: Response.ResponseEvents[U]): this;
+    on(event: string | symbol, listener: (...args: any[]) => void): this;
+    once<U extends keyof Response.ResponseEvents>(event: U, listener: Response.ResponseEvents[U]): this;
+    once(event: string | symbol, listener: (...args: any[]) => void): this;
+    off<U extends keyof Response.ResponseEvents>(event: U, listener: Response.ResponseEvents[U]): this;
+    off(event: string | symbol, listener: (...args: any[]) => void): this;
+    emit<U extends keyof Response.ResponseEvents>(event: U, ...args: Parameters<Response.ResponseEvents[U]>): boolean;
+    emit(event: string | symbol, ...args: any[]): boolean;
+    get(hdr: string): string | undefined;
+    has(hdr: string): boolean;
+    getHeaderName(hdr: string): string | undefined;
+    getParsedHeader(name: 'contact' | 'Contact'): Array<SipMessage.AOR>;
+    getParsedHeader(name: 'via' | 'Via'): Array<SipMessage.Via>;
+    getParsedHeader(name: 'To' | 'to' | 'From' | 'from' | 'refer-to' | 'referred-by' | 'p-asserted-identity' | 'remote-party-id'): SipMessage.AOR;
+    getParsedHeader(name: string): any;
+    getParsedHeader(hdr: string): any;
+    set(hdr: string | Record<string, string>, value?: string): this;
+    headers: Record<string, string>;
+    body: string;
+    payload: any[];
+    status: number;
+    reason: string;
+    readonly raw: string;
+    readonly type: string;
+}
 declare class Response extends Emitter {
     _agent?: any;
     msg: SipMessage;

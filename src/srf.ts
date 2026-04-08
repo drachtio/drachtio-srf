@@ -36,6 +36,34 @@ class DialogDirection {
 import tls from 'tls';
 
 declare namespace Srf {
+  export interface SrfEvents {
+    'connect': (err: Error | null, hostport: string, serverVersion?: string, localHostports?: string) => void;
+    'error': (err: Error, socket?: any) => void;
+    'disconnect': () => void;
+    'message': (req: Request, res: Response) => void;
+    'request': (req: Request, res: Response) => void;
+    'register': (req: Request, res: Response) => void;
+    'invite': (req: Request, res: Response) => void;
+    'bye': (req: Request, res: Response) => void;
+    'cancel': (req: Request, res: Response) => void;
+    'ack': (req: Request, res: Response) => void;
+    'info': (req: Request, res: Response) => void;
+    'notify': (req: Request, res: Response) => void;
+    'options': (req: Request, res: Response) => void;
+    'prack': (req: Request, res: Response) => void;
+    'publish': (req: Request, res: Response) => void;
+    'refer': (req: Request, res: Response) => void;
+    'subscribe': (req: Request, res: Response) => void;
+    'update': (req: Request, res: Response) => void;
+    'cdr:attempt': (source: string, time: string, msg: SipMessage) => void;
+    'cdr:start': (source: string, time: string, role: string, msg: SipMessage) => void;
+    'cdr:stop': (source: string, time: string, reason: string, msg: SipMessage) => void;
+    'listening': () => void;
+    'reconnecting': () => void;
+    'close': () => void;
+    [key: string]: (...args: any[]) => void;
+  }
+
   export interface CreateUASOptions {
     localSdp?: string | (() => string | Promise<string>);
     headers?: Record<string, string>;
@@ -141,42 +169,14 @@ function possiblyRemoveHeaders(hdrList: any[], obj: any) {
 
 }
 
-interface SrfEvents {
-  'connect': (err: Error | null, hostport: string, serverVersion?: string, localHostports?: string) => void;
-  'error': (err: Error, socket?: any) => void;
-  'disconnect': () => void;
-  'message': (req: Request, res: Response) => void;
-  'request': (req: Request, res: Response) => void;
-  'register': (req: Request, res: Response) => void;
-  'invite': (req: Request, res: Response) => void;
-  'bye': (req: Request, res: Response) => void;
-  'cancel': (req: Request, res: Response) => void;
-  'ack': (req: Request, res: Response) => void;
-  'info': (req: Request, res: Response) => void;
-  'notify': (req: Request, res: Response) => void;
-  'options': (req: Request, res: Response) => void;
-  'prack': (req: Request, res: Response) => void;
-  'publish': (req: Request, res: Response) => void;
-  'refer': (req: Request, res: Response) => void;
-  'subscribe': (req: Request, res: Response) => void;
-  'update': (req: Request, res: Response) => void;
-  'cdr:attempt': (source: string, time: string, msg: SipMessage) => void;
-  'cdr:start': (source: string, time: string, role: string, msg: SipMessage) => void;
-  'cdr:stop': (source: string, time: string, reason: string, msg: SipMessage) => void;
-  'listening': () => void;
-  'reconnecting': () => void;
-  'close': () => void;
-  [key: string]: (...args: any[]) => void;
-}
-
 declare interface Srf {
-  on<U extends keyof SrfEvents>(event: U, listener: SrfEvents[U]): this;
+  on<U extends keyof Srf.SrfEvents>(event: U, listener: Srf.SrfEvents[U]): this;
   on(event: string | symbol, listener: (...args: any[]) => void): this;
-  once<U extends keyof SrfEvents>(event: U, listener: SrfEvents[U]): this;
+  once<U extends keyof Srf.SrfEvents>(event: U, listener: Srf.SrfEvents[U]): this;
   once(event: string | symbol, listener: (...args: any[]) => void): this;
-  off<U extends keyof SrfEvents>(event: U, listener: SrfEvents[U]): this;
+  off<U extends keyof Srf.SrfEvents>(event: U, listener: Srf.SrfEvents[U]): this;
   off(event: string | symbol, listener: (...args: any[]) => void): this;
-  emit<U extends keyof SrfEvents>(event: U, ...args: Parameters<SrfEvents[U]>): boolean;
+  emit<U extends keyof Srf.SrfEvents>(event: U, ...args: Parameters<Srf.SrfEvents[U]>): boolean;
   emit(event: string | symbol, ...args: any[]): boolean;
 
   // Delegated properties and methods

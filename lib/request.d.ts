@@ -2,6 +2,44 @@ import { EventEmitter as Emitter } from 'events';
 import SipMessage from './sip-parser/message';
 import Response from './response';
 import DrachtioAgent from './drachtio-agent';
+declare namespace Request {
+    interface RequestEvents {
+        'response': (res: Response, ack: (opts?: any) => void) => void;
+        'cancel': (cancelReq: SipMessage) => void;
+        'update': (req: Request, res: Response) => void;
+        'authenticate': (req: Request) => void;
+    }
+}
+declare interface Request {
+    on<U extends keyof Request.RequestEvents>(event: U, listener: Request.RequestEvents[U]): this;
+    on(event: string | symbol, listener: (...args: any[]) => void): this;
+    once<U extends keyof Request.RequestEvents>(event: U, listener: Request.RequestEvents[U]): this;
+    once(event: string | symbol, listener: (...args: any[]) => void): this;
+    off<U extends keyof Request.RequestEvents>(event: U, listener: Request.RequestEvents[U]): this;
+    off(event: string | symbol, listener: (...args: any[]) => void): this;
+    emit<U extends keyof Request.RequestEvents>(event: U, ...args: Parameters<Request.RequestEvents[U]>): boolean;
+    emit(event: string | symbol, ...args: any[]): boolean;
+    get(hdr: string): string | undefined;
+    has(hdr: string): boolean;
+    getHeaderName(hdr: string): string | undefined;
+    getParsedHeader(name: 'contact' | 'Contact'): Array<SipMessage.AOR>;
+    getParsedHeader(name: 'via' | 'Via'): Array<SipMessage.Via>;
+    getParsedHeader(name: 'To' | 'to' | 'From' | 'from' | 'refer-to' | 'referred-by' | 'p-asserted-identity' | 'remote-party-id'): SipMessage.AOR;
+    getParsedHeader(name: string): any;
+    getParsedHeader(hdr: string): any;
+    set(hdr: string | Record<string, string>, value?: string): this;
+    method: string;
+    uri: string;
+    headers: Record<string, string>;
+    body: string;
+    payload: any[];
+    readonly type: string;
+    readonly raw: string;
+    readonly callingNumber: string;
+    readonly callingName: string;
+    readonly calledNumber: string;
+    readonly canFormDialog: boolean;
+}
 declare class Request extends Emitter {
     msg: SipMessage;
     _res?: Response;

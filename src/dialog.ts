@@ -18,25 +18,26 @@ import Request from './request';
 import Response from './response';
 import SipMessage from './sip-parser/message';
 
-interface DialogEvents {
-  'destroy': (msg: SipMessage | Request, reason?: string) => void;
-  'modify': (req: Request, res: Response) => void;
-  'refresh': (req: Request) => void;
-  'info': (req: Request, res: Response) => void;
-  'notify': (req: Request, res: Response) => void;
-  'options': (req: Request, res: Response) => void;
-  'update': (req: Request, res: Response) => void;
-  'refer': (req: Request, res: Response) => void;
-  'message': (req: Request, res: Response) => void;
-  'ack': (req: Request) => void;
-  'subscribe': (req: Request, res: Response) => void;
-  'unsubscribe': (req: Request, event: string) => void;
-  'hold': (req: Request) => void;
-  'unhold': (req: Request) => void;
-}
-
 declare namespace Dialog {
+  export interface DialogEvents {
+    'destroy': (msg: SipMessage | Request, reason?: string) => void;
+    'modify': (req: Request, res: Response) => void;
+    'refresh': (req: Request) => void;
+    'info': (req: Request, res: Response) => void;
+    'notify': (req: Request, res: Response) => void;
+    'options': (req: Request, res: Response) => void;
+    'update': (req: Request, res: Response) => void;
+    'refer': (req: Request, res: Response) => void;
+    'message': (req: Request, res: Response) => void;
+    'ack': (req: Request) => void;
+    'subscribe': (req: Request, res: Response) => void;
+    'unsubscribe': (req: Request, event: string) => void;
+    'hold': (req: Request) => void;
+    'unhold': (req: Request) => void;
+  }
+
   export interface DialogRequestOptions {
+
     method?: string;
     headers?: Record<string, string>;
     body?: string;
@@ -48,13 +49,13 @@ declare namespace Dialog {
 }
 
 declare interface Dialog {
-  on<U extends keyof DialogEvents>(event: U, listener: DialogEvents[U]): this;
+  on<U extends keyof Dialog.DialogEvents>(event: U, listener: Dialog.DialogEvents[U]): this;
   on(event: string | symbol, listener: (...args: any[]) => void): this;
-  once<U extends keyof DialogEvents>(event: U, listener: DialogEvents[U]): this;
+  once<U extends keyof Dialog.DialogEvents>(event: U, listener: Dialog.DialogEvents[U]): this;
   once(event: string | symbol, listener: (...args: any[]) => void): this;
-  off<U extends keyof DialogEvents>(event: U, listener: DialogEvents[U]): this;
+  off<U extends keyof Dialog.DialogEvents>(event: U, listener: Dialog.DialogEvents[U]): this;
   off(event: string | symbol, listener: (...args: any[]) => void): this;
-  emit<U extends keyof DialogEvents>(event: U, ...args: Parameters<DialogEvents[U]>): boolean;
+  emit<U extends keyof Dialog.DialogEvents>(event: U, ...args: Parameters<Dialog.DialogEvents[U]>): boolean;
   emit(event: string | symbol, ...args: any[]): boolean;
 
   invite(opts?: Dialog.DialogRequestOptions): Promise<Response>;
@@ -143,17 +144,17 @@ class Dialog extends Emitter {
     };
 
     this.sip = {
-      callId: this.res.get('Call-ID'),
-      remoteTag: 'uas' === type ?
-        this.req.getParsedHeader('from').params.tag : this.res.getParsedHeader('to').params.tag,
-      localTag: 'uas' === type ?
-        opts.sent.getParsedHeader('to').params.tag : this.req.getParsedHeader('from').params.tag
+      callId: this.res.get('Call-ID') || '',
+      remoteTag: ('uas' === type ?
+        this.req.getParsedHeader('from').params.tag : this.res.getParsedHeader('to').params.tag) as string,
+      localTag: ('uas' === type ?
+        opts.sent.getParsedHeader('to').params.tag : this.req.getParsedHeader('from').params.tag) as string
     };
 
     this.local = {
       uri: 'uas' === type ? opts.sent.getParsedHeader('Contact')[0].uri : this.req.uri,
       sdp: 'uas' === type ? opts.sent.body : this.req.body,
-      contact: 'uas' === type ? opts.sent.get('Contact') : this.req.get('Contact')
+      contact: 'uas' === type ? opts.sent.get('Contact') : this.req.get('Contact') || ''
     };
 
     this.remote = {
@@ -176,7 +177,7 @@ class Dialog extends Emitter {
     return this.req.method;
   }
 
-  get subscribeEvent(): string | null {
+  get subscribeEvent(): string | null | undefined {
     return this.dialogType === 'SUBSCRIBE' ? this.req.get('Event') : null;
   }
 
