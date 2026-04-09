@@ -60,7 +60,7 @@ declare interface Request {
     /** The body of the request (e.g., SDP). */
     body: string;
     /** For multipart messages, an array of body payloads. */
-    payload: any[];
+    payload: SipMessage.Payload[];
     /** The message type ('request' or 'response'). */
     readonly type: string;
     /** The raw, unparsed SIP message string. */

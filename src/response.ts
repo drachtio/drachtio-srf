@@ -65,7 +65,7 @@ declare interface Response {
   /** The body of the response (e.g., SDP). */
   body: string;
   /** For multipart messages, an array of body payloads. */
-  payload: any[];
+  payload: SipMessage.Payload[];
   /** The SIP status code. */
   status: number;
   /** The SIP reason phrase. */

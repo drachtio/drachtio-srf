@@ -48,6 +48,12 @@ declare namespace SipMessage {
         /** The context if it's a tel URI. */
         context?: string | null;
     }
+    interface Payload {
+        /** The content type of this multipart payload element. */
+        type: string | null;
+        /** The raw content of this multipart payload element. */
+        content: string;
+    }
 }
 /**
  * Represents the fundamental SIP message structure (either request or response).
@@ -62,10 +68,7 @@ declare class SipMessage {
     reason?: string;
     uri?: string;
     body?: string;
-    payload?: {
-        type: string | null;
-        content: string;
-    }[];
+    payload?: SipMessage.Payload[];
     constructor(msg?: string | Partial<SipMessage>);
     get type(): string;
     get calledNumber(): string;
