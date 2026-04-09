@@ -1,0 +1,34 @@
+// @ts-nocheck
+import test from 'tape';
+import sipp from './sipp';
+const { output, sippUac } = sipp('test_testbed');
+import Uas from './scripts/uas';
+import debugFn from 'debug';
+const debug = debugFn('drachtio:test');
+
+process.on('unhandledRejection', (reason, p) => {
+  console.log('Unhandled Rejection at: Promise', p, 'reason:', reason);
+});
+
+test('reinvite tests', (t) => {
+  t.timeoutAfter(20000);
+
+  let uas = new Uas();
+  let p;
+
+  Promise.resolve()
+    .then(() => {
+      p = uas.handleReinviteScenario();
+      return;
+    })
+    .then(() => sippUac('uac-send-reinvite-no-sdp.xml'))
+    .then(() => uas.disconnect())
+    .then(() => t.pass('res#send of 200 OK supports fnAck'))
+    .then(() => t.end())
+    .catch((err) => {
+      if (uas) uas.disconnect();
+      console.log(`error received: ${err}`);
+      console.log(output());
+      t.error(err);
+    });
+  });

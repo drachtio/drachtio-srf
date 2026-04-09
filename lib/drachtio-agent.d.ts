@@ -1,0 +1,46 @@
+import { EventEmitter as Emitter } from 'events';
+/**
+ * Internal class managing the connection and communication protocol with the drachtio server.
+ * Handles parsing messages from the server, routing them to the correct dialogs/requests,
+ * and formatting outbound messages.
+ * @internal
+ */
+declare class DrachtioAgent extends Emitter {
+    puntUpTheMiddleware: any;
+    params: Map<string, any>;
+    mapServer: Map<any, any>;
+    verbs: Map<string, any>;
+    cdrHandlers: Map<string, any>;
+    pendingSipAuthTxnIdUpdate: Map<string, any>;
+    _listen: boolean;
+    secret?: string;
+    tags?: string[];
+    wp?: any;
+    constructor(callback: any);
+    get isListening(): boolean;
+    get idle(): boolean;
+    connect(opts: any, callback?: any): void;
+    listen(opts: any, callback?: any): any;
+    on(event: string | symbol, fn?: any): this;
+    sendMessage(socket: any, msg: any, opts?: any): string;
+    _normalizeParams(socket: any, uri: any, options: any, callback: any): any;
+    _makeRequest(params: any): void;
+    request(socket: any, request_uri?: any, options?: any, callback?: any): any;
+    uac(socket: any, request_uri?: any, options?: any, callback?: any): any;
+    sendResponse(res: any, opts?: any, callback?: any, fnAck?: any): void;
+    sendAck(method: string, dialogId: string, req: any, res: any, opts: any, callback: any): void;
+    proxy(req: any, opts: any, callback: any): void;
+    set(prop: string, val: any): void;
+    get(prop: string): any;
+    route(verb: string): void;
+    routeVerbs(socket: any): void;
+    removeRoute(verb: string): void;
+    disconnect(socket?: any): void;
+    close(): void;
+    _getDefaultSocket(): any;
+    _initServer(socket: any): any;
+    _onConnect(socket: any): void;
+    _onClose(socket: any): void;
+    _onMsg(socket: any, msg: string): void;
+}
+export = DrachtioAgent;
