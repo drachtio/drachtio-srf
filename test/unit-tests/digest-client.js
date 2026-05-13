@@ -134,3 +134,66 @@ describe('DigestClient proxy pinning after challenge', function() {
   });
 
 });
+
+describe('DigestClient malformed challenge handling', function() {
+
+  function resWithChallenge(value) {
+    const options = {
+      method: 'INVITE',
+      uri: 'sip:u@sbc.example.com',
+      auth: {username: 'u', password: 'p'},
+      headers: {}
+    };
+    const req = {
+      method: 'INVITE',
+      _originalParams: {options},
+      get: () => undefined,
+      getParsedHeader: () => ({seq: 1, method: 'INVITE'})
+    };
+    return {
+      statusCode: 401,
+      source_address: '1.1.1.1',
+      source_port: 5060,
+      socket: {},
+      req,
+      agent: {request: () => {}},
+      has: (h) => h.toLowerCase() === 'www-authenticate',
+      get: (h) => h.toLowerCase() === 'www-authenticate' ? value : undefined
+    };
+  }
+
+  it('returns Error (does not throw) when www-authenticate value is undefined', function(done) {
+    new DigestClient(resWithChallenge(undefined)).authenticate((err) => {
+      err.should.be.an.Error();
+      err.message.should.match(/empty or non-string/);
+      done();
+    });
+  });
+
+  it('returns Error when www-authenticate value is empty string', function(done) {
+    new DigestClient(resWithChallenge('')).authenticate((err) => {
+      err.should.be.an.Error();
+      err.message.should.match(/empty or non-string/);
+      done();
+    });
+  });
+
+  it('_parseChallenge returns {} for undefined input', function() {
+    const out = new DigestClient(resWithChallenge('Digest realm="x",nonce="y"'))
+      ._parseChallenge(undefined);
+    out.should.eql({});
+  });
+
+  it('_parseChallenge returns {} for non-Digest input', function() {
+    const out = new DigestClient(resWithChallenge('Digest realm="x",nonce="y"'))
+      ._parseChallenge('Basic realm="x"');
+    out.should.eql({});
+  });
+
+  it('_parseChallenge captures digit-containing directive names (md5 algorithm)', function() {
+    const out = new DigestClient(resWithChallenge('Digest realm="x",nonce="y"'))
+      ._parseChallenge('Digest realm="x",nonce="y",algorithm=MD5');
+    out.algorithm.should.eql('MD5');
+  });
+
+});
