@@ -29,7 +29,7 @@
     "node-noop": "^1.0.0",
     "only": "^0.0.2",
     "sdp-transform": "^2.15.0",
-    "short-uuid": "^5.2.0",
+    "short-uuid": "^6.0.3",
     "sip-methods": "^0.3.0",
     "sip-status": "^0.1.0",
     "utils-merge": "^1.0.1",
