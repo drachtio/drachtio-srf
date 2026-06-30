@@ -167,11 +167,27 @@ describe('Parser', function () {
     msg.get('From').should.eql('"Dave" <sip:daveh@localhost>;tag=1234');
     msg.callingName.should.eql('Dave');
   });
-  it('should parse calling name', function () {
+  it('should parse calling name from multi-valued P-Asserted-Identity with tel and sip URIs', function () {
     var msg = new SipMessage();
-    msg.set('From', '"Dave" <sip:daveh@localhost>;tag=1234');
-    msg.get('From').should.eql('"Dave" <sip:daveh@localhost>;tag=1234');
-    msg.callingName.should.eql('Dave');
+    msg.set('P-Asserted-Identity', '"Cha Van" <tel:+17818955550>');
+    msg.set('P-Asserted-Identity', '"Cha Van" <sip:+17818955550@ims.lte.wal.verizon.com>');
+    msg.callingName.should.eql('Cha Van');
+  });
+  it('should parse calling name from single sip P-Asserted-Identity', function () {
+    var msg = new SipMessage();
+    msg.set('P-Asserted-Identity', '"Jane Doe" <sip:+15551234567@example.com>');
+    msg.callingName.should.eql('Jane Doe');
+  });
+  it('should return empty calling name when P-Asserted-Identity has only tel URI', function () {
+    var msg = new SipMessage();
+    msg.set('P-Asserted-Identity', '"Jane Doe" <tel:+15551234567>');
+    msg.callingName.should.eql('');
+  });
+  it('should parse calling name when sip URI comes first in multi-valued PAI', function () {
+    var msg = new SipMessage();
+    msg.set('P-Asserted-Identity', '"Bob Smith" <sip:+15559876543@carrier.net>');
+    msg.set('P-Asserted-Identity', '"Bob Smith" <tel:+15559876543>');
+    msg.callingName.should.eql('Bob Smith');
   });
 });
 
