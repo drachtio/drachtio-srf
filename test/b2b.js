@@ -1,5 +1,6 @@
 const test = require('tape');
-const { output, sippUac } = require('./sipp')('test_testbed');
+const { output, sippUac, sippUas } = require('./sipp')('test_testbed');
+const { matchesUacDestroyCrash } = require('./scripts/crash-signatures');
 const B2b = require('./scripts/b2b');
 const debug = require('debug')('drachtio:test');
 
@@ -379,6 +380,59 @@ test('B2B', (t) => {
     })
     .then(() => {
       return t.pass('Srf#createB2BUA(req, res, {uri}) is valid signature');
+    })
+    .then(() => {
+      b2b.disconnect();
+      return new Promise((resolve, reject) => {
+        setTimeout(() => {
+          b2b = new B2b();
+          resolve();
+        }, 100);
+      });
+    })
+
+    // 3PCC no-offer INVITE where UAS leg fails after B leg succeeds.
+    // Regression test for `uac.destroy is not a function` crash: the
+    // cleanup path must reject cleanly instead of throwing a TypeError
+    // that escapes as an unhandledRejection and crashes the worker.
+    //
+    // It ALSO pins the B-leg teardown: the sipp-uas scenario (uas.xml)
+    // sends 200 OK then requires ACK + BYE before it completes with exit 0.
+    // If createB2BUA failed to tear down the answered B leg (the residual
+    // leak), sipp-uas would never see the ACK/BYE and time out -> the
+    // sippUasB probe below rejects and this test fails.
+    .then(() => {
+      debug('starting sipp');
+      let sawCrashSignature = false;
+      // the bug surfaces as a process-level unhandledRejection (the promise
+      // wrapper around __x does not catch async throws); a correct fix
+      // surfaces it, if at all, as an app-side error event.
+      const onError = (err) => { if (matchesUacDestroyCrash(err)) sawCrashSignature = true; };
+      const onRejection = (reason) => { if (matchesUacDestroyCrash(reason)) sawCrashSignature = true; };
+      b2b.on('error', onError);
+      process.on('unhandledRejection', onRejection);
+      b2b.expect3pccUasFailure('sip:sipp-uas-b-teardown');
+      // start the B-leg UAS probe: it answers 200 OK and REQUIRES the
+      // subsequent ACK + BYE (from createB2BUA's 3pcc teardown) to succeed.
+      const sippUasB = sippUas('uas.xml', 'sipp-uas-b-teardown');
+      // give the UAS container a moment to start listening before the A-leg
+      // INVITE triggers the B-leg INVITE towards it.
+      return new Promise((resolve) => setTimeout(resolve, 1500))
+        .then(() => sippUac('uac-3pcc-nosdp.xml'))
+        .catch(() => {})  // A-leg gets a 480; its own exit code is not the assertion
+        .then(() => new Promise((resolve) => setTimeout(resolve, 250)))  // let any late rejection surface
+        .then(() => {
+          b2b.removeListener('error', onError);
+          process.removeListener('unhandledRejection', onRejection);
+          if (sawCrashSignature) {
+            throw new Error('createB2BUA leaked `uac.destroy is not a function` on 3pcc UAS failure');
+          }
+          // the B-leg UAS must have received ACK + BYE (proving teardown).
+          return sippUasB;
+        });
+    })
+    .then(() => {
+      return t.pass('b2b 3pcc UAS failure does not crash and tears down the B leg');
     })
     .then(() => {
       b2b.disconnect();
