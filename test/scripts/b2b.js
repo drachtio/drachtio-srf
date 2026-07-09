@@ -2,6 +2,7 @@ const Emitter = require('events');
 const Srf = require('../..');
 const config = require('config');
 const debug = require('debug')('drachtio:test');
+const { matchesUacDestroyCrash } = require('./crash-signatures');
 
 class App extends Emitter {
   constructor() {
@@ -103,6 +104,58 @@ class App extends Emitter {
         .catch((err) => {
           throw err;
         });
+    });
+  }
+
+  // Shared invite -> createB2BUA scaffold used by the expect* helpers.
+  // onConnected(dialogs, req, res) runs on success; onFailure(err, req, res)
+  // runs on rejection. Removes the duplicated invite/createB2BUA/then/catch
+  // boilerplate from each caller.
+  _inviteB2BUA(uri, opts, {onConnected, onFailure} = {}) {
+    this.srf.invite((req, res) => {
+      this.srf.createB2BUA(req, res, uri, opts)
+        .then((dialogs) => {
+          if (onConnected) return onConnected(dialogs, req, res);
+          this.emit('connected', dialogs);
+        })
+        .catch((err) => {
+          if (onFailure) return onFailure(err, req, res);
+          throw err;
+        });
+    });
+  }
+
+  // Reproduces the `uac.destroy is not a function` crash.
+  //
+  // The A leg INVITE arrives with no SDP, so createB2BUA takes the 3PCC
+  // (no-offer) path.  The B leg UAC succeeds and returns a {ack, res}
+  // object (NOT a finalized dialog).  We then force the UAS leg to fail
+  // by supplying a localSdpA function that throws.  This drives execution
+  // into the createB2BUA catch block while `uac` is still the {ack, res}
+  // object, exercising the guarded uac.destroy() cleanup.
+  //
+  // Before the fix this threw a synchronous TypeError inside the catch,
+  // which surfaced as an unhandledRejection and crashed the worker.
+  // After the fix the promise rejects cleanly and this onFailure runs.
+  expect3pccUasFailure(uri) {
+    this._inviteB2BUA(uri, {
+      localSdpA: () => {
+        throw new Error('simulated SDP/route processing failure on UAS leg');
+      }
+    }, {
+      onConnected: () => {
+        this.emit('error', new Error('unexpected dialog success - expected UAS leg failure'));
+      },
+      onFailure: (err, req, res) => {
+        debug(`expect3pccUasFailure: got expected error ${err}`);
+        if (matchesUacDestroyCrash(err)) {
+          // the original bug leaked back to the app as a rejection
+          this.emit('error', err);
+          return;
+        }
+        this.emit('failed', err);
+        if (!res.finalResponseSent) res.send(480);
+      }
     });
   }
 

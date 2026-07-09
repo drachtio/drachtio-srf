@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE scenario SYSTEM "sipp.dtd">
+
+<!--                                                                    -->
+<!-- 3PCC / no-offer UAC scenario.                                      -->
+<!--                                                                    -->
+<!-- Sends an INVITE with NO SDP body (Content-Length: 0).  This forces -->
+<!-- drachtio-srf createB2BUA down the 3PCC (no-offer) path, where the  -->
+<!-- B-leg UAC dialog is not finalized until the A-leg ACK carries the  -->
+<!-- answer SDP.                                                        -->
+<!--                                                                    -->
+<!-- Used to reproduce the `uac.destroy is not a function` crash: when  -->
+<!-- the UAS leg fails AFTER the B leg has produced its {ack, res}      -->
+<!-- object, the createB2BUA cleanup path calls uac.destroy() on an     -->
+<!-- object that has no destroy() method.                               -->
+<!--                                                                    -->
+
+<scenario name="3PCC no-offer UAC">
+  <send retrans="500">
+    <![CDATA[
+
+      INVITE sip:[service]@[remote_ip]:[remote_port] SIP/2.0
+      Via: SIP/2.0/[transport] [local_ip]:[local_port];branch=[branch]
+      From: sipp <sip:sipp@[local_ip]:[local_port]>;tag=[pid]SIPpTag00[call_number]
+      To: [service] <sip:[service]@[remote_ip]:[remote_port]>
+      Call-ID: [call_id]
+      CSeq: 1 INVITE
+      Contact: sip:sipp@[local_ip]:[local_port]
+      Max-Forwards: 70
+      Subject: uac-3pcc-nosdp
+      Content-Length: 0
+
+    ]]>
+  </send>
+
+  <recv response="100" optional="true">
+  </recv>
+
+  <recv response="180" optional="true">
+  </recv>
+
+  <recv response="183" optional="true">
+  </recv>
+
+  <!-- Because the UAS leg fails, the B2BUA app rejects and sends a 480  -->
+  <!-- failure final response to the A leg.  The important assertion     -->
+  <!-- (worker did not crash on uac.destroy) is made on the drachtio-srf -->
+  <!-- application side; here we simply complete the transaction.        -->
+  <recv response="480" rtd="true">
+  </recv>
+
+  <!-- ACK the non-2xx final response to complete the INVITE            -->
+  <!-- transaction (RFC 3261 - ACK for a failure response uses the same -->
+  <!-- branch/CSeq as the INVITE).                                      -->
+  <send>
+    <![CDATA[
+
+      ACK sip:[service]@[remote_ip]:[remote_port] SIP/2.0
+      [last_Via]
+      From: sipp <sip:sipp@[local_ip]:[local_port]>;tag=[pid]SIPpTag00[call_number]
+      To: [service] <sip:[service]@[remote_ip]:[remote_port]>[peer_tag_param]
+      Call-ID: [call_id]
+      CSeq: 1 ACK
+      Contact: sip:sipp@[local_ip]:[local_port]
+      Max-Forwards: 70
+      Subject: uac-3pcc-nosdp
+      Content-Length: 0
+
+    ]]>
+  </send>
+
+  <!-- definition of the response time repartition table (unit is ms)   -->
+  <ResponseTimeRepartition value="10, 20, 30, 40, 50, 100, 150, 200"/>
+
+  <!-- definition of the call length repartition table (unit is ms)     -->
+  <CallLengthRepartition value="10, 50, 100, 500, 1000, 5000, 10000"/>
+
+</scenario>
