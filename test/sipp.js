@@ -45,7 +45,6 @@ obj.sippUac = (file) => {
 // scenario completes (exit 0), e.g. uas.xml requires INVITE -> 200 -> ACK -> BYE,
 // so a resolved promise proves the B leg was answered AND torn down.
 obj.sippUas = (file, containerName) => {
-  const cmd = 'docker';
   const args = [
     'run', '--rm', '--net', `${network}`, '--name', `${containerName}`,
     '-v', `${__dirname}/scenarios:/tmp/scenarios`,
