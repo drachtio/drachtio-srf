@@ -51,18 +51,23 @@ test('B2B', (t) => {
     // INVITE with no SDP
     .then(() => {
       debug('starting sipp');
-      return b2b.expectSuccess('sip:sipp-uas', {
+      let uasRemoteSdp;
+      b2b.once('connected', ({uas}) => { uasRemoteSdp = uas.remote.sdp; });
+      b2b.expectSuccess('sip:sipp-uas', {
         responseHeaders: {
           'Contact': 'sip:foo@localhost'
         }
       });
+      return () => uasRemoteSdp;
     })
-    .then(() => {
+    .then((getUasRemoteSdp) => {
       debug('start sipp...');
-      return sippUac('uac-nosdp.xml');
+      return sippUac('uac-nosdp.xml').then(() => getUasRemoteSdp());
     })
-    .then(() => {
-      return t.pass('b2b handles INVITE with late sdp');
+    .then((uasRemoteSdp) => {
+      t.pass('b2b handles INVITE with late sdp');
+      return t.ok(/m=audio/.test(uasRemoteSdp || ''),
+        'uas.remote.sdp holds the SDP answer from the A-leg ACK on a 3pcc call');
     })
     .then(() => {
       b2b.disconnect();
