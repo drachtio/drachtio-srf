@@ -176,6 +176,28 @@ test('B2B', (t) => {
       });
     })
 
+    // pass a failure code that is not in sip-status (608 Rejected)
+    .then(() => {
+      debug('starting sipp');
+      b2b.expectFailure('sip:sipp-uas-608', 608);
+      const sippUas608 = sippUas('uas-608.xml', 'sipp-uas-608');
+      return new Promise((resolve) => setTimeout(resolve, 1500))
+        .then(() => sippUac('uac-expect-608.xml'))
+        .then(() => sippUas608);
+    })
+    .then(() => {
+      return t.pass('b2b passes non-standard failure code 608');
+    })
+    .then(() => {
+      b2b.disconnect();
+      return new Promise((resolve, reject) => {
+        setTimeout(() => {
+          b2b = new B2b();
+          resolve();
+        }, 100);
+      });
+    })
+
     // dont pass failure
     .then(() => {
       debug('starting sipp');
