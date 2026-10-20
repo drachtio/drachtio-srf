@@ -4,6 +4,11 @@ console.log('Run unit tests');
 
 exec('"npm" run unittests', (err, stdout, stderr) => {
     console.log(stdout);
+    if (err) {
+        console.error(stderr);
+        console.error('unit tests failed');
+        process.exit(1);
+    }
 
     console.log('Run integration tests');
 
