@@ -32,6 +32,34 @@ function buildSubscribeDialog() {
   return new Dialog(srf, 'uac', {req, res});
 }
 
+/* A uas INVITE dialog, e.g. the transferee leg of a REFER transfer. */
+function buildInviteDialog() {
+  const req = {
+    method: 'INVITE',
+    body: 'v=0',
+    ...header({contact: '<sip:remote@127.0.0.1>'}),
+    getParsedHeader: (h) => 'from' === h ?
+      {params: {tag: 'remote-tag'}} : [{uri: 'sip:remote@127.0.0.1'}]
+  };
+  const res = {
+    agent: {},
+    stackDialogId: 'dialog-2',
+    ...header({'call-id': 'call-2'})
+  };
+  const sent = {
+    body: 'v=0',
+    ...header({contact: '<sip:local@127.0.0.1>'}),
+    getParsedHeader: (h) => 'to' === h ?
+      {params: {tag: 'local-tag'}} : [{uri: 'sip:local@127.0.0.1'}]
+  };
+  const srf = {removeDialog: () => {}};
+  return new Dialog(srf, 'uas', {req, res, sent});
+}
+
+function bye() {
+  return {method: 'BYE', meta: {source: 'network'}, ...header({})};
+}
+
 function notify(state) {
   return {
     method: 'NOTIFY',
@@ -83,8 +111,43 @@ describe('Dialog in-dialog NOTIFY', function() {
     dialog.on('destroy', () => order.push('destroy'));
 
     await nextTurn();
-    await nextTurn();
     order.should.eql(['notify', 'destroy']);
     dialog.connected.should.be.false();
+  });
+});
+
+describe('Dialog requests received just before a BYE', function() {
+  it('delivers a NOTIFY followed by a BYE in arrival order', async function() {
+    const dialog = buildInviteDialog();
+    const order = [];
+    dialog.on('notify', () => order.push('notify'));
+    dialog.on('destroy', () => order.push('destroy'));
+
+    // the end of a REFER transfer: final NOTIFY, then the transferee hangs up
+    dialog.handle({
+      method: 'NOTIFY', ...header({event: 'refer', 'subscription-state': 'terminated;reason=noresource'})
+    }, recordingRes());
+    const byeRes = recordingRes();
+    dialog.handle(bye(), byeRes);
+
+    byeRes.sent.length.should.equal(1);
+    byeRes.sent[0][0].should.equal(200);
+    dialog.connected.should.be.false();
+    await nextTurn();
+    order.should.eql(['notify', 'destroy']);
+    dialog.listenerCount('destroy').should.equal(0);
+  });
+
+  it('delivers a REFER followed by a BYE in arrival order', async function() {
+    const dialog = buildInviteDialog();
+    const order = [];
+    dialog.on('refer', () => order.push('refer'));
+    dialog.on('destroy', () => order.push('destroy'));
+
+    dialog.handle({method: 'REFER', ...header({'refer-to': '<sip:bob@127.0.0.1>'})}, recordingRes());
+    dialog.handle(bye(), recordingRes());
+
+    await nextTurn();
+    order.should.eql(['refer', 'destroy']);
   });
 });
