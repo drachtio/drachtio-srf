@@ -68,4 +68,32 @@ describe('Dialog in-dialog SUBSCRIBE', function() {
     res.sent.length.should.equal(1);
     res.sent[0][0].should.equal(489);
   });
+
+  it('delivers an unsubscribe to a listener attached right after the dialog is resolved', async function() {
+    const dialog = buildDialog();
+    const res = recordingRes();
+    let unsubscribed = 0;
+
+    dialog.handle(subscribe(0), res);
+    await Promise.resolve();
+    dialog.on('unsubscribe', () => unsubscribed++);
+
+    await new Promise((resolve) => setImmediate(resolve));
+    unsubscribed.should.equal(1);
+    res.sent.length.should.equal(1);
+    res.sent[0][0].should.equal(202);
+  });
+
+  it('delivers a SUBSCRIBE and a following unsubscribe in arrival order', async function() {
+    const dialog = buildDialog();
+    const order = [];
+    dialog.on('subscribe', () => order.push('subscribe'));
+    dialog.on('unsubscribe', () => order.push('unsubscribe'));
+
+    dialog.handle(subscribe(3600), recordingRes());
+    dialog.handle(subscribe(0), recordingRes());
+
+    await new Promise((resolve) => setImmediate(resolve));
+    order.should.eql(['subscribe', 'unsubscribe']);
+  });
 });
