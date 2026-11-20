@@ -65,4 +65,28 @@ describe('wire-protocol reconnect over TLS', function() {
     mock.firstBytes[0].should.equal(0x16);
     mock.firstBytes[1].should.equal(0x16);
   });
+
+  it('stops after maxAttempts when every TLS handshake fails', async function() {
+    // TCP connects every time, then the handshake is cut, as with an expired certificate.
+    let connections = 0;
+    server = net.createServer((socket) => {
+      connections++;
+      socket.on('error', () => {});
+      socket.once('data', () => socket.destroy());
+    });
+    await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
+    wp = new WireProtocol({});
+    wp.on('error', () => {});
+
+    wp.connect({
+      host: '127.0.0.1',
+      port: server.address().port,
+      tls: {rejectUnauthorized: false},
+      reconnect: {maxAttempts: 3},
+    });
+    // three attempts need about 0.7 s with the default backoff (255 ms, then 433 ms)
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+
+    connections.should.equal(3);
+  });
 });
