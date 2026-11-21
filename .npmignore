@@ -1,0 +1,6 @@
+test/
+examples/
+config/
+.eslintrc*
+eslint.config.mjs
+pre-commit.sh
