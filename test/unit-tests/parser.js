@@ -156,6 +156,20 @@ describe('Parser', function () {
     var msg = new SipMessage(examples('siprec3'));
     msg.payload.length.should.eql(2);
   });
+  it('should keep blank lines inside a multi-part part', function () {
+    const sdp = 'v=0\r\no=- 1 1 IN IP4 1.2.3.4\r\ns=-\r\nc=IN IP4 1.2.3.4\r\nt=0 0\r\nm=audio 5000 RTP/AVP 0\r\n';
+    const xml = '<?xml version="1.0"?>\r\n<recording>\r\n\r\n  <session/>\r\n</recording>';
+    const body = 'preamble\r\n--b.1+x\r\ncontent-type: application/sdp\r\n\r\n' + sdp +
+      '--b.1+x\r\nContent-Type: application/rs-metadata+xml\r\nContent-Disposition: recording-session\r\n\r\n' +
+      xml + '\r\n--b.1+x--\r\n';
+    const msg = new SipMessage('INVITE sip:srs@1.2.3.4 SIP/2.0\r\n' +
+      'Content-Type: multipart/mixed;boundary="b.1+x"\r\n' +
+      `Content-Length: ${body.length}\r\n\r\n` + body);
+    msg.payload.should.eql([
+      {type: 'application/sdp', content: sdp},
+      {type: 'application/rs-metadata+xml', content: xml + '\r\n'}
+    ]);
+  });
   it('should parse a sip uri with a dash or underscore', function () {
     var uri = parseUri('sip:service@test_sipp-uas_1.com');
     uri.family.should.eql('ipv4');
